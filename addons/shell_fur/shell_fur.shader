@@ -16,7 +16,7 @@ uniform float length_rand = 0.3;
 uniform float ao = 1.0;
 uniform float gravity = 0.1;
 
-// Should no be changed on the material, only through script.
+// Should not be changed on the material, only through script.
 uniform int layers = 40;
 uniform bool use_blend_shapes = false;
 uniform float blend_shape_multiplier = 1.0;

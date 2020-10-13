@@ -33,8 +33,3 @@ window/vsync/use_vsync=false
 [editor_plugins]
 
 enabled=PoolStringArray( "shell_fur" )
-
-[logging]
-
-file_logging/enable_file_logging=true
-file_logging/log_path="C:\\Users\\Kasper\\Documentss/godot.log"
