@@ -11,7 +11,9 @@ static func update_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, mater
 	# Blendshape_index of -1 means not to use blendshapes
 	if blendshape_index != -1:
 		new_mesh = _blendshape_to_vertex_color(new_mesh, material, blendshape_index)
-		
+	else:
+		new_mesh = _normals_to_vertex_color(new_mesh, material)
+	
 	mmi.multimesh.mesh = new_mesh
 	
 	mmi.multimesh.instance_count = layers
@@ -29,6 +31,7 @@ static func update_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, mater
 			var grey = float(i) / float(layers / 4) + float(LOD_layer) * 1.0 / float(layers)
 			mmi.multimesh.set_instance_color(index, Color(1.0, 1.0, 1.0, grey))
 			index += 1
+
 
 static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendshape_index: int) -> Mesh:
 	var mdt = MeshDataTool.new()
@@ -74,6 +77,22 @@ static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendsh
 	mdt.commit_to_surface(new_mesh)
 	return new_mesh
 
+
+static func _normals_to_vertex_color(mesh: Mesh, material : Material) -> Mesh:
+	var mdt = MeshDataTool.new()
+	
+	material.set_shader_param("blend_shape_multiplier", 1.0)
+	
+	mdt.create_from_surface(_multiple_surfaces_to_single(mesh), 0)
+	for i in range(mdt.get_vertex_count()):
+		var normal_scaled = mdt.get_vertex_normal(i) * 0.5 + Vector3(0.5, 0.5, 0.5)
+		mdt.set_vertex_color(i, Color(normal_scaled.x, normal_scaled.y, normal_scaled.z))
+	
+	var new_mesh = Mesh.new()
+	mdt.commit_to_surface(new_mesh)
+	return new_mesh
+
+
 static func _multiple_surfaces_to_single(mesh : Mesh) -> Mesh:
 	var st := SurfaceTool.new()
 	
@@ -95,6 +114,8 @@ static func generate_mesh_shells(shell_fur_object : Spatial, parent_object : Spa
 	
 	if blendshape_index != -1:
 		copy_mesh = _blendshape_to_vertex_color(copy_mesh, material, blendshape_index)
+	else:
+		copy_mesh = _normals_to_vertex_color(copy_mesh, material)
 	
 	var merged_mesh = _multiple_surfaces_to_single(copy_mesh)
 

@@ -18,25 +18,26 @@ uniform float gravity = 0.1;
 
 // Should not be changed on the material, only through script.
 uniform int layers = 40;
-uniform bool use_blend_shapes = false;
 uniform float blend_shape_multiplier = 1.0;
+varying vec3 adjusted_color;
+varying vec3 gravity_vec;
 
 void vertex() {
-	// rescaling the color values into modelspace, this will just come out as a neutral value if no blendshape is used
-	vec3 adjusted_color = (vec3(COLOR.xyz) * 2.0 - 1.0) * blend_shape_multiplier; 
+	// rescaling the color values into vectors.
+	adjusted_color = (vec3(COLOR.xyz) * 2.0 - 1.0) * blend_shape_multiplier; 
 	
-	if (use_blend_shapes) {
-		VERTEX += (adjusted_color.xyz * fur_length * COLOR.a) + adjusted_color.xyz * (fur_length / float(layers)); 
-		// Below is an attempt to make the fur bend towards the blend shape, but I think I'd need to add some control to that
-		//VERTEX += mix(NORMAL * (fur_length / float(layers)), adjusted_color.xyz, COLOR.a) * blend_shape_multiplier * fur_length * COLOR.a  + adjusted_color.xyz * (fur_length / float(layers));
-	} else {
-		VERTEX += NORMAL * fur_length * COLOR.a + NORMAL * (fur_length / float(layers));
-	}
+	VERTEX += (adjusted_color.xyz * fur_length * COLOR.a) + adjusted_color.xyz * (fur_length / float(layers)); 
+	// Below is an attempt to make the fur bend towards the blend shape, but I think I'd need to add some control to that
+	//VERTEX += mix(NORMAL * (fur_length / float(layers)), adjusted_color.xyz, COLOR.a) * blend_shape_multiplier * fur_length * COLOR.a  + adjusted_color.xyz * (fur_length / float(layers));
+
 		
-	vec3 world_down = (vec4(0.0, -1.0, 0.0, 0.0) * WORLD_MATRIX).xyz;
+	gravity_vec = (vec4(0.0, -1.0, 0.0, 0.0) * WORLD_MATRIX).xyz * length(adjusted_color) * smoothstep(0.0, 1.0, COLOR.a * gravity);
 	
-	VERTEX += world_down * length(adjusted_color) * smoothstep(0.0, 1.0, COLOR.a * gravity);
-	
+	VERTEX += gravity_vec;
+}
+
+vec3 projectOnPlane( vec3 vec, vec3 normal ) {
+    return vec - normal * ( dot( vec, normal ) / dot( normal, normal ) );
 }
 
 void fragment() {
@@ -47,6 +48,7 @@ void fragment() {
 	//if (mod(COLOR.a + every_other_layer * .25, every_other_layer) > every_other_layer * .5) {
 	//	discard;
 	//}
+	NORMAL = projectOnPlane(VIEW, normalize(adjusted_color.xyz + gravity_vec));
 	
 	vec2 pattern = texture(pattern_texture, UV * density).rg;
 	float strand = pattern.r;

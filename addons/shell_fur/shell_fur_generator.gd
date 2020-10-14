@@ -84,7 +84,6 @@ func _enter_tree() -> void:
 		# adding the node.
 		_update_fur(0.05)
 		_delayed_position_correction()
-		print("What is pattern selector at this point?" + str(pattern_selector))
 		set_pattern_texture(load(PATTERNS[pattern_selector]))
 
 func _analyse_parent() -> void:
@@ -100,7 +99,6 @@ func _analyse_parent() -> void:
 
 func _update_fur(delay : float) -> void:
 	yield(get_tree().create_timer(delay), "timeout")
-	_material.set_shader_param("use_blend_shapes", use_blendshape)
 	var b_index : int = blendshape_index if use_blendshape else -1
 	for child in get_children():
 		remove_child(child)
