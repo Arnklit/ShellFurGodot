@@ -11,7 +11,7 @@ Copy the folder addons/shell_fur into your project and activate the add-on from 
 
 Purpose
 -------
-I was inspired by games like Shadow of the Colossus and Red Dead Redemption 2 which used this technique to try and make my own implementation in Godot.
+I was inspired by games like Shadow of the Colossus and Red Dead Redemption 2 which uses this technique to try and make my own implementation in Godot.
 
 Usage
 -----
@@ -49,7 +49,8 @@ Top: Base mesh, Middle: Blendshape, Bottom: Fur styled by blendshape
 
 Current Limitations
 -------------------
-- No wind or other physics currently.
-- No LOD system currently.
-- While the fur can be styled with blendshapes, it does not currently inheirit the blendshapes from the mesh, so it is not possible to deform the base mesh with blendshapes and have the fur follow the shape.
-- The normals are not corrected along the fur strands, so low roughness settings will not look correct.
+- No wind. Currently working on implementing a 3D perlin noise for vertex displacement.
+- No LOD system currently. I will add the option to have the number of layers decrease at a given distance and have the fur fade away beyond that.
+- While the fur can be styled with blendshapes, it does not currently inheirit the blendshapes from the mesh, so it is not possible to deform the base mesh with blendshapes and have the fur follow the shape. It should be possible to have this fixed, but I haven't looked into it yet.
+- Since the fur is made up of shells that are paralel to the surface, the fur can look pretty bad when seen from the side. This is somewhat mitigated by using the blendshape styling but could be further improved by adding in generated fur fins around the contour of the mesh.
+- No options for texture tiling on color texture and height texture. These will be added soon so its easier to use the tool for stuff like grass.
