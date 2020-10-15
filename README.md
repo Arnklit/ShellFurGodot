@@ -1,6 +1,6 @@
 # Shell Fur and Grass Add-on for Godot Engine
 
-![image](https://user-images.githubusercontent.com/4955051/95903332-e9438c00-0d8d-11eb-9c76-368189795cff.png)
+![image](https://user-images.githubusercontent.com/4955051/96116171-f1abdc00-0edf-11eb-8ca4-89c05c0f52b4.png)
 
 Add-on that adds a fur node to Godot 3.2.
 
@@ -49,8 +49,8 @@ Top: Base mesh, Middle: Blendshape, Bottom: Fur styled by blendshape
 
 Current Limitations
 -------------------
-- No wind. Currently working on implementing a 3D perlin noise for vertex displacement.
 - No LOD system currently. I will add the option to have the number of layers decrease at a given distance and have the fur fade away beyond that.
-- While the fur can be styled with blendshapes, it does not currently inheirit the blendshapes from the mesh, so it is not possible to deform the base mesh with blendshapes and have the fur follow the shape. It should be possible to have this fixed, but I haven't looked into it yet.
 - Since the fur is made up of shells that are paralel to the surface, the fur can look pretty bad when seen from the side. This is somewhat mitigated by using the blendshape styling but could be further improved by adding in generated fur fins around the contour of the mesh.
-- No options for texture tiling on color texture and height texture. These will be added soon so its easier to use the tool for stuff like grass.
+- Aliasing. Since Godot doesn't have any FXAA or TAA the hair can ends up loking very noisy with aliasing.
+- Limited physics interactions. The fur has a simple gravity and wind system, but does not react to things like momentum. This will be added eventually.
+- Limitations to skinned meshes. When the fur is applied to skinned meshes, MultiMeshInstance method cannot be used, so a custom mesh is generated with many layers. This is heavy on skinning performance and currently blendshapes are not copied over, so the fur will not adhere to blendshape changes on the base mesh. Using material passes would bypass this issue, but would cause a lot of drawcalls. I'm still looking into a solution for this.
