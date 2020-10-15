@@ -48,8 +48,7 @@ export(float, 0.0, 5.0) var wind_speed := 1.0 setget set_wind_speed
 export(float, 0.0, 5.0) var wind_scale := 1.0 setget set_wind_scale
 export(float, 0.0, 360) var wind_angle := 0.0 setget set_wind_angle
 export(Shader) var custom_shader : Shader setget set_custom_shader
-export(bool) var use_blendshape := false setget set_use_blendshape
-export(int) var blendshape_index := 0 setget set_blendshape_index
+export(int) var blendshape_index := -1 setget set_blendshape_index
 export(float, 0.0, 1.0) var normal_bias := 0.0 setget set_normal_bias
 
 var _parent_is_mesh_instance = false 
@@ -65,7 +64,6 @@ var _skeleton_object
 
 
 func _init() -> void:
-	print("init is run")
 	_default_shader = load(DEFAULT_SHADER_PATH)
 	_material = ShaderMaterial.new()
 	_material.shader = _default_shader
@@ -78,10 +76,11 @@ func _enter_tree() -> void:
 	
 	_analyse_parent()
 	
+	# Calling this in case the blendshaping has been active but the node is
+	# being moved to a new mesh that might not have blend shapes
+	set_blendshape_index(blendshape_index)
+	
 	if _parent_has_mesh_assigned:
-		# This should disable use_blendshape if it's enabled and get's moved to 
-		# a mesh that doesn't support blend shapes.
-		set_use_blendshape(use_blendshape) 
 		# Delaying the fur update to avoid throwing below error on reparenting
 		# ERROR "scene/main/node.cpp:1554 - Condition "!owner_valid" is true."
 		# Not sure why this is thrown, since it's not a problem when first
@@ -103,18 +102,17 @@ func _analyse_parent() -> void:
 
 func _update_fur(delay : float) -> void:
 	yield(get_tree().create_timer(delay), "timeout")
-	var b_index : int = blendshape_index if use_blendshape else -1
 	for child in get_children():
 		remove_child(child)
 	
 	if _parent_has_skin_assigned:
-		_fur_generation_helper.generate_mesh_shells(self, _parent_object, layers, _material, b_index)
+		_fur_generation_helper.generate_mesh_shells(self, _parent_object, layers, _material, blendshape_index)
 		_fur_generation_helper.generate_combined(self, _parent_object, _material)
 	else:
 		_multimeshInstance = MultiMeshInstance.new()
 		add_child(_multimeshInstance)
 		_multimeshInstance.set_owner(get_tree().get_edited_scene_root()) 
-		_fur_generation_helper.update_mmi(layers, _multimeshInstance, _parent_object.mesh, _material, b_index)
+		_fur_generation_helper.update_mmi(layers, _multimeshInstance, _parent_object.mesh, _material, blendshape_index)
 
 func _exit_tree() -> void:
 	print("_exit_tree is called")
@@ -125,7 +123,7 @@ func _exit_tree() -> void:
 
 func _delayed_position_correction() -> void:
 	# This is delayed because some transform correction appears to be called
-	# internall after _enter_tree and that overrides this value if it's not 
+	# internally after _enter_tree and that overrides this value if it's not 
 	# delayed
 	yield(get_tree().create_timer(0.1), "timeout")
 	transform = Transform.IDENTITY
@@ -142,6 +140,7 @@ func _get_configuration_warning() -> String:
 func set_pattern_selector(var index) -> void:
 	set_pattern_texture(load(PATTERNS[index]))
 	pattern_selector = index
+
 
 func set_pattern_texture(var texture) -> void:
 	pattern_texture = texture
@@ -250,7 +249,6 @@ func set_wind_scale(var new_wind_scale) -> void:
 func set_wind_angle(var new_wind_angle) -> void:
 	wind_angle = new_wind_angle
 	var angle_vector = Vector2(cos(deg2rad(wind_angle)), sin(deg2rad(wind_angle)))
-	print("the angle vector is: " + str(angle_vector))
 	_material.set_shader_param("wind_angle", Vector3(angle_vector.x, 0.0, angle_vector.y))
 
 func set_custom_shader(shader: Shader) -> void:
@@ -268,50 +266,37 @@ func set_custom_shader(shader: Shader) -> void:
 				shader.code = _default_shader.code
 
 
-func set_use_blendshape(value: bool) -> void:
-	if use_blendshape == value:
-		return
-	if _first_enter_tree:
-		use_blendshape = value
-		return
-	
-	if value:
-		if _parent_has_mesh_assigned:
-			if _parent_object.mesh.is_class("ArrayMesh"):
-				if _parent_object.mesh.get_blend_shape_count() > 0:
-					use_blendshape = value
-					_update_fur(0.0)
-					return
-	else:
-		use_blendshape = value
-		_update_fur(0.0)
-		return
-	push_warning("There are no blendshapes on the parent mesh.")
-	use_blendshape = false
-
 func set_blendshape_index(index: int) -> void:
 	if _first_enter_tree:
 		blendshape_index = index
 		return
-	
-	if not use_blendshape:
-		push_warning("'Use Blendshape' must be enabled before setting the index.")
+
+	if index != -1:
+		if _parent_has_mesh_assigned:
+			if _parent_object.mesh.is_class("ArrayMesh"):
+				if _parent_object.mesh.get_blend_shape_count() > 0:
+					var b_shapes = _parent_object.mesh.get_blend_shape_count()
+					if index != 0 and b_shapes == 1:
+						push_warning("There is only one blend shape, index has to be '0', or '-1' to disable blend shape styling.")
+						return
+					if index < 0 or index > b_shapes - 1:
+						push_warning("There are only " + str(b_shapes) + " blend shapes on the mesh, index has to be between '0' and '" + str(b_shapes - 1) + "', or '-1' to disable blend shape styling.")
+						return
+					blendshape_index = index
+					_update_fur(0.1)
+					return
+	else:
+		blendshape_index = -1
+		_update_fur(0.1)
 		return
-	var b_shapes = _parent_object.mesh.get_blend_shape_count()
-	if index != 0 and b_shapes == 1:
-		push_warning("There is only one blend shape, index has to be '0'.")
-		return
-	if index < 0 or index > b_shapes - 1:
-		push_warning("There are only " + str(b_shapes) + " blend shapes on the mesh, index has to be between 0 and " + str(b_shapes - 1) + ".")
-		return
-	blendshape_index = index
-	set_layers(layers)
+	push_warning("There are no blend shapes on parent mesh.")
+	blendshape_index = -1
+	_update_fur(0.1)
 
 
 func set_normal_bias(value: float) -> void:
-	if not use_blendshape:
+	if blendshape_index == -1:
 		push_warning("Normal Bias only affects fur using blendshape styling.")
 		return
 	normal_bias = value
 	_material.set_shader_param("normal_bias", normal_bias)
-	
