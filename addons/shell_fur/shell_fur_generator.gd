@@ -30,31 +30,35 @@ export(int, "Fine Hair", "Rough Hair", "Moss") var pattern_selector setget set_p
 export(Color, RGB) var base_color := Color(0.43, 0.35, 0.29) setget set_base_color
 export(Color, RGB) var tip_color := Color(0.78, 0.63, 0.52) setget set_tip_color
 export(Texture) var color_texture setget set_color_texture
+export(Texture) var length_texture setget set_length_texture
+export(Vector2) var texture_tiling := Vector2(1.0, 1.0) setget set_texture_tiling
 export(Color, RGB) var transmission := Color(0.3, 0.3, 0.3) setget set_transmission
 export(float, 0.0, 1.0) var roughness := 1.0 setget set_roughness
+export(float, 0.0, 1.0) var normal_correction := 1.0 setget set_normal_correction
 export(int, 4, 100, 4) var layers = 40 setget set_layers
 export(float, 0.0, 20.0) var density := 5.0 setget set_density
 export(float, 0.0, 5.0) var length := 0.5 setget set_length
-export(Texture) var length_texture setget set_length_texture
 export(float, 0.0, 1.0) var length_rand := 0.3 setget set_length_rand
 export(float, 0.0, 1.0) var thickness_base := 0.65 setget set_thickness_base
 export(float, 0.0, 1.0) var thickness_tip := 0.3 setget set_thickness_tip
 export(float, 0.0, 2.0) var ao := 1.0 setget set_ao
 export(float, 0.0, 1.0) var gravity := 0.1 setget set_gravity
+export(float, 0.0, 5.0) var wind_strength := 0.0 setget set_wind_strength
+export(float, 0.0, 5.0) var wind_speed := 1.0 setget set_wind_speed
+export(float, 0.0, 5.0) var wind_scale := 1.0 setget set_wind_scale
+export(float, 0.0, 360) var wind_angle := 0.0 setget set_wind_angle
 export(Shader) var custom_shader : Shader setget set_custom_shader
 export(bool) var use_blendshape := false setget set_use_blendshape
 export(int) var blendshape_index := 0 setget set_blendshape_index
+export(float, 0.0, 1.0) var normal_bias := 0.0 setget set_normal_bias
 
-# Values stored, but hidden from inspector, see _get_property_list() at the end of the file
 var _parent_is_mesh_instance = false 
 var _parent_has_mesh_assigned = false 
 var _parent_has_skin_assigned = false
-
 var _material: ShaderMaterial = null
 var _default_shader: Shader = null
 var _multimeshInstance : MultiMeshInstance = null
 var _fur_generation_helper
-
 var _first_enter_tree := true
 var _parent_object : Spatial
 var _skeleton_object
@@ -149,6 +153,16 @@ func set_color_texture(var texture) -> void:
 	_material.set_shader_param("color_texture", texture)
 
 
+func set_length_texture(var texture) -> void:
+	length_texture = texture
+	_material.set_shader_param("length_texture", texture)
+
+
+func set_texture_tiling(tiling : Vector2) -> void:
+	texture_tiling = tiling
+	_material.set_shader_param("tiling", tiling)
+
+
 func set_base_color(var new_color) -> void:
 	base_color = new_color;
 	_material.set_shader_param("base_color", new_color)
@@ -169,6 +183,11 @@ func set_roughness(var new_roughness) -> void:
 	_material.set_shader_param("roughness", new_roughness)
 
 
+func set_normal_correction(var new_normal_correction) -> void:
+	normal_correction = new_normal_correction
+	_material.set_shader_param("normal_correction", new_normal_correction)
+
+
 func set_layers(var new_layers) -> void:
 	if layers == new_layers:
 		return
@@ -186,11 +205,6 @@ func set_density(var new_desity) -> void:
 func set_length(var new_length) -> void:
 	length = new_length
 	_material.set_shader_param("fur_length", new_length)
-
-
-func set_length_texture(var texture) -> void:
-	length_texture = texture
-	_material.set_shader_param("length_texture", texture)
 
 
 func set_length_rand(var new_length_rand) -> void:
@@ -217,6 +231,27 @@ func set_gravity(var new_gravity) -> void:
 	gravity = new_gravity
 	_material.set_shader_param("gravity", new_gravity)
 
+
+func set_wind_strength(var new_wind_strength) -> void:
+	wind_strength = new_wind_strength
+	_material.set_shader_param("wind_strength", wind_strength)
+
+
+func set_wind_speed(var new_wind_speed) -> void:
+	wind_speed = new_wind_speed
+	_material.set_shader_param("wind_speed", wind_speed)
+
+
+func set_wind_scale(var new_wind_scale) -> void:
+	wind_scale = new_wind_scale
+	_material.set_shader_param("wind_scale", wind_scale)
+
+
+func set_wind_angle(var new_wind_angle) -> void:
+	wind_angle = new_wind_angle
+	var angle_vector = Vector2(cos(deg2rad(wind_angle)), sin(deg2rad(wind_angle)))
+	print("the angle vector is: " + str(angle_vector))
+	_material.set_shader_param("wind_angle", Vector3(angle_vector.x, 0.0, angle_vector.y))
 
 func set_custom_shader(shader: Shader) -> void:
 	if custom_shader == shader:
@@ -272,22 +307,11 @@ func set_blendshape_index(index: int) -> void:
 	blendshape_index = index
 	set_layers(layers)
 
-# Override _get_property_list to save variables without displaying them in the inspector.
-func _get_property_list() -> Array:
-	return [
-				{
-			"name": "_parent_is_mesh_instance",
-			"type": TYPE_BOOL,
-			"usage": PROPERTY_USAGE_STORAGE
-		},
-		{
-			"name": "_parent_has_mesh_assigned",
-			"type": TYPE_BOOL,
-			"usage": PROPERTY_USAGE_STORAGE
-		},
-		{
-			"name": "_parent_has_skin_assigned",
-			"type": TYPE_BOOL,
-			"usage": PROPERTY_USAGE_STORAGE
-		},
-	]
+
+func set_normal_bias(value: float) -> void:
+	if not use_blendshape:
+		push_warning("Normal Bias only affects fur using blendshape styling.")
+		return
+	normal_bias = value
+	_material.set_shader_param("normal_bias", normal_bias)
+	
