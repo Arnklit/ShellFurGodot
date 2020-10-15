@@ -74,13 +74,11 @@ void vertex() {
 	// Rescaling the color values into vectors.
 	extrusion_vec = (vec3(COLOR.xyz) * 2.0 - 1.0) * blend_shape_multiplier; 
 	
-	float layerdepth = fur_length / float(layers);
-	// Extruding the  shells according tho the vertex color data
-	//VERTEX += (extrusion_vec.xyz * fur_length * COLOR.a) + extrusion_vec.xyz * layerdepth; 
-	// Below is an attempt to make the fur bend towards the blend shape, but I think I'd need to add some control to that
-	vec3 normal_biased_extrude = mix(NORMAL * layerdepth, extrusion_vec.xyz, COLOR.a);
-	vec3 non_biased_extrude = extrusion_vec.xyz * fur_length * COLOR.a;
-	VERTEX += mix(non_biased_extrude, normal_biased_extrude, smoothstep(0.0, 2.0, normal_bias)) * blend_shape_multiplier * fur_length * COLOR.a  + extrusion_vec.xyz * layerdepth;
+	vec3 normal_biased_extrude = mix(NORMAL, extrusion_vec.xyz, COLOR.a);
+	vec3 interpolated_extrude = mix(extrusion_vec, normal_biased_extrude, smoothstep(0.0, 2.0, normal_bias));
+	vec3 offset_from_surface = interpolated_extrude * fur_length / float(layers);
+	VERTEX += extrusion_vec * fur_length * COLOR.a + offset_from_surface;
+	//VERTEX += extrusion_vec
 
 	vec3 winduv = VERTEX * wind_scale;
 	winduv.y += TIME * wind_speed;	

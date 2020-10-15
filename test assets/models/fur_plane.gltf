@@ -15,23 +15,22 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "Blend Plane"
+            "name" : "fur_plane"
         }
     ],
     "materials" : [
         {
-            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
                 0
             ],
-            "name" : "Blend Plane",
+            "name" : "fur_plane",
             "pbrMetallicRoughness" : {
                 "baseColorFactor" : [
-                    0.800000011920929,
-                    0.800000011920929,
-                    0.800000011920929,
+                    0.7528364658355713,
+                    0.23563402891159058,
+                    0.8000000715255737,
                     1
                 ],
                 "metallicFactor" : 0,
@@ -43,11 +42,10 @@
         {
             "extras" : {
                 "targetNames" : [
-                    "Key 1",
-                    "Key 2"
+                    "Key 1"
                 ]
             },
-            "name" : "Plane",
+            "name" : "fur_plane_mesh",
             "primitives" : [
                 {
                     "attributes" : {
@@ -61,16 +59,11 @@
                         {
                             "POSITION" : 4,
                             "NORMAL" : 5
-                        },
-                        {
-                            "POSITION" : 6,
-                            "NORMAL" : 7
                         }
                     ]
                 }
             ],
             "weights" : [
-                0,
                 0
             ]
         }
@@ -79,128 +72,96 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 1089,
+            "count" : 81,
             "max" : [
-                1.0000001192092896,
+                1,
                 0,
-                1.0000001192092896
+                1
             ],
             "min" : [
-                -1.0000001192092896,
+                -1,
                 0,
-                -1.0000001192092896
+                -1
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 1089,
+            "count" : 81,
             "type" : "VEC3"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 1089,
+            "count" : 81,
             "type" : "VEC2"
         },
         {
             "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 6144,
+            "count" : 384,
             "type" : "SCALAR"
         },
         {
             "bufferView" : 4,
             "componentType" : 5126,
-            "count" : 1089,
+            "count" : 81,
             "max" : [
-                -0.0031294822692871094,
-                0.39671993255615234,
-                -0.013807117938995361
+                0.733018159866333,
+                0.9950815439224243,
+                1.4901161193847656e-07
             ],
             "min" : [
-                -0.12402554601430893,
-                0.0002093873918056488,
-                -0.5914618372917175
+                0.5203288793563843,
+                0.5469150543212891,
+                0
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 5,
             "componentType" : 5126,
-            "count" : 1089,
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 6,
-            "componentType" : 5126,
-            "count" : 1089,
-            "max" : [
-                0.17392395436763763,
-                -0.09101758897304535,
-                -0.0017470121383666992
-            ],
-            "min" : [
-                0.02749049663543701,
-                -0.5758391618728638,
-                -0.011052938178181648
-            ],
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 7,
-            "componentType" : 5126,
-            "count" : 1089,
+            "count" : 81,
             "type" : "VEC3"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 13068,
+            "byteLength" : 972,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
-            "byteLength" : 13068,
-            "byteOffset" : 13068
+            "byteLength" : 972,
+            "byteOffset" : 972
         },
         {
             "buffer" : 0,
-            "byteLength" : 8712,
-            "byteOffset" : 26136
+            "byteLength" : 648,
+            "byteOffset" : 1944
         },
         {
             "buffer" : 0,
-            "byteLength" : 12288,
-            "byteOffset" : 34848
+            "byteLength" : 768,
+            "byteOffset" : 2592
         },
         {
             "buffer" : 0,
-            "byteLength" : 13068,
-            "byteOffset" : 47136
+            "byteLength" : 972,
+            "byteOffset" : 3360
         },
         {
             "buffer" : 0,
-            "byteLength" : 13068,
-            "byteOffset" : 60204
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 13068,
-            "byteOffset" : 73272
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 13068,
-            "byteOffset" : 86340
+            "byteLength" : 972,
+            "byteOffset" : 4332
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 99408,
-            "uri" : "blend_plane.bin"
+            "byteLength" : 5304,
+            "uri" : "fur_plane.bin"
         }
     ]
 }
