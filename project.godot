@@ -33,3 +33,7 @@ window/vsync/use_vsync=false
 [editor_plugins]
 
 enabled=PoolStringArray( "shell_fur" )
+
+[rendering]
+
+quality/filters/msaa=2
