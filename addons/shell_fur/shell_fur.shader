@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode cull_disabled, depth_draw_alpha_prepass;
+render_mode depth_draw_alpha_prepass;
 
 uniform sampler2D pattern_texture : hint_black;
 uniform vec4 base_color = vec4(0.43, 0.35, 0.29, 1.0);
@@ -21,6 +21,8 @@ uniform float wind_strength = 0.0;
 uniform float wind_speed = 1.0;
 uniform float wind_scale = 1.0;
 uniform vec3 wind_angle = vec3(1.0, 0.0, 0.0);
+uniform vec3 physics_pos_offset;
+uniform vec3 physics_rot_offset;
 uniform float normal_bias = 0.0;
 
 // Should not be changed on the material, only through script.
@@ -83,8 +85,9 @@ void vertex() {
 	winduv.y += TIME * wind_speed;	
 	vec3 wind_dir_flattened = projectOnPlane(wind_angle, NORMAL);
 	vec3 wind_vec = wind_dir_flattened * perlin3D(winduv, 0) * wind_strength;
+	vec3 spring_vec = projectOnPlane(physics_pos_offset, NORMAL);
 	
-	forces_vec = (vec4(vec3(0.0, -1.0, 0.0) * gravity + wind_vec, 0.0) * WORLD_MATRIX).xyz * length(extrusion_vec) * smoothstep(0.0, 2.0, COLOR.a);
+	forces_vec = (vec4(vec3(0.0, -1.0, 0.0) * gravity + wind_vec + spring_vec, 0.0) * WORLD_MATRIX).xyz * length(extrusion_vec) * smoothstep(0.0, 2.0, COLOR.a);
 	
 	VERTEX += forces_vec;
 }

@@ -36,7 +36,7 @@ export(Color, RGB) var transmission := Color(0.3, 0.3, 0.3) setget set_transmiss
 export(float, 0.0, 1.0) var roughness := 1.0 setget set_roughness
 export(float, 0.0, 1.0) var normal_correction := 1.0 setget set_normal_correction
 export(int, 4, 100, 4) var layers = 40 setget set_layers
-export(float, 0.0, 20.0) var density := 5.0 setget set_density
+export(float, 0.0, 100.0) var density := 5.0 setget set_density
 export(float, 0.0, 5.0) var length := 0.5 setget set_length
 export(float, 0.0, 1.0) var length_rand := 0.3 setget set_length_rand
 export(float, 0.0, 1.0) var thickness_base := 0.65 setget set_thickness_base
@@ -47,6 +47,8 @@ export(float, 0.0, 5.0) var wind_strength := 0.0 setget set_wind_strength
 export(float, 0.0, 5.0) var wind_speed := 1.0 setget set_wind_speed
 export(float, 0.0, 5.0) var wind_scale := 1.0 setget set_wind_scale
 export(float, 0.0, 360) var wind_angle := 0.0 setget set_wind_angle
+export(float, 0.0, 10.0) var spring := 4.0 
+export(float, 0.0, 1.0) var dampening := 0.9
 export(Shader) var custom_shader : Shader setget set_custom_shader
 export(int) var blendshape_index := -1 setget set_blendshape_index
 export(float, 0.0, 1.0) var normal_bias := 0.0 setget set_normal_bias
@@ -62,12 +64,24 @@ var _first_enter_tree := true
 var _parent_object : Spatial
 var _skeleton_object
 
+var _trans_momentum : Vector3
+onready var _physics_pos := global_transform.origin
+
+
+func _physics_process(delta: float) -> void:
+	var position_diff = global_transform.origin - _physics_pos
+	_trans_momentum += position_diff * spring
+	_physics_pos += _trans_momentum * delta
+	_material.set_shader_param("physics_pos_offset", -position_diff)
+	_trans_momentum *= dampening
+
 
 func _init() -> void:
 	_default_shader = load(DEFAULT_SHADER_PATH)
 	_material = ShaderMaterial.new()
 	_material.shader = _default_shader
 	_fur_generation_helper = preload("res://addons/shell_fur/fur_generation_helper.gd")
+	_physics_pos = global_transform.origin
 
 
 func _enter_tree() -> void:	
@@ -137,22 +151,22 @@ func _get_configuration_warning() -> String:
 	return ""
 
 
-func set_pattern_selector(var index) -> void:
-	set_pattern_texture(load(PATTERNS[index]))
-	pattern_selector = index
-
-
-func set_pattern_texture(var texture) -> void:
+func set_pattern_texture(texture : Texture) -> void:
 	pattern_texture = texture
 	_material.set_shader_param("pattern_texture", texture)
 
 
-func set_color_texture(var texture) -> void:
+func set_pattern_selector(index : int) -> void:
+	set_pattern_texture(load(PATTERNS[index]))
+	pattern_selector = index
+
+
+func set_color_texture(texture : Texture) -> void:
 	color_texture = texture
 	_material.set_shader_param("color_texture", texture)
 
 
-func set_length_texture(var texture) -> void:
+func set_length_texture(texture : Texture) -> void:
 	length_texture = texture
 	_material.set_shader_param("length_texture", texture)
 
