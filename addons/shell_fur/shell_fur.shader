@@ -83,15 +83,13 @@ void vertex() {
 
 	vec3 winduv = VERTEX * wind_scale;
 	winduv.y += TIME * wind_speed;	
-	vec3 wind_dir_flattened = projectOnPlane(wind_angle, NORMAL);
+	vec3 wind_angle_world = (vec4(wind_angle, 0) * WORLD_MATRIX).xyz;
+	vec3 wind_dir_flattened = projectOnPlane(wind_angle_world, NORMAL);
 	vec3 wind_vec = wind_dir_flattened * perlin3D(winduv, 0) * wind_strength;
-	vec3 spring_vec = projectOnPlane(physics_pos_offset, NORMAL);
-	
-	VERTEX = mix(VERTEX, (vec4(VERTEX, 0.0) * physics_rot_offset).xyz, COLOR.a);
-	
-	//forces_vec = (vec4(wind_vec + spring_vec, 0.0) * WORLD_MATRIX).xyz * length(extrusion_vec) * smoothstep(0.0, 2.0, COLOR.a);
-	
-	//VERTEX += forces_vec;
+	vec3 physics_pos_offset_world = (vec4(physics_pos_offset, 0) * WORLD_MATRIX).xyz;
+	vec3 spring_vec = projectOnPlane(physics_pos_offset_world, NORMAL);
+	forces_vec = (spring_vec + wind_vec) * length(extrusion_vec) * smoothstep(0.0, 2.0, COLOR.a);
+	VERTEX += forces_vec;
 }
 
 void fragment() {

@@ -58,9 +58,10 @@ var _first_enter_tree := true
 var _parent_object : Spatial
 var _skeleton_object
 var _trans_momentum : Vector3
-var _rot_momentum : Vector3
+#var _rot_momentum : Transform
 onready var _physics_pos := global_transform.origin
-onready var _physics_rot := global_transform.basis.get_euler()
+#onready var _physics_rot := global_transform
+
 
 func _physics_process(delta: float) -> void:
 	var position_diff := global_transform.origin - _physics_pos
@@ -69,41 +70,15 @@ func _physics_process(delta: float) -> void:
 	_physics_pos += _trans_momentum * delta
 	_trans_momentum *= dampening
 	
-	var rotation_diff := physics_rotation_correction(global_transform.basis.get_euler() - _physics_rot)
-	
-	_rot_momentum += rotation_diff * spring
-	_physics_rot += _rot_momentum * delta
-	_physics_rot = physics_rotation_correction(_physics_rot)
-	_rot_momentum *= dampening
-	
 	_material.set_shader_param("physics_pos_offset", -position_diff)
-	_material.set_shader_param("physics_rot_offset", Quat(rotation_diff))
 	
-	# Broken transform/quat version
+	# Broken transform/quat physics rotation
 	#var rotation_diff := global_transform * _physics_rot.inverse()
-	#_rot_momentum = _rot_momentum * Transform().interpolate_with(rotation_diff, spring)
-	#_physics_rot = _physics_rot * Transform().interpolate_with(_rot_momentum.orthonormalized(), delta)
+	#_rot_momentum *= Transform().interpolate_with(rotation_diff, spring)
+	#_physics_rot *= Transform().interpolate_with(_rot_momentum.orthonormalized(), delta)
 	#_rot_momentum = _rot_momentum.orthonormalized().interpolate_with(Transform(), dampening)
 
-
-func physics_rotation_correction(rot : Vector3) -> Vector3:
-	var new_rot = rot;
-	if rot.x > PI:
-		new_rot.x -= PI * 2
-	if rot.x < -PI:
-		new_rot.x += PI * 2
-	
-	if rot.y > PI:
-		new_rot.y -= PI * 2
-	if rot.y < -PI:
-		new_rot.y += PI * 2
-	
-	if rot.z > PI:
-		new_rot.z -= PI * 2
-	if rot.z < -PI:
-		new_rot.z += PI * 2
-	
-	return new_rot
+	#_material.set_shader_param("physics_rot_offset", rotation_diff * global_transform)
 
 
 func _init() -> void:
@@ -112,7 +87,7 @@ func _init() -> void:
 	_material.shader = _default_shader
 	_fur_generation_helper = preload("res://addons/shell_fur/fur_generation_helper.gd")
 	_physics_pos = global_transform.origin
-	_physics_rot = global_transform.basis.get_euler()
+	#_physics_rot = global_transform
 
 
 func _enter_tree() -> void:	
