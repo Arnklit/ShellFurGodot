@@ -22,7 +22,7 @@ uniform float wind_speed = 1.0;
 uniform float wind_scale = 1.0;
 uniform vec3 wind_angle = vec3(1.0, 0.0, 0.0);
 uniform vec3 physics_pos_offset;
-uniform vec3 physics_rot_offset;
+uniform mat4 physics_rot_offset;
 uniform float normal_bias = 0.0;
 
 // Should not be changed on the material, only through script.
@@ -87,10 +87,11 @@ void vertex() {
 	vec3 wind_vec = wind_dir_flattened * perlin3D(winduv, 0) * wind_strength;
 	vec3 spring_vec = projectOnPlane(physics_pos_offset, NORMAL);
 	
-	//forces_vec = (vec4(vec3(0.0, -1.0, 0.0) * gravity + wind_vec + spring_vec, 0.0) * WORLD_MATRIX).xyz * length(extrusion_vec) * smoothstep(0.0, 2.0, COLOR.a);
-	forces_vec = (vec4(wind_vec + spring_vec, 0.0) * WORLD_MATRIX).xyz * length(extrusion_vec) * smoothstep(0.0, 2.0, COLOR.a);
+	VERTEX = mix(VERTEX, (vec4(VERTEX, 0.0) * physics_rot_offset).xyz, COLOR.a);
 	
-	VERTEX += forces_vec;
+	//forces_vec = (vec4(wind_vec + spring_vec, 0.0) * WORLD_MATRIX).xyz * length(extrusion_vec) * smoothstep(0.0, 2.0, COLOR.a);
+	
+	//VERTEX += forces_vec;
 }
 
 void fragment() {

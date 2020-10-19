@@ -28,6 +28,8 @@ static func generate_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, mat
 		mmi.multimesh.set_instance_transform(i, Transform(Basis(), Vector3()))
 		var grey = float(i) / float(layers)
 		mmi.multimesh.set_instance_color(i, Color(1.0, 1.0, 1.0, grey))
+	
+	mmi.cast_shadow = 0
 
 
 static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendshape_index: int) -> Mesh:
@@ -138,7 +140,7 @@ static func generate_combined(shell_fur_object : Spatial, parent_object : Spatia
 	for child in shell_fur_object.get_children():
 		st.append_from(child.mesh, 0, Transform.IDENTITY)
 		shell_fur_object.remove_child(child)
-	var combined_obj = MeshInstance.new()
+	var combined_obj := MeshInstance.new()
 	combined_obj.name = "CombinedFurMesh"
 	combined_obj.mesh = st.commit()
 	shell_fur_object.add_child(combined_obj)
@@ -146,3 +148,5 @@ static func generate_combined(shell_fur_object : Spatial, parent_object : Spatia
 	combined_obj.set_surface_material(0, material)
 	combined_obj.set_skin(parent_object.get_skin())
 	combined_obj.set_skeleton_path("../../..")
+	combined_obj.cast_shadow = 0
+	
