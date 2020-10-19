@@ -87,7 +87,8 @@ void vertex() {
 	vec3 wind_vec = wind_dir_flattened * perlin3D(winduv, 0) * wind_strength;
 	vec3 spring_vec = projectOnPlane(physics_pos_offset, NORMAL);
 	
-	forces_vec = (vec4(vec3(0.0, -1.0, 0.0) * gravity + wind_vec + spring_vec, 0.0) * WORLD_MATRIX).xyz * length(extrusion_vec) * smoothstep(0.0, 2.0, COLOR.a);
+	//forces_vec = (vec4(vec3(0.0, -1.0, 0.0) * gravity + wind_vec + spring_vec, 0.0) * WORLD_MATRIX).xyz * length(extrusion_vec) * smoothstep(0.0, 2.0, COLOR.a);
+	forces_vec = (vec4(wind_vec + spring_vec, 0.0) * WORLD_MATRIX).xyz * length(extrusion_vec) * smoothstep(0.0, 2.0, COLOR.a);
 	
 	VERTEX += forces_vec;
 }

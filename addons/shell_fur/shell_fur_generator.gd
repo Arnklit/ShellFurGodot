@@ -1,21 +1,15 @@
+# Copyright © 2020 Kasper Arnklit Frandsen - MIT License
+# See `LICENSE.md` included in the source distribution for details.
 tool
 extends Spatial
 # Fur generator node. Is used to generate the fur objects.
-# The node will only generate fur if it is set as a direct child to a Mesh node.
-# The node will generate fur in two separate ways based on whether the Mesh
-# node is a static mesh a skinned mesh.
-# If the mesh is static, the generator with spawn a MultiMeshInstance as a
-# child of itself and fill that MultiMeshInstance with instances of the
-# parent mesh with varying vertex colors.
-# If the mesh is skinned, the generator will manually create copies of the mesh,
-# assign them varrying vertex colour and merge the copies to a single mesh,
-# and place it as a child of itself.
-# Either path will then use the shell_fur.shader for it's material. The shader
-# expands the mesh in layers using the vertex color information.
-# The shader uses premade noise textures with two channels, one for alpha cutoff
-# and one to vary length of strands.
-# Under "Custom Shader" you can choose "New Shader" and a copy of the default
-# fur shader will be made that you can edit.
+# The node will only generate fur if it is set as a direct child to a 
+# MeshInstance node.
+# The node will generate fur in two separate ways based on whether the 
+# MeshInstance node is a static mesh a skinned mesh.
+# For static meshes it use a MultiMeshInstance for skinned meshes it will create
+# a multi-layered mesh in its own MeshInstance and place either as a child.
+# The node also manages the materials of the fur, using a custom shader.
 
 const DEFAULT_SHADER_PATH = "res://addons/shell_fur/shell_fur.shader"
 
@@ -34,7 +28,7 @@ export(Texture) var length_texture setget set_length_texture
 export(Vector2) var texture_tiling := Vector2(1.0, 1.0) setget set_texture_tiling
 export(Color, RGB) var transmission := Color(0.3, 0.3, 0.3) setget set_transmission
 export(float, 0.0, 1.0) var roughness := 1.0 setget set_roughness
-export(float, 0.0, 1.0) var normal_correction := 1.0 setget set_normal_correction
+export(float, 0.0, 1.0) var normal_correction := 0.0 setget set_normal_correction
 export(int, 4, 100, 4) var layers = 40 setget set_layers
 export(float, 0.0, 100.0) var density := 5.0 setget set_density
 export(float, 0.0, 5.0) var length := 0.5 setget set_length
@@ -42,7 +36,7 @@ export(float, 0.0, 1.0) var length_rand := 0.3 setget set_length_rand
 export(float, 0.0, 1.0) var thickness_base := 0.65 setget set_thickness_base
 export(float, 0.0, 1.0) var thickness_tip := 0.3 setget set_thickness_tip
 export(float, 0.0, 2.0) var ao := 1.0 setget set_ao
-export(float, 0.0, 1.0) var gravity := 0.1 setget set_gravity
+export(float, 0.0, 4.0) var gravity := 0.1 setget set_gravity
 export(float, 0.0, 5.0) var wind_strength := 0.0 setget set_wind_strength
 export(float, 0.0, 5.0) var wind_speed := 1.0 setget set_wind_speed
 export(float, 0.0, 5.0) var wind_scale := 1.0 setget set_wind_scale
@@ -63,17 +57,17 @@ var _fur_generation_helper
 var _first_enter_tree := true
 var _parent_object : Spatial
 var _skeleton_object
-
 var _trans_momentum : Vector3
 onready var _physics_pos := global_transform.origin
-
 
 func _physics_process(delta: float) -> void:
 	var position_diff = global_transform.origin - _physics_pos
 	_trans_momentum += position_diff * spring
+	_trans_momentum += Vector3(0.0, -1.0, 0.0) * gravity
 	_physics_pos += _trans_momentum * delta
-	_material.set_shader_param("physics_pos_offset", -position_diff)
 	_trans_momentum *= dampening
+		
+	_material.set_shader_param("physics_pos_offset", -position_diff)
 
 
 func _init() -> void:
@@ -126,7 +120,8 @@ func _update_fur(delay : float) -> void:
 		_multimeshInstance = MultiMeshInstance.new()
 		add_child(_multimeshInstance)
 		_multimeshInstance.set_owner(get_tree().get_edited_scene_root()) 
-		_fur_generation_helper.update_mmi(layers, _multimeshInstance, _parent_object.mesh, _material, blendshape_index)
+		_fur_generation_helper.generate_mmi(layers, _multimeshInstance, _parent_object.mesh, _material, blendshape_index)
+
 
 func _exit_tree() -> void:
 	print("_exit_tree is called")
@@ -176,32 +171,32 @@ func set_texture_tiling(tiling : Vector2) -> void:
 	_material.set_shader_param("tiling", tiling)
 
 
-func set_base_color(var new_color) -> void:
+func set_base_color(new_color : Color) -> void:
 	base_color = new_color;
 	_material.set_shader_param("base_color", new_color)
 
 
-func set_tip_color(var new_color) -> void:
+func set_tip_color(new_color : Color) -> void:
 	tip_color = new_color;
 	_material.set_shader_param("tip_color", new_color)
 
 
-func set_transmission(var color) -> void:
-	transmission = color;
-	_material.set_shader_param("transmission", color)
+func set_transmission(new_color : Color) -> void:
+	transmission = new_color;
+	_material.set_shader_param("transmission", new_color)
 
 
-func set_roughness(var new_roughness) -> void:
+func set_roughness(new_roughness : float) -> void:
 	roughness = new_roughness
 	_material.set_shader_param("roughness", new_roughness)
 
 
-func set_normal_correction(var new_normal_correction) -> void:
+func set_normal_correction(new_normal_correction : float) -> void:
 	normal_correction = new_normal_correction
 	_material.set_shader_param("normal_correction", new_normal_correction)
 
 
-func set_layers(var new_layers) -> void:
+func set_layers(new_layers : int) -> void:
 	if layers == new_layers:
 		return
 	layers = new_layers
@@ -210,59 +205,60 @@ func set_layers(var new_layers) -> void:
 	_material.set_shader_param("layers", new_layers)
 	_update_fur(0.0)
 
-func set_density(var new_desity) -> void:
+
+func set_density(new_desity : float) -> void:
 	density = new_desity
 	_material.set_shader_param("density", new_desity)
 
 
-func set_length(var new_length) -> void:
+func set_length(new_length : float) -> void:
 	length = new_length
 	_material.set_shader_param("fur_length", new_length)
 
 
-func set_length_rand(var new_length_rand) -> void:
+func set_length_rand(new_length_rand : float) -> void:
 	length_rand = new_length_rand
 	_material.set_shader_param("length_rand", new_length_rand)
 
 
-func set_thickness_base(var thickness) -> void:
+func set_thickness_base(thickness : float) -> void:
 	thickness_base = thickness
 	_material.set_shader_param("thickness_base", thickness)
 
 
-func set_thickness_tip(var thickness) -> void:
+func set_thickness_tip(thickness : float) -> void:
 	thickness_tip = thickness
 	_material.set_shader_param("thickness_tip", thickness)
 
 
-func set_ao(var new_ao) -> void:
+func set_ao(new_ao : float) -> void:
 	ao = new_ao
 	_material.set_shader_param("ao", new_ao)
 
 
-func set_gravity(var new_gravity) -> void:
+func set_gravity(new_gravity : float) -> void:
 	gravity = new_gravity
 	_material.set_shader_param("gravity", new_gravity)
 
 
-func set_wind_strength(var new_wind_strength) -> void:
+func set_wind_strength(new_wind_strength : float) -> void:
 	wind_strength = new_wind_strength
 	_material.set_shader_param("wind_strength", wind_strength)
 
 
-func set_wind_speed(var new_wind_speed) -> void:
+func set_wind_speed(new_wind_speed : float) -> void:
 	wind_speed = new_wind_speed
 	_material.set_shader_param("wind_speed", wind_speed)
 
 
-func set_wind_scale(var new_wind_scale) -> void:
+func set_wind_scale(new_wind_scale : float) -> void:
 	wind_scale = new_wind_scale
 	_material.set_shader_param("wind_scale", wind_scale)
 
 
-func set_wind_angle(var new_wind_angle) -> void:
+func set_wind_angle(new_wind_angle : float) -> void:
 	wind_angle = new_wind_angle
-	var angle_vector = Vector2(cos(deg2rad(wind_angle)), sin(deg2rad(wind_angle)))
+	var angle_vector := Vector2(cos(deg2rad(wind_angle)), sin(deg2rad(wind_angle)))
 	_material.set_shader_param("wind_angle", Vector3(angle_vector.x, 0.0, angle_vector.y))
 
 func set_custom_shader(shader: Shader) -> void:

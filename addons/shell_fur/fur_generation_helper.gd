@@ -1,36 +1,33 @@
-static func update_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, material : Material, blendshape_index : int) -> void:
+# Copyright © 2020 Kasper Arnklit Frandsen - MIT License
+# See `LICENSE.md` included in the source distribution for details.
+
+# Static functions used for generation of fur shells
+
+static func generate_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, material : Material, blendshape_index : int) -> void:
 	var mdt = MeshDataTool.new()
 	if mmi.multimesh == null:
 		mmi.multimesh = MultiMesh.new()
 		mmi.multimesh.transform_format = MultiMesh.TRANSFORM_3D
 		mmi.multimesh.color_format = MultiMesh.COLOR_FLOAT
 		mmi.multimesh.custom_data_format = MultiMesh.CUSTOM_DATA_NONE
-		
+	
 	var new_mesh : Mesh = mesh.duplicate(true)
 	
-	# Blendshape_index of -1 means not to use blendshapes
 	if blendshape_index != -1:
 		new_mesh = _blendshape_to_vertex_color(new_mesh, material, blendshape_index)
 	else:
 		new_mesh = _normals_to_vertex_color(new_mesh, material)
 	
 	mmi.multimesh.mesh = new_mesh
-	
 	mmi.multimesh.instance_count = layers
 	mmi.multimesh.visible_instance_count = layers
 	for surface in new_mesh.get_surface_count():
 		mmi.multimesh.mesh.surface_set_material(surface, material)
 	
-	# We place the layers in 4 loops so Visible Instance Count can be lowered
-	# by half and to a quarter and correctly show spread out layers.
-	# The LOD system is not implemented yet.
-	var index = 0
-	for LOD_layer in 4:
-		for i in layers / 4:
-			mmi.multimesh.set_instance_transform(i, Transform(Basis(), Vector3()))
-			var grey = float(i) / float(layers / 4) + float(LOD_layer) * 1.0 / float(layers)
-			mmi.multimesh.set_instance_color(index, Color(1.0, 1.0, 1.0, grey))
-			index += 1
+	for i in layers:
+		mmi.multimesh.set_instance_transform(i, Transform(Basis(), Vector3()))
+		var grey = float(i) / float(layers)
+		mmi.multimesh.set_instance_color(i, Color(1.0, 1.0, 1.0, grey))
 
 
 static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendshape_index: int) -> Mesh:
@@ -63,9 +60,9 @@ static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendsh
 			longest_diff_vec = diffvec
 
 	for i in compare_array.size():
-		var newx = vertex_diff_to_vertex_color_value(compare_array[i].x, longest_diff_length)
-		var newy = vertex_diff_to_vertex_color_value(compare_array[i].y, longest_diff_length)
-		var newz = vertex_diff_to_vertex_color_value(compare_array[i].z, longest_diff_length)
+		var newx = _vertex_diff_to_vertex_color_value(compare_array[i].x, longest_diff_length)
+		var newy = _vertex_diff_to_vertex_color_value(compare_array[i].y, longest_diff_length)
+		var newz = _vertex_diff_to_vertex_color_value(compare_array[i].z, longest_diff_length)
 		compare_array_adjusted.append( Vector3(newx, newy, newz))
 
 	material.set_shader_param("blend_shape_multiplier", longest_diff_length)
@@ -104,7 +101,7 @@ static func _multiple_surfaces_to_single(mesh : Mesh) -> Mesh:
 	return merging_mesh
 
 
-static func vertex_diff_to_vertex_color_value(var value, var factor) -> float:
+static func _vertex_diff_to_vertex_color_value(value : float, factor : float) -> float:
 	return (value / factor) * 0.5 + 0.5
 
 
