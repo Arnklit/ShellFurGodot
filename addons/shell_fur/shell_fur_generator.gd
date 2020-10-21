@@ -166,7 +166,7 @@ func _analyse_parent() -> void:
 func _update_fur(delay : float) -> void:
 	yield(get_tree().create_timer(delay), "timeout")
 	for child in get_children():
-		remove_child(child)
+		child.queue_free()
 	
 	if not _parent_is_mesh_instance:
 		return

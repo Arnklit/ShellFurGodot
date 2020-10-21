@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/bending_arm4_with_shape.gltf-987aafbb637712f1183122a8735d2bbc.scn"
+path="res://.import/bending_arm4_with_shape.gltf-18235899a90d84a2e453d6c65073c30c.scn"
 
 [deps]
 
-source_file="res://test assets/models/bending_arm4_with_shape.gltf"
-dest_files=[ "res://.import/bending_arm4_with_shape.gltf-987aafbb637712f1183122a8735d2bbc.scn" ]
+source_file="res://test_assets/models/bending_arm4_with_shape.gltf"
+dest_files=[ "res://.import/bending_arm4_with_shape.gltf-18235899a90d84a2e453d6c65073c30c.scn" ]
 
 [params]
 

@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/fur_plane.gltf-462d069636169f773dae790efa41f822.scn"
+path="res://.import/fur_plane.gltf-070922415f8056c30130cd59453e48e9.scn"
 
 [deps]
 
-source_file="res://test assets/models/fur_plane.gltf"
-dest_files=[ "res://.import/fur_plane.gltf-462d069636169f773dae790efa41f822.scn" ]
+source_file="res://test_assets/models/fur_plane.gltf"
+dest_files=[ "res://.import/fur_plane.gltf-070922415f8056c30130cd59453e48e9.scn" ]
 
 [params]
 

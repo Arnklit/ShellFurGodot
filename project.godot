@@ -16,6 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="ShellFurTool"
+config/icon="res://icon.png"
 
 [debug]
 
@@ -37,3 +38,4 @@ enabled=PoolStringArray( "shell_fur" )
 [rendering]
 
 quality/filters/msaa=2
+environment/default_environment="res://default_env.tres"

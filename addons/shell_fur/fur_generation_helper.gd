@@ -139,7 +139,7 @@ static func generate_combined(shell_fur_object : Spatial, parent_object : Spatia
 	var st = SurfaceTool.new()
 	for child in shell_fur_object.get_children():
 		st.append_from(child.mesh, 0, Transform.IDENTITY)
-		shell_fur_object.remove_child(child)
+		shell_fur_object.get_child(child).queue_free()
 	var combined_obj := MeshInstance.new()
 	combined_obj.name = "CombinedFurMesh"
 	combined_obj.mesh = st.commit()
