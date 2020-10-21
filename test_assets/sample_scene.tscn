@@ -62,8 +62,8 @@ albedo_color = Color( 0.490196, 0.384314, 0.258824, 1 )
 
 [sub_resource type="ShaderMaterial" id=7]
 shader = ExtResource( 1 )
-shader_param/base_color = Color( 0.43, 0.35, 0.29, 1 )
-shader_param/tip_color = Color( 0.78, 0.63, 0.52, 1 )
+shader_param/base_color = Color( 0.423529, 0.345098, 0.286275, 1 )
+shader_param/tip_color = Color( 0.764706, 0.619608, 0.517647, 1 )
 shader_param/color_tiling = Vector2( 1, 1 )
 shader_param/length_tiling = Vector2( 1, 1 )
 shader_param/transmission = Color( 0.3, 0.3, 0.3, 1 )
@@ -75,13 +75,12 @@ shader_param/thickness_tip = 0.3
 shader_param/fur_length = 0.5
 shader_param/length_rand = 0.3
 shader_param/ao = 1.0
-shader_param/gravity = 0.1
-shader_param/wind_strength = 0.0
-shader_param/wind_speed = 1.0
+shader_param/wind_strength = 0.405
+shader_param/wind_speed = 3.341
 shader_param/wind_scale = 1.0
 shader_param/wind_angle = Vector3( 1, 0, 0 )
-shader_param/physics_pos_offset = Vector3( 0, -0.025, 0 )
-shader_param/physics_rot_offset = Quat( 0.802724, 0.235711, 0.547767, 1.30385e-07 )
+shader_param/physics_pos_offset = Vector3( 0, -0.659, 0 )
+shader_param/physics_rot_offset = Quat( 0, 0, 0, 1 )
 shader_param/normal_bias = 0.0
 shader_param/LOD = 1.0
 shader_param/fur_contract = 0.0
@@ -140,9 +139,14 @@ mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
 [node name="ShellFur" type="Spatial" parent="MeshInstance"]
-transform = Transform( 0.498322, 0.780257, 0.377993, 0.777586, -0.595046, 0.20318, 0.383456, 0.192673, -0.903239, 0, 0, 0 )
 script = ExtResource( 4 )
 pattern_texture = ExtResource( 2 )
+base_color = Color( 0.423529, 0.345098, 0.286275, 1 )
+tip_color = Color( 0.764706, 0.619608, 0.517647, 1 )
+gravity = 1.318
+wind_strength = 0.405
+wind_speed = 3.341
+spring = 2.0
 
 [node name="MultiMeshInstance2" type="MultiMeshInstance" parent="MeshInstance/ShellFur"]
 cast_shadow = 0

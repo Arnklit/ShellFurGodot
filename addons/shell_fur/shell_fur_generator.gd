@@ -62,12 +62,13 @@ var _first_enter_tree := true
 var _parent_object : Spatial
 var _skeleton_object
 var _trans_momentum : Vector3
-#var _rot_momentum : Transform
+var _rot_momentum : Vector3
 onready var _physics_pos := global_transform.origin
-#onready var _physics_rot := global_transform
+onready var _physics_rot := global_transform.basis.get_rotation_quat()
 onready var _LOD_refresh_timer := rand_range(0.0, 0.25)
 var _fur_contract := 0.0
 var _current_LOD := 0
+
 
 func _physics_process(delta: float) -> void:
 	var position_diff := global_transform.origin - _physics_pos
@@ -78,16 +79,16 @@ func _physics_process(delta: float) -> void:
 	
 	_material.set_shader_param("physics_pos_offset", -position_diff)
 	
-	# Broken transform/quat physics rotation
-	#var rotation_diff := global_transform * _physics_rot.inverse()
-	#_rot_momentum *= Transform().interpolate_with(rotation_diff, spring)
-	#_physics_rot *= Transform().interpolate_with(_rot_momentum.orthonormalized(), delta)
-	#_rot_momentum = _rot_momentum.orthonormalized().interpolate_with(Transform(), dampening)
+	var rot_diff := _physics_rot.inverse() * global_transform.basis.get_rotation_quat()
+	_rot_momentum += rot_diff.get_euler() * spring
+	_physics_rot *= Quat(_rot_momentum * delta)
+	_rot_momentum *= dampening
 
-	#_material.set_shader_param("physics_rot_offset", rotation_diff * global_transform)
+	_material.set_shader_param("physics_rot_offset", rot_diff)
 	
 	if not Engine.editor_hint:
 		_process_LOD(delta)
+
 
 func _process_LOD(delta : float) -> void:
 	var _camera := get_viewport().get_camera()
@@ -122,13 +123,14 @@ func _process_LOD(delta : float) -> void:
 			for child in get_child_count():
 					get_child(child).visible = false
 
+
 func _init() -> void:
 	_default_shader = load(DEFAULT_SHADER_PATH)
 	_material = ShaderMaterial.new()
 	_material.shader = _default_shader
 	_fur_generation_helper = preload("res://addons/shell_fur/fur_generation_helper.gd")
 	_physics_pos = global_transform.origin
-	#_physics_rot = global_transform
+	_physics_rot = global_transform.basis.get_rotation_quat()
 
 
 func _enter_tree() -> void:	

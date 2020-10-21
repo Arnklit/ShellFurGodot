@@ -17,7 +17,6 @@ uniform float thickness_tip = 0.3;
 uniform float fur_length = 0.5;
 uniform float length_rand = 0.3;
 uniform float ao = 1.0;
-uniform float gravity = 0.1;
 uniform float wind_strength = 0.0;
 uniform float wind_speed = 1.0;
 uniform float wind_scale = 1.0;
@@ -84,7 +83,7 @@ void vertex() {
 		vec3 normal_biased_extrude = mix(NORMAL * blend_shape_multiplier, extrusion_vec.xyz, lod_adjusted_layer_value);
 		vec3 interpolated_extrude = mix(extrusion_vec, normal_biased_extrude, smoothstep(0.0, 2.0, normal_bias));
 		vec3 offset_from_surface = interpolated_extrude * fur_length / float(layers);
-		VERTEX += interpolated_extrude * fur_length * lod_adjusted_layer_value + offset_from_surface;
+		VERTEX += (vec4(interpolated_extrude * fur_length * lod_adjusted_layer_value + offset_from_surface, 0.0) * physics_rot_offset).xyz;
 		VERTEX -= fur_contract * NORMAL * fur_length;
 		
 		vec3 winduv = VERTEX * wind_scale;
@@ -93,8 +92,7 @@ void vertex() {
 		vec3 wind_dir_flattened = projectOnPlane(wind_angle_world, NORMAL);
 		vec3 wind_vec = wind_dir_flattened * perlin3D(winduv, 0) * wind_strength;
 		vec3 physics_pos_offset_world = (vec4(physics_pos_offset, 0) * WORLD_MATRIX).xyz;
-		vec3 spring_vec = projectOnPlane(physics_pos_offset_world, NORMAL);
-		forces_vec = (spring_vec + wind_vec) * length(extrusion_vec) * smoothstep(0.0, 2.0, lod_adjusted_layer_value);
+		forces_vec = (physics_pos_offset_world + wind_vec) * length(extrusion_vec) * smoothstep(0.0, 2.0, lod_adjusted_layer_value);
 		VERTEX += forces_vec;
 	}
 }
