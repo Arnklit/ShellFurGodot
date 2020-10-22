@@ -10,7 +10,7 @@ uniform sampler2D length_texture : hint_white;
 uniform vec2 length_tiling = vec2(1.0, 1.0);
 uniform vec4 transmission = vec4(0.3, 0.3, 0.3, 1.0);
 uniform float roughness = 1.0;
-uniform float normal_correction = 1.0;
+uniform float normal_correction = 0.0;
 uniform float density = 5.0;
 uniform float thickness_base = 0.65;
 uniform float thickness_tip = 0.3;

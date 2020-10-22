@@ -129,13 +129,14 @@ func _init() -> void:
 	_material = ShaderMaterial.new()
 	_material.shader = _default_shader
 	_fur_generation_helper = preload("res://addons/shell_fur/fur_generation_helper.gd")
-	_physics_pos = global_transform.origin
-	_physics_rot = global_transform.basis.get_rotation_quat()
 
 
 func _enter_tree() -> void:	
 	if Engine.editor_hint and _first_enter_tree:
 		_first_enter_tree = false
+	
+	_physics_pos = global_transform.origin
+	_physics_rot = global_transform.basis.get_rotation_quat()
 	
 	_analyse_parent()
 	

@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://addons/shell_fur/shell_fur.shader" type="Shader" id=1]
-[ext_resource path="res://addons/shell_fur/noise_patterns/fine_hair.png" type="Texture" id=2]
+[ext_resource path="res://addons/shell_fur/noise_patterns/rough_hair.png" type="Texture" id=2]
 [ext_resource path="res://addons/shell_fur/shell_fur_generator.gd" type="Script" id=4]
 
 [sub_resource type="ProceduralSky" id=1]
@@ -69,18 +69,18 @@ shader_param/length_tiling = Vector2( 1, 1 )
 shader_param/transmission = Color( 0.3, 0.3, 0.3, 1 )
 shader_param/roughness = 1.0
 shader_param/normal_correction = 0.0
-shader_param/density = 5.0
-shader_param/thickness_base = 0.65
-shader_param/thickness_tip = 0.3
-shader_param/fur_length = 0.5
-shader_param/length_rand = 0.3
+shader_param/density = 4.422
+shader_param/thickness_base = 0.99
+shader_param/thickness_tip = 0.372
+shader_param/fur_length = 1.223
+shader_param/length_rand = 0.577
 shader_param/ao = 1.0
 shader_param/wind_strength = 0.405
 shader_param/wind_speed = 3.341
 shader_param/wind_scale = 1.0
 shader_param/wind_angle = Vector3( 1, 0, 0 )
-shader_param/physics_pos_offset = Vector3( 0, -0.659, 0 )
-shader_param/physics_rot_offset = Quat( 0, 0, 0, 1 )
+shader_param/physics_pos_offset = Vector3( 0, -1, 0 )
+shader_param/physics_rot_offset = Quat( 1.4013e-45, 0, -1.4013e-45, 1 )
 shader_param/normal_bias = 0.0
 shader_param/LOD = 1.0
 shader_param/fur_contract = 0.0
@@ -126,27 +126,33 @@ shadow_enabled = true
 [node name="Camera Pivot" type="Spatial" parent="CameraRig"]
 
 [node name="Camera" type="Camera" parent="CameraRig/Camera Pivot"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.712 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.429, 6.95921 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="CameraRig"]
+autoplay = "panning in and out"
 "anims/camera rotating" = SubResource( 3 )
 "anims/panning in and out" = SubResource( 4 )
 "next/panning in and out" = "panning in and out"
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
 [node name="ShellFur" type="Spatial" parent="MeshInstance"]
 script = ExtResource( 4 )
 pattern_texture = ExtResource( 2 )
+pattern_selector = 1
 base_color = Color( 0.423529, 0.345098, 0.286275, 1 )
 tip_color = Color( 0.764706, 0.619608, 0.517647, 1 )
-gravity = 1.318
+density = 4.422
+length = 1.223
+length_rand = 0.577
+thickness_base = 0.99
+thickness_tip = 0.372
+gravity = 4.0
 wind_strength = 0.405
 wind_speed = 3.341
-spring = 2.0
+LOD1_distance = 50.0
 
 [node name="MultiMeshInstance2" type="MultiMeshInstance" parent="MeshInstance/ShellFur"]
 cast_shadow = 0
