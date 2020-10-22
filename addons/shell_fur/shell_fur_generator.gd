@@ -37,6 +37,7 @@ export(Vector2) var length_tiling := Vector2(1.0, 1.0) setget set_length_tiling
 export(float, 0.0, 1.0) var thickness_base := 0.65 setget set_thickness_base
 export(float, 0.0, 1.0) var thickness_tip := 0.3 setget set_thickness_tip
 export(float, 0.0, 2.0) var ao := 1.0 setget set_ao
+export(NodePath) var custom_physics_pivot : NodePath setget set_custom_physics_pivot
 export(float, 0.0, 4.0) var gravity := 0.1 setget set_gravity
 export(float, 0.0, 5.0) var wind_strength := 0.0 setget set_wind_strength
 export(float, 0.0, 5.0) var wind_speed := 1.0 setget set_wind_speed
@@ -63,15 +64,19 @@ var _parent_object : Spatial
 var _skeleton_object
 var _trans_momentum : Vector3
 var _rot_momentum : Vector3
-onready var _physics_pos := global_transform.origin
-onready var _physics_rot := global_transform.basis.get_rotation_quat()
+var _physics_pos : Vector3
+var _physics_rot : Quat
 onready var _LOD_refresh_timer := rand_range(0.0, 0.25)
 var _fur_contract := 0.0
 var _current_LOD := 0
 
 
+func _ready() -> void:
+	_update_physics_object(0.0)
+
+
 func _physics_process(delta: float) -> void:
-	var position_diff := global_transform.origin - _physics_pos
+	var position_diff := _current_physics_object().global_transform.origin - _physics_pos
 	_trans_momentum += position_diff * spring
 	_trans_momentum += Vector3(0.0, -1.0, 0.0) * gravity
 	_physics_pos += _trans_momentum * delta
@@ -79,7 +84,7 @@ func _physics_process(delta: float) -> void:
 	
 	_material.set_shader_param("physics_pos_offset", -position_diff)
 	
-	var rot_diff := _physics_rot.inverse() * global_transform.basis.get_rotation_quat()
+	var rot_diff := _physics_rot.inverse() * _current_physics_object().global_transform.basis.get_rotation_quat()
 	_rot_momentum += rot_diff.get_euler() * spring
 	_physics_rot *= Quat(_rot_momentum * delta)
 	_rot_momentum *= dampening
@@ -88,6 +93,13 @@ func _physics_process(delta: float) -> void:
 	
 	if not Engine.editor_hint:
 		_process_LOD(delta)
+
+
+func _current_physics_object() -> Spatial:
+	if custom_physics_pivot.is_empty():
+		return self
+	else:
+		return get_node(custom_physics_pivot) as Spatial
 
 
 func _process_LOD(delta : float) -> void:
@@ -125,7 +137,7 @@ func _process_LOD(delta : float) -> void:
 
 
 func _init() -> void:
-	_default_shader = load(DEFAULT_SHADER_PATH)
+	_default_shader = load(DEFAULT_SHADER_PATH) as Shader
 	_material = ShaderMaterial.new()
 	_material.shader = _default_shader
 	_fur_generation_helper = preload("res://addons/shell_fur/fur_generation_helper.gd")
@@ -134,16 +146,12 @@ func _init() -> void:
 func _enter_tree() -> void:	
 	if Engine.editor_hint and _first_enter_tree:
 		_first_enter_tree = false
-	
-	_physics_pos = global_transform.origin
-	_physics_rot = global_transform.basis.get_rotation_quat()
-	
+
 	_analyse_parent()
 	
+	_update_physics_object(0.5)
+	
 	if _parent_has_mesh_assigned:
-		# Calling this in case the blendshaping has been active but the node is
-		# being moved to a new mesh that might not have blend shapes
-		set_blendshape_index(blendshape_index)
 		# Delaying the fur update to avoid throwing below error on reparenting
 		# ERROR "scene/main/node.cpp:1554 - Condition "!owner_valid" is true."
 		# Not sure why this is thrown, since it's not a problem when first
@@ -156,6 +164,10 @@ func _enter_tree() -> void:
 
 
 func _analyse_parent() -> void:
+	if _parent_object != get_parent():
+		# Parent has changed, disable blendshape
+		blendshape_index = -1
+		
 	_parent_object = get_parent()
 	if _parent_object.get_class() == "MeshInstance":
 		_parent_is_mesh_instance = true
@@ -169,7 +181,7 @@ func _analyse_parent() -> void:
 func _update_fur(delay : float) -> void:
 	yield(get_tree().create_timer(delay), "timeout")
 	for child in get_children():
-		child.queue_free()
+		child.free()
 	
 	if not _parent_is_mesh_instance:
 		return
@@ -180,12 +192,18 @@ func _update_fur(delay : float) -> void:
 	else:
 		_multimeshInstance = MultiMeshInstance.new()
 		add_child(_multimeshInstance)
-		_multimeshInstance.set_owner(get_tree().get_edited_scene_root()) 
+		# uncomment to debug whether MMI is created
+		#_multimeshInstance.set_owner(get_tree().get_edited_scene_root()) 
 		_fur_generation_helper.generate_mmi(layers, _multimeshInstance, _parent_object.mesh, _material, blendshape_index)
 
 
+func _update_physics_object(delay : float) -> void:
+	yield(get_tree().create_timer(delay), "timeout")
+	_physics_pos = _current_physics_object().global_transform.origin
+	_physics_rot = _current_physics_object().global_transform.basis.get_rotation_quat()
+
+
 func _exit_tree() -> void:
-	print("_exit_tree is called")
 	_parent_is_mesh_instance = false
 	_parent_has_mesh_assigned = false
 	_parent_has_skin_assigned = false
@@ -253,8 +271,6 @@ func set_normal_correction(new_normal_correction : float) -> void:
 
 
 func set_layers(new_layers : int) -> void:
-	if layers == new_layers:
-		return
 	layers = new_layers
 	if _first_enter_tree:
 		return
@@ -275,6 +291,7 @@ func set_length(new_length : float) -> void:
 func set_length_rand(new_length_rand : float) -> void:
 	length_rand = new_length_rand
 	_material.set_shader_param("length_rand", new_length_rand)
+
 
 func set_length_texture(texture : Texture) -> void:
 	length_texture = texture
@@ -299,6 +316,14 @@ func set_thickness_tip(thickness : float) -> void:
 func set_ao(new_ao : float) -> void:
 	ao = new_ao
 	_material.set_shader_param("ao", new_ao)
+
+
+func set_custom_physics_pivot(path : NodePath) -> void:
+	custom_physics_pivot = path
+	if _first_enter_tree:
+		return
+	_physics_pos = _current_physics_object().global_transform.origin
+	_physics_rot = _current_physics_object().global_transform.basis.get_rotation_quat()
 
 
 func set_gravity(new_gravity : float) -> void:

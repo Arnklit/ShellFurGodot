@@ -139,12 +139,13 @@ static func generate_combined(shell_fur_object : Spatial, parent_object : Spatia
 	var st = SurfaceTool.new()
 	for child in shell_fur_object.get_children():
 		st.append_from(child.mesh, 0, Transform.IDENTITY)
-		child.queue_free()
+		child.free()
 	var combined_obj := MeshInstance.new()
 	combined_obj.name = "CombinedFurMesh"
 	combined_obj.mesh = st.commit()
 	shell_fur_object.add_child(combined_obj)
-	combined_obj.set_owner(shell_fur_object.get_tree().get_edited_scene_root())
+	# Uncomment to check whether the object is getting created
+	#combined_obj.set_owner(shell_fur_object.get_tree().get_edited_scene_root())
 	combined_obj.set_surface_material(0, material)
 	combined_obj.set_skin(parent_object.get_skin())
 	combined_obj.set_skeleton_path("../../..")
