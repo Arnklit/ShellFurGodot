@@ -1,8 +1,8 @@
 [gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://test_assets/bending_arm_with_shape.tscn" type="PackedScene" id=1]
-[ext_resource path="res://addons/shell_fur/noise_patterns/fine_hair.png" type="Texture" id=2]
-[ext_resource path="res://addons/shell_fur/shell_fur_generator.gd" type="Script" id=4]
+[ext_resource path="res://addons/shell_fur/noise_patterns/moss.png" type="Texture" id=2]
+[ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=4]
 
 [sub_resource type="ProceduralSky" id=1]
 
@@ -86,16 +86,20 @@ autoplay = "panning in and out"
 [node name="bending_arm4_with_shape" parent="." instance=ExtResource( 1 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0 )
 
-[node name="ShellFur" type="Spatial" parent="bending_arm4_with_shape/Armature/Skeleton/LittleArmShaped" index="0"]
-script = ExtResource( 4 )
-pattern_texture = ExtResource( 2 )
-blendshape_index = 0
-
 [node name="BoneAttachment" parent="bending_arm4_with_shape/Armature/Skeleton" index="1"]
 transform = Transform( 1, -7.25854e-09, -2.38552e-07, -9.39762e-09, -0.99996, -0.00896813, -2.38478e-07, 0.00896813, -0.99996, -5.80998e-09, -0.800262, -0.00759613 )
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
 mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
+
+[node name="ShellFur" type="Spatial" parent="MeshInstance"]
+script = ExtResource( 4 )
+pattern_texture = ExtResource( 2 )
+pattern_selector = 2
+density = 6.212
+thickness_base = 0.823
+gravity = 1.418
+spring = 2.902
 
 [editable path="bending_arm4_with_shape"]

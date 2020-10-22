@@ -2,8 +2,8 @@ shader_type spatial;
 render_mode depth_draw_alpha_prepass;
 
 uniform sampler2D pattern_texture : hint_black;
-uniform vec4 base_color = vec4(0.43, 0.35, 0.29, 1.0);
-uniform vec4 tip_color = vec4(0.78, 0.63, 0.52, 1.0);
+uniform vec4 base_color : hint_color = vec4(0.43, 0.35, 0.29, 1.0);
+uniform vec4 tip_color : hint_color = vec4(0.78, 0.63, 0.52, 1.0);
 uniform sampler2D color_texture : hint_albedo;
 uniform vec2 color_tiling = vec2(1.0, 1.0);
 uniform sampler2D length_texture : hint_white;
