@@ -10,9 +10,9 @@ uniform sampler2D length_texture : hint_white;
 uniform vec2 length_tiling = vec2(1.0, 1.0);
 uniform vec4 transmission = vec4(0.3, 0.3, 0.3, 1.0);
 uniform float roughness = 1.0;
-uniform float normal_correction = 0.0;
+uniform float normal_adjustment = 0.0;
 uniform float density = 5.0;
-uniform float thickness_base = 0.65;
+uniform float thickness_base = 0.75;
 uniform float thickness_tip = 0.3;
 uniform float fur_length = 0.5;
 uniform float length_rand = 0.3;
@@ -102,7 +102,7 @@ void fragment() {
 		discard;
 	}
 	
-	NORMAL = mix(NORMAL, projectOnPlane(VIEW, extrusion_vec.xyz), normal_correction);
+	NORMAL = mix(NORMAL, projectOnPlane(VIEW, extrusion_vec.xyz), normal_adjustment);
 	
 	ALBEDO = (texture(color_texture, UV * color_tiling) * mix(base_color, tip_color, lod_adjusted_layer_value)).rgb;
 	TRANSMISSION = transmission.rgb;

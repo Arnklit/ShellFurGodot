@@ -21,8 +21,17 @@ const PATTERNS = [
 	"res://addons/shell_fur/noise_patterns/moss.png",
 	]
 
+export(int, 4, 100, 0.9) var layers = 40 setget set_layers
 export(Texture) var pattern_texture setget set_pattern_texture
 export(int, "Fine Hair", "Rough Hair", "Moss") var pattern_selector setget set_pattern_selector
+export(float, 0.0, 100.0) var density := 5.0 setget set_density
+export(float, 0.0, 5.0) var length := 0.5 setget set_length
+export(float, 0.0, 1.0) var length_rand := 0.3 setget set_length_rand
+export(Texture) var length_texture setget set_length_texture
+export(Vector2) var length_tiling := Vector2(1.0, 1.0) setget set_length_tiling
+export(float, 0.0, 1.0) var thickness_base := 0.75 setget set_thickness_base
+export(float, 0.0, 1.0) var thickness_tip := 0.3 setget set_thickness_tip
+
 export(Color, RGB) var base_color := Color(0.43, 0.35, 0.29) setget set_base_color
 export(Color, RGB) var tip_color := Color(0.78, 0.63, 0.52) setget set_tip_color
 export(Texture) var color_texture setget set_color_texture
@@ -30,16 +39,7 @@ export(Vector2) var color_tiling := Vector2(1.0, 1.0) setget set_color_tiling
 export(Color, RGB) var transmission := Color(0.3, 0.3, 0.3) setget set_transmission
 export(float, 0.0, 2.0) var ao := 1.0 setget set_ao
 export(float, 0.0, 1.0) var roughness := 1.0 setget set_roughness
-export(float, 0.0, 1.0) var normal_correction := 0.0 setget set_normal_correction
-export(int, 4, 100, 0.9) var layers = 40 setget set_layers
-export(float, 0.0, 100.0) var density := 5.0 setget set_density
-export(float, 0.0, 5.0) var length := 0.5 setget set_length
-export(float, 0.0, 1.0) var length_rand := 0.3 setget set_length_rand
-export(Texture) var length_texture setget set_length_texture
-export(Vector2) var length_tiling := Vector2(1.0, 1.0) setget set_length_tiling
-export(float, 0.0, 1.0) var thickness_base := 0.65 setget set_thickness_base
-export(float, 0.0, 1.0) var thickness_tip := 0.3 setget set_thickness_tip
-export(Shader) var custom_shader : Shader setget set_custom_shader
+export(float, 0.0, 1.0) var normal_adjustment := 0.0 setget set_normal_adjustment
 
 export(NodePath) var custom_physics_pivot : NodePath setget set_custom_physics_pivot
 export(float, 0.0, 4.0) var gravity := 0.1 setget set_gravity
@@ -55,6 +55,8 @@ export(float, 0.0, 1.0) var normal_bias := 0.0 setget set_normal_bias
 
 export(float, 1.0, 100.0) var LOD0_distance := 10.0 setget set_LOD0_distance
 export(float, 1.0, 1000.0) var LOD1_distance := 100.0 setget set_LOD1_distance 
+
+export(Shader) var custom_shader : Shader setget set_custom_shader
 
 var _parent_is_mesh_instance = false 
 var _parent_has_mesh_assigned = false 
@@ -136,6 +138,14 @@ func get_current_LOD() -> int:
 
 # Setter Methods
 
+func set_layers(new_layers : int) -> void:
+	layers = new_layers
+	if _first_enter_tree:
+		return
+	_material.set_shader_param("layers", new_layers)
+	_update_fur(0.0)
+
+
 func set_pattern_texture(texture : Texture) -> void:
 	pattern_texture = texture
 	_material.set_shader_param("pattern_texture", texture)
@@ -144,54 +154,6 @@ func set_pattern_texture(texture : Texture) -> void:
 func set_pattern_selector(index : int) -> void:
 	set_pattern_texture(load(PATTERNS[index]))
 	pattern_selector = index
-
-
-func set_color_texture(texture : Texture) -> void:
-	color_texture = texture
-	_material.set_shader_param("color_texture", texture)
-
-
-func set_color_tiling(tiling : Vector2) -> void:
-	color_tiling = tiling
-	_material.set_shader_param("color_tiling", tiling)
-
-
-func set_base_color(new_color : Color) -> void:
-	base_color = new_color;
-	_material.set_shader_param("base_color", new_color)
-
-
-func set_tip_color(new_color : Color) -> void:
-	tip_color = new_color;
-	_material.set_shader_param("tip_color", new_color)
-
-
-func set_transmission(new_color : Color) -> void:
-	transmission = new_color;
-	_material.set_shader_param("transmission", new_color)
-
-
-func set_ao(new_ao : float) -> void:
-	ao = new_ao
-	_material.set_shader_param("ao", new_ao)
-
-
-func set_roughness(new_roughness : float) -> void:
-	roughness = new_roughness
-	_material.set_shader_param("roughness", new_roughness)
-
-
-func set_normal_correction(new_normal_correction : float) -> void:
-	normal_correction = new_normal_correction
-	_material.set_shader_param("normal_correction", new_normal_correction)
-
-
-func set_layers(new_layers : int) -> void:
-	layers = new_layers
-	if _first_enter_tree:
-		return
-	_material.set_shader_param("layers", new_layers)
-	_update_fur(0.0)
 
 
 func set_density(new_desity : float) -> void:
@@ -229,19 +191,44 @@ func set_thickness_tip(thickness : float) -> void:
 	_material.set_shader_param("thickness_tip", thickness)
 
 
-func set_custom_shader(shader: Shader) -> void:
-	if custom_shader == shader:
-		return
-	custom_shader = shader
-	if custom_shader == null:
-		_material.shader = load(DEFAULT_SHADER_PATH)
-	else:
-		_material.shader = custom_shader
-		
-		if Engine.editor_hint:
-			# Ability to fork default shader
-			if shader.code == "":
-				shader.code = _default_shader.code
+func set_color_texture(texture : Texture) -> void:
+	color_texture = texture
+	_material.set_shader_param("color_texture", texture)
+
+
+func set_color_tiling(tiling : Vector2) -> void:
+	color_tiling = tiling
+	_material.set_shader_param("color_tiling", tiling)
+
+
+func set_base_color(new_color : Color) -> void:
+	base_color = new_color;
+	_material.set_shader_param("base_color", new_color)
+
+
+func set_tip_color(new_color : Color) -> void:
+	tip_color = new_color;
+	_material.set_shader_param("tip_color", new_color)
+
+
+func set_transmission(new_color : Color) -> void:
+	transmission = new_color;
+	_material.set_shader_param("transmission", new_color)
+
+
+func set_ao(new_ao : float) -> void:
+	ao = new_ao
+	_material.set_shader_param("ao", new_ao)
+
+
+func set_roughness(new_roughness : float) -> void:
+	roughness = new_roughness
+	_material.set_shader_param("roughness", new_roughness)
+
+
+func set_normal_adjustment(new_normal_adjustment : float) -> void:
+	normal_adjustment = new_normal_adjustment
+	_material.set_shader_param("normal_adjustment", new_normal_adjustment)
 
 
 func set_custom_physics_pivot(path : NodePath) -> void:
@@ -339,9 +326,9 @@ func _process_fur_physics(delta: float) -> void:
 	_material.set_shader_param("physics_pos_offset", -position_diff)
 	
 	var rot_diff := _physics_rot.inverse() * _current_physics_object().global_transform.basis.get_rotation_quat()
-	_rot_momentum += rot_diff.get_euler() * spring * 2.0
+	_rot_momentum += rot_diff.get_euler() * spring
 	_physics_rot *= Quat(_rot_momentum * delta)
-	_rot_momentum *= damping
+	_rot_momentum *= damping * -1 + 1
 
 	_material.set_shader_param("physics_rot_offset", rot_diff)
 
@@ -437,3 +424,18 @@ func _delayed_position_correction() -> void:
 	# delayed
 	yield(get_tree().create_timer(0.1), "timeout")
 	transform = Transform.IDENTITY
+
+
+func set_custom_shader(shader: Shader) -> void:
+	if custom_shader == shader:
+		return
+	custom_shader = shader
+	if custom_shader == null:
+		_material.shader = load(DEFAULT_SHADER_PATH)
+	else:
+		_material.shader = custom_shader
+		
+		if Engine.editor_hint:
+			# Ability to fork default shader
+			if shader.code == "":
+				shader.code = _default_shader.code
