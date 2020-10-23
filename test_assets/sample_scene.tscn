@@ -101,7 +101,7 @@ density = 6.212
 thickness_base = 0.823
 gravity = 1.418
 spring = 2.902
-LOD0_distance = 3.0
-LOD1_distance = 5.0
+LOD0_distance = 5.0
+LOD1_distance = 7.0
 
 [editable path="bending_arm4_with_shape"]

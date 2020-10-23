@@ -2,14 +2,14 @@
 # See `LICENSE.md` included in the source distribution for details.
 tool
 extends Spatial
-# Fur generator node. Is used to generate the fur objects.
+# Fur manager node. Is used to generate the fur objects and control it.
 # The node will only generate fur if it is set as a direct child to a 
 # MeshInstance node.
 # The node will generate fur in two separate ways based on whether the 
 # MeshInstance node is a static mesh a skinned mesh.
 # For static meshes it use a MultiMeshInstance for skinned meshes it will create
-# a multi-layered mesh in its own MeshInstance and place either as a child.
-# The node also manages the materials of the fur, using a custom shader.
+# a multi-layered mesh of its own MeshInstance mesh and place either as a child.
+# The node also manages the material of the fur, using a custom shader.
 
 const FurHelperMethods = preload("res://addons/shell_fur/fur_helper_methods.gd")
 
@@ -352,18 +352,17 @@ func _process_LOD(delta : float) -> void:
 		0:
 			_material.set_shader_param("LOD", 1.0)
 		1:
-			var lod_value = lerp(1.0, 0.25, (distance - LOD0_distance) / LOD1_distance)
+			var lod_value = lerp(1.0, 0.25, (distance - LOD0_distance) / (LOD1_distance - LOD0_distance))
 			_material.set_shader_param("LOD", lod_value)
 		2:
 			_material.set_shader_param("LOD", 0.25)
-			_fur_contract = clamp(LOD1_distance - distance, 0.0, 1.0)
+			_fur_contract = clamp(distance - LOD1_distance - 1, 0.0, 1.1)
 			_material.set_shader_param("fur_contract", _fur_contract)
 			if _fur_object == null:
-				print("_fur_object is null")
 				return
-			if is_equal_approx(_fur_contract, 1.0) and _fur_object.visible == true:
+			if _fur_contract > 1.0 and _fur_object.visible == true:
 				_fur_object.visible = false
-			if is_equal_approx(_fur_contract, 0.0) and _fur_object.visible == false:
+			if _fur_contract < 1.0 and _fur_object.visible == false:
 				_fur_object.visible = true
 
 
