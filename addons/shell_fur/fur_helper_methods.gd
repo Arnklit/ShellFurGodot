@@ -135,7 +135,7 @@ static func generate_mesh_shells(shell_fur_object : Spatial, parent_object : Spa
 		new_object.mesh = new_mesh
 
 
-static func generate_combined(shell_fur_object : Spatial, parent_object : Spatial, material : Material) -> void:
+static func generate_combined(shell_fur_object : Spatial, parent_object : Spatial, material : Material) -> Spatial:
 	var st = SurfaceTool.new()
 	for child in shell_fur_object.get_children():
 		st.append_from(child.mesh, 0, Transform.IDENTITY)
@@ -150,4 +150,4 @@ static func generate_combined(shell_fur_object : Spatial, parent_object : Spatia
 	combined_obj.set_skin(parent_object.get_skin())
 	combined_obj.set_skeleton_path("../../..")
 	combined_obj.cast_shadow = 0
-	
+	return combined_obj

@@ -63,13 +63,13 @@ var _material: ShaderMaterial = null
 var _default_shader: Shader = null
 var _multimeshInstance : MultiMeshInstance = null
 var _first_enter_tree := true
+var _fur_object : Spatial
 var _parent_object : Spatial
 var _skeleton_object
 var _trans_momentum : Vector3
 var _rot_momentum : Vector3
 var _physics_pos : Vector3
 var _physics_rot : Quat
-var _LOD_refresh_timer : float
 var _fur_contract := 0.0
 var _current_LOD := 0
 
@@ -79,7 +79,6 @@ func _init() -> void:
 	_default_shader = load(DEFAULT_SHADER_PATH) as Shader
 	_material = ShaderMaterial.new()
 	_material.shader = _default_shader
-	#FurHelperMethods = preload("res://addons/shell_fur/fur_helper_methods.gd") as Script
 
 
 func _enter_tree() -> void:	
@@ -106,7 +105,6 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_update_physics_object(0.0)
-	_LOD_refresh_timer = rand_range(0.0, 0.25)
 
 
 func _physics_process(delta: float) -> void:
@@ -341,34 +339,32 @@ func _process_LOD(delta : float) -> void:
 	var _camera := get_viewport().get_camera()
 	if _camera == null:
 		return
-	_LOD_refresh_timer += delta
-	if _LOD_refresh_timer > 0.25:
-		_LOD_refresh_timer -= 0.25
-		var distance := _camera.global_transform.origin.distance_to(global_transform.origin)
-		if distance <= LOD0_distance:
-			_current_LOD = 0
+
+	var distance := _camera.global_transform.origin.distance_to(global_transform.origin)
+	if distance <= LOD0_distance:
+		_current_LOD = 0	
+	if LOD0_distance < distance and distance <= LOD1_distance:
+		_current_LOD = 1
+	if distance > LOD1_distance:
+		_current_LOD = 2
+	
+	match _current_LOD:
+		0:
 			_material.set_shader_param("LOD", 1.0)
-		if LOD0_distance < distance and distance <= LOD1_distance:
-			if _current_LOD == 3:
-				for child in get_child_count():
-					get_child(child).visible = true
-			_current_LOD = 1
+		1:
 			var lod_value = lerp(1.0, 0.25, (distance - LOD0_distance) / LOD1_distance)
 			_material.set_shader_param("LOD", lod_value)
-		if distance > LOD1_distance and _current_LOD != 3:
-			_current_LOD = 2
+		2:
 			_material.set_shader_param("LOD", 0.25)
-	
-	if _current_LOD == 0 or _current_LOD == 1:
-		_fur_contract = move_toward(_fur_contract, 0.0, delta)
-		_material.set_shader_param("fur_contract", _fur_contract)
-	if _current_LOD == 2:
-		_fur_contract = move_toward(_fur_contract, 1.0, delta)
-		_material.set_shader_param("fur_contract", _fur_contract)
-		if is_equal_approx(_fur_contract, 1.0):
-			_current_LOD = 3
-			for child in get_child_count():
-					get_child(child).visible = false
+			_fur_contract = clamp(LOD1_distance - distance, 0.0, 1.0)
+			_material.set_shader_param("fur_contract", _fur_contract)
+			if _fur_object == null:
+				print("_fur_object is null")
+				return
+			if is_equal_approx(_fur_contract, 1.0) and _fur_object.visible == true:
+				_fur_object.visible = false
+			if is_equal_approx(_fur_contract, 0.0) and _fur_object.visible == false:
+				_fur_object.visible = true
 
 
 func _analyse_parent() -> void:
@@ -415,13 +411,14 @@ func _update_fur(delay : float) -> void:
 	
 	if _parent_has_skin_assigned:
 		FurHelperMethods.generate_mesh_shells(self, _parent_object, layers, _material, blendshape_index)
-		FurHelperMethods.generate_combined(self, _parent_object, _material)
+		_fur_object = FurHelperMethods.generate_combined(self, _parent_object, _material)
 	else:
 		_multimeshInstance = MultiMeshInstance.new()
 		add_child(_multimeshInstance)
 		# uncomment to debug whether MMI is created
 		#_multimeshInstance.set_owner(get_tree().get_edited_scene_root()) 
 		FurHelperMethods.generate_mmi(layers, _multimeshInstance, _parent_object.mesh, _material, blendshape_index)
+		_fur_object = _multimeshInstance
 
 
 func _delayed_position_correction() -> void:

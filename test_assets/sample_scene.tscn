@@ -75,7 +75,7 @@ shadow_enabled = true
 [node name="Camera Pivot" type="Spatial" parent="CameraRig"]
 
 [node name="Camera" type="Camera" parent="CameraRig/Camera Pivot"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.429, 6.95921 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.429, 10.1882 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="CameraRig"]
 autoplay = "panning in and out"
@@ -101,5 +101,7 @@ density = 6.212
 thickness_base = 0.823
 gravity = 1.418
 spring = 2.902
+LOD0_distance = 3.0
+LOD1_distance = 5.0
 
 [editable path="bending_arm4_with_shape"]
