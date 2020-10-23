@@ -80,11 +80,11 @@ void vertex() {
 		// Rescaling the color values into vectors.
 		extrusion_vec = ((vec3(COLOR.xyz) * 2.0 - 1.0) * blend_shape_multiplier); 
 		
-		vec3 normal_biased_extrude = mix(NORMAL * blend_shape_multiplier, extrusion_vec.xyz, lod_adjusted_layer_value);
+		vec3 normal_biased_extrude = mix(NORMAL * blend_shape_multiplier, extrusion_vec, lod_adjusted_layer_value);
 		vec3 interpolated_extrude = mix(extrusion_vec, normal_biased_extrude, smoothstep(0.0, 2.0, normal_bias));
 		vec3 offset_from_surface = interpolated_extrude * fur_length / float(layers);
 		VERTEX += (vec4(interpolated_extrude * fur_length * lod_adjusted_layer_value + offset_from_surface, 0.0) * physics_rot_offset).xyz;
-		VERTEX -= fur_contract * NORMAL * fur_length;
+		VERTEX -= fur_contract * extrusion_vec * fur_length;
 		
 		vec3 winduv = VERTEX * wind_scale;
 		winduv.y += TIME * wind_speed;	

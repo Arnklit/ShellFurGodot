@@ -108,21 +108,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	var position_diff := _current_physics_object().global_transform.origin - _physics_pos
-	_trans_momentum += position_diff * spring
-	_trans_momentum += Vector3(0.0, -1.0, 0.0) * gravity
-	_physics_pos += _trans_momentum * delta
-	_trans_momentum *= damping * -1 + 1
-	
-	_material.set_shader_param("physics_pos_offset", -position_diff)
-	
-	var rot_diff := _physics_rot.inverse() * _current_physics_object().global_transform.basis.get_rotation_quat()
-	_rot_momentum += rot_diff.get_euler() * spring
-	_physics_rot *= Quat(_rot_momentum * delta)
-	_rot_momentum *= damping
-
-	_material.set_shader_param("physics_rot_offset", rot_diff)
-	
+	_process_fur_physics(delta)
 	if not Engine.editor_hint:
 		_process_LOD(delta)
 
@@ -139,6 +125,14 @@ func _exit_tree() -> void:
 	_parent_is_mesh_instance = false
 	_parent_has_mesh_assigned = false
 	_parent_has_skin_assigned = false
+
+# Getter Methods
+
+func get_current_LOD() -> int:
+	if _fur_object != null:
+		if _fur_object.visible == false:
+			return 3
+	return _current_LOD
 
 # Setter Methods
 
@@ -334,6 +328,23 @@ func set_LOD1_distance(value : float) -> void:
 		LOD1_distance = value
 
 # Private Methods
+
+func _process_fur_physics(delta: float) -> void:
+	var position_diff := _current_physics_object().global_transform.origin - _physics_pos
+	_trans_momentum += position_diff * spring
+	_trans_momentum += Vector3(0.0, -1.0, 0.0) * gravity
+	_physics_pos += _trans_momentum * delta
+	_trans_momentum *= damping * -1 + 1
+	
+	_material.set_shader_param("physics_pos_offset", -position_diff)
+	
+	var rot_diff := _physics_rot.inverse() * _current_physics_object().global_transform.basis.get_rotation_quat()
+	_rot_momentum += rot_diff.get_euler() * spring * 2.0
+	_physics_rot *= Quat(_rot_momentum * delta)
+	_rot_momentum *= damping
+
+	_material.set_shader_param("physics_rot_offset", rot_diff)
+
 
 func _process_LOD(delta : float) -> void:
 	var _camera := get_viewport().get_camera()

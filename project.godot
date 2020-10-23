@@ -38,4 +38,4 @@ enabled=PoolStringArray( "shell_fur" )
 [rendering]
 
 quality/filters/msaa=2
-environment/default_environment="res://default_env.tres"
+environment/default_environment="res://test_assets/default_env.tres"
