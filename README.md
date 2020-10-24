@@ -2,7 +2,7 @@
 
 ![DemoScene](https://user-images.githubusercontent.com/4955051/97077434-8b0f7800-15db-11eb-98eb-7cecf1648304.png)
 
-Add-on that adds a fur node to Godot 3.2. Demo project available [here!](https://github.com/Arnklit/ShellFurGodotDemo)
+Add-on that adds a fur node to Godot 3.2. Demo project available [here.](https://github.com/Arnklit/ShellFurGodotDemo)
 
 
 Instalation
