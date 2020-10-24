@@ -1,4 +1,4 @@
-# Shell Fur and Grass Add-on for Godot Engine
+# Shell Fur Add-on for Godot Engine
 
 ![DemoScene](https://user-images.githubusercontent.com/4955051/97077434-8b0f7800-15db-11eb-98eb-7cecf1648304.png)
 
