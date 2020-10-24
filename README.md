@@ -1,8 +1,8 @@
 # Shell Fur and Grass Add-on for Godot Engine
 
-![image](https://user-images.githubusercontent.com/4955051/96335352-f4d5d200-106f-11eb-915d-19aeb114303b.png)
+![DemoScene](https://user-images.githubusercontent.com/4955051/97077434-8b0f7800-15db-11eb-98eb-7cecf1648304.png)
 
-Add-on that adds a fur node to Godot 3.2.
+Add-on that adds a fur node to Godot 3.2. Demo project available [here!](https://github.com/Arnklit/ShellFurGodotDemo)
 
 
 Instalation
@@ -25,7 +25,7 @@ Select any MeshInstance node and add the ShellFur node as a child beneath it.
 
 If you select the added fur node you will see the fur settings available in the inspector.
 
-![image](https://user-images.githubusercontent.com/4955051/96335747-a6760280-1072-11eb-8835-61609a4cabe9.png)
+![image](https://user-images.githubusercontent.com/4955051/97077698-af6c5400-15dd-11eb-9da1-65d94d6947c6.png)
 
 Most of the options should be self explanatory. But a few are a bit more specific.
 
@@ -59,7 +59,5 @@ Top: Normal Bias = 0.0, Bottom: Normal Bias = 1.0.
 
 Current Limitations
 -------------------
-- No LOD system currently. I will add the option to have the number of layers decrease at a given distance and have the fur fade away beyond that.
 - Since the fur is made up of shells that are paralel to the surface, the fur can look pretty bad when seen from the side. This is somewhat mitigated by using the blendshape styling but could be further improved by adding in generated fur fins around the contour of the mesh.
-- Limited physics interactions. The fur has a simple gravity and wind system, but does not react to things like momentum. This will be added eventually.
 - Limitations to skinned meshes. When the fur is applied to skinned meshes, MultiMeshInstance method cannot be used, so a custom mesh is generated with many layers. This is heavy on skinning performance and currently blendshapes are not copied over, so the fur will not adhere to blendshape changes on the base mesh. Using material passes would bypass this issue, but would cause a lot of drawcalls. I'm still looking into a solution for this.
