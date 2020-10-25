@@ -21,42 +21,49 @@ const PATTERNS = [
 	"res://addons/shell_fur/noise_patterns/moss.png",
 	]
 
-export(int, 4, 100, 0.9) var layers = 40 setget set_layers
-export(Texture) var pattern_texture setget set_pattern_texture
-export(int, "Fine Hair", "Rough Hair", "Moss") var pattern_selector setget set_pattern_selector
-export(float, 0.0, 100.0) var density := 5.0 setget set_density
-export(float, 0.0, 5.0) var length := 0.5 setget set_length
-export(float, 0.0, 1.0) var length_rand := 0.3 setget set_length_rand
-export(Texture) var length_texture setget set_length_texture
-export(Vector2) var length_tiling := Vector2(1.0, 1.0) setget set_length_tiling
-export(float, 0.0, 1.0) var thickness_base := 0.75 setget set_thickness_base
-export(float, 0.0, 1.0) var thickness_tip := 0.3 setget set_thickness_tip
+# Shape
+var shape_layers := 40 setget set_layers
+var shape_pattern_texture : Texture setget set_pattern_texture
+var shape_pattern_selector : int setget set_pattern_selector
+var shape_density := 5.0 setget set_density
+var shape_length := 0.5 setget set_length
+var shape_length_rand := 0.3 setget set_length_rand
+var shape_length_texture : Texture setget set_length_texture
+var shape_length_tiling := Vector2(1.0, 1.0) setget set_length_tiling
+var shape_thickness_base := 0.75 setget set_thickness_base
+var shape_thickness_tip := 0.3 setget set_thickness_tip
 
-export(Color, RGB) var base_color := Color(0.43, 0.35, 0.29) setget set_base_color
-export(Color, RGB) var tip_color := Color(0.78, 0.63, 0.52) setget set_tip_color
-export(Texture) var color_texture setget set_color_texture
-export(Vector2) var color_tiling := Vector2(1.0, 1.0) setget set_color_tiling
-export(Color, RGB) var transmission := Color(0.3, 0.3, 0.3) setget set_transmission
-export(float, 0.0, 2.0) var ao := 1.0 setget set_ao
-export(float, 0.0, 1.0) var roughness := 1.0 setget set_roughness
-export(float, 0.0, 1.0) var normal_adjustment := 0.0 setget set_normal_adjustment
+# Material
+var mat_base_color := Color(0.43, 0.35, 0.29) setget set_base_color
+var mat_tip_color := Color(0.78, 0.63, 0.52) setget set_tip_color
+var mat_color_texture : Texture setget set_color_texture
+var mat_color_tiling := Vector2(1.0, 1.0) setget set_color_tiling
+var mat_transmission := Color(0.3, 0.3, 0.3) setget set_transmission
+var mat_ao := 1.0 setget set_ao
+var mat_roughness := 1.0 setget set_roughness
+var mat_normal_adjustment := 0.0 setget set_normal_adjustment
 
-export(NodePath) var custom_physics_pivot : NodePath setget set_custom_physics_pivot
-export(float, 0.0, 4.0) var gravity := 0.1 setget set_gravity
-export(float, 0.0, 10.0) var spring := 4.0 
-export(float, 0.0, 1.0) var damping := 0.1
-export(float, 0.0, 5.0) var wind_strength := 0.0 setget set_wind_strength
-export(float, 0.0, 5.0) var wind_speed := 1.0 setget set_wind_speed
-export(float, 0.0, 5.0) var wind_scale := 1.0 setget set_wind_scale
-export(float, 0.0, 360) var wind_angle := 0.0 setget set_wind_angle
+# Physics
+var physics_custom_physics_pivot : NodePath setget set_custom_physics_pivot
+var physics_gravity := 0.1 setget set_gravity
+var physics_spring := 4.0 
+var physics_damping := 0.1
+var physics_wind_strength := 0.0 setget set_wind_strength
+var physics_wind_speed := 1.0 setget set_wind_speed
+var physics_wind_scale := 1.0 setget set_wind_scale
+var physics_wind_angle := 0.0 setget set_wind_angle
 
-export(int) var blendshape_index := -1 setget set_blendshape_index
-export(float, 0.0, 1.0) var normal_bias := 0.0 setget set_normal_bias
+# Blendshape Styling
+var styling_blendshape_index := -1 setget set_blendshape_index
+var styling_normal_bias := 0.0 setget set_normal_bias
 
-export(float, 1.0, 100.0) var LOD0_distance := 10.0 setget set_LOD0_distance
-export(float, 1.0, 1000.0) var LOD1_distance := 100.0 setget set_LOD1_distance 
+# Level of Detail
+var lod_LOD0_distance := 10.0 setget set_LOD0_distance
+var lod_LOD1_distance := 100.0 setget set_LOD1_distance 
 
-export(Shader) var custom_shader : Shader setget set_custom_shader
+# Advanced
+var adv_custom_shader : Shader setget set_custom_shader
+var adv_cast_shadow : bool setget set_cast_shadow
 
 var _parent_is_mesh_instance = false 
 var _parent_has_mesh_assigned = false 
@@ -77,6 +84,259 @@ var _current_LOD := 0
 
 # Built-in Methods
 
+func _get_property_list() -> Array:
+	return [
+		{
+			name = "Shape",
+			type = TYPE_NIL,
+			hint_string = "shape_",
+			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "shape_layers",
+			type = TYPE_INT,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0, 100",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "shape_pattern_texture",
+			type = TYPE_OBJECT,
+			hint = PROPERTY_HINT_RESOURCE_TYPE,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
+			hint_string = "Texture"
+		},
+		{
+			name = "shape_pattern_selector",
+			type = TYPE_INT,
+			hint = PROPERTY_HINT_ENUM,
+			hint_string = "Fine Hair, Rough Hair, Moss",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "shape_density",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 100.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "shape_length",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 5.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+				{
+			name = "shape_length_rand",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 1.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "shape_length_texture",
+			type = TYPE_OBJECT,
+			hint = PROPERTY_HINT_RESOURCE_TYPE,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
+			hint_string = "Texture"
+		},
+		{
+			name = "shape_length_tiling",
+			type = TYPE_VECTOR2,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "shape_thickness_base",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 1.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "shape_thickness_tip",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 1.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "Material",
+			type = TYPE_NIL,
+			hint_string = "mat_",
+			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "mat_base_color",
+			type = TYPE_COLOR,
+			hint = PROPERTY_HINT_COLOR_NO_ALPHA,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "mat_tip_color",
+			type = TYPE_COLOR,
+			hint = PROPERTY_HINT_COLOR_NO_ALPHA,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "mat_color_texture",
+			type = TYPE_OBJECT,
+			hint = PROPERTY_HINT_RESOURCE_TYPE,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
+			hint_string = "Texture"
+		},
+		{
+			name = "mat_color_tiling",
+			type = TYPE_VECTOR2,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "mat_transmission",
+			type = TYPE_COLOR,
+			hint = PROPERTY_HINT_COLOR_NO_ALPHA,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "mat_ao",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 2.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "mat_roughness",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 1.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "mat_normal_adjustment",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 1.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "Physics",
+			type = TYPE_NIL,
+			hint_string = "physics_",
+			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "physics_custom_physics_pivot",
+			type = TYPE_NODE_PATH,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "physics_gravity",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 4.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "physics_spring",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 10.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "physics_damping",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 1.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "physics_wind_strength",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 5.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+			{
+			name = "physics_wind_speed",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 5.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "physics_wind_scale",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 5.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "physics_wind_angle",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 360.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+				{
+			name = "Blendshape Styling",
+			type = TYPE_NIL,
+			hint_string = "styling_",
+			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "styling_blendshape_index",
+			type = TYPE_INT,
+			hint_string = "0.0, 360.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "styling_normal_bias",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 1.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "Level of Detail",
+			type = TYPE_NIL,
+			hint_string = "lod_",
+			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "lod_LOD0_distance",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 100.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "lod_LOD1_distance",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0.0, 1000.0",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "Advanced",
+			type = TYPE_NIL,
+			hint_string = "adv_",
+			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "adv_cast_shadow",
+			type = TYPE_BOOL,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+		},
+		{
+			name = "adv_custom_shader",
+			type = TYPE_OBJECT,
+			hint = PROPERTY_HINT_RESOURCE_TYPE | PROPERTY_USAGE_STORAGE,
+			usage = PROPERTY_USAGE_EDITOR,
+			hint_string = "Shader"
+		},
+	]
+
+
 func _init() -> void:
 	_default_shader = load(DEFAULT_SHADER_PATH) as Shader
 	_material = ShaderMaterial.new()
@@ -96,10 +356,10 @@ func _enter_tree() -> void:
 		# Not sure why this is thrown, since it's not a problem when first
 		# adding the node.
 		_delayed_position_correction()
-		set_pattern_texture(load(PATTERNS[pattern_selector]))
+		set_pattern_texture(load(PATTERNS[shape_pattern_selector]))
 		# Force colors
-		set_tip_color(tip_color)
-		set_base_color(base_color)
+		set_tip_color(mat_tip_color)
+		set_base_color(mat_base_color)
 	
 	# Updates the fur if it's needed, clears the fur if it's not
 	_update_fur(0.05)
@@ -139,7 +399,7 @@ func get_current_LOD() -> int:
 # Setter Methods
 
 func set_layers(new_layers : int) -> void:
-	layers = new_layers
+	shape_layers = new_layers
 	if _first_enter_tree:
 		return
 	_material.set_shader_param("layers", new_layers)
@@ -147,92 +407,93 @@ func set_layers(new_layers : int) -> void:
 
 
 func set_pattern_texture(texture : Texture) -> void:
-	pattern_texture = texture
+	shape_pattern_texture = texture
 	_material.set_shader_param("pattern_texture", texture)
 
 
 func set_pattern_selector(index : int) -> void:
+	print("set_pattern_selector getting run: " + str(index))
 	set_pattern_texture(load(PATTERNS[index]))
-	pattern_selector = index
+	shape_pattern_selector = index
 
 
 func set_density(new_desity : float) -> void:
-	density = new_desity
+	shape_density = new_desity
 	_material.set_shader_param("density", new_desity)
 
 
 func set_length(new_length : float) -> void:
-	length = new_length
+	shape_length = new_length
 	_material.set_shader_param("fur_length", new_length)
 
 
 func set_length_rand(new_length_rand : float) -> void:
-	length_rand = new_length_rand
+	shape_length_rand = new_length_rand
 	_material.set_shader_param("length_rand", new_length_rand)
 
 
 func set_length_texture(texture : Texture) -> void:
-	length_texture = texture
+	shape_length_texture = texture
 	_material.set_shader_param("length_texture", texture)
 
 
 func set_length_tiling(tiling : Vector2) -> void:
-	length_tiling = tiling
+	shape_length_tiling = tiling
 	_material.set_shader_param("length_tiling", tiling)
 
 
 func set_thickness_base(thickness : float) -> void:
-	thickness_base = thickness
+	shape_thickness_base = thickness
 	_material.set_shader_param("thickness_base", thickness)
 
 
 func set_thickness_tip(thickness : float) -> void:
-	thickness_tip = thickness
+	shape_thickness_tip = thickness
 	_material.set_shader_param("thickness_tip", thickness)
 
 
 func set_color_texture(texture : Texture) -> void:
-	color_texture = texture
+	mat_color_texture = texture
 	_material.set_shader_param("color_texture", texture)
 
 
 func set_color_tiling(tiling : Vector2) -> void:
-	color_tiling = tiling
+	mat_color_tiling = tiling
 	_material.set_shader_param("color_tiling", tiling)
 
 
 func set_base_color(new_color : Color) -> void:
-	base_color = new_color;
+	mat_base_color = new_color;
 	_material.set_shader_param("base_color", new_color)
 
 
 func set_tip_color(new_color : Color) -> void:
-	tip_color = new_color;
+	mat_tip_color = new_color;
 	_material.set_shader_param("tip_color", new_color)
 
 
 func set_transmission(new_color : Color) -> void:
-	transmission = new_color;
+	mat_transmission = new_color;
 	_material.set_shader_param("transmission", new_color)
 
 
 func set_ao(new_ao : float) -> void:
-	ao = new_ao
+	mat_ao = new_ao
 	_material.set_shader_param("ao", new_ao)
 
 
 func set_roughness(new_roughness : float) -> void:
-	roughness = new_roughness
+	mat_roughness = new_roughness
 	_material.set_shader_param("roughness", new_roughness)
 
 
 func set_normal_adjustment(new_normal_adjustment : float) -> void:
-	normal_adjustment = new_normal_adjustment
+	mat_normal_adjustment = new_normal_adjustment
 	_material.set_shader_param("normal_adjustment", new_normal_adjustment)
 
 
 func set_custom_physics_pivot(path : NodePath) -> void:
-	custom_physics_pivot = path
+	physics_custom_physics_pivot = path
 	if _first_enter_tree:
 		return
 	_physics_pos = _current_physics_object().global_transform.origin
@@ -240,34 +501,34 @@ func set_custom_physics_pivot(path : NodePath) -> void:
 
 
 func set_gravity(new_gravity : float) -> void:
-	gravity = new_gravity
+	physics_gravity = new_gravity
 	_material.set_shader_param("gravity", new_gravity)
 
 
 func set_wind_strength(new_wind_strength : float) -> void:
-	wind_strength = new_wind_strength
-	_material.set_shader_param("wind_strength", wind_strength)
+	physics_wind_strength = new_wind_strength
+	_material.set_shader_param("wind_strength", physics_wind_strength)
 
 
 func set_wind_speed(new_wind_speed : float) -> void:
-	wind_speed = new_wind_speed
-	_material.set_shader_param("wind_speed", wind_speed)
+	physics_wind_speed = new_wind_speed
+	_material.set_shader_param("wind_speed", physics_wind_speed)
 
 
 func set_wind_scale(new_wind_scale : float) -> void:
-	wind_scale = new_wind_scale
-	_material.set_shader_param("wind_scale", wind_scale)
+	physics_wind_scale = new_wind_scale
+	_material.set_shader_param("wind_scale", physics_wind_scale)
 
 
 func set_wind_angle(new_wind_angle : float) -> void:
-	wind_angle = new_wind_angle
-	var angle_vector := Vector2(cos(deg2rad(wind_angle)), sin(deg2rad(wind_angle)))
+	physics_wind_angle = new_wind_angle
+	var angle_vector := Vector2(cos(deg2rad(physics_wind_angle)), sin(deg2rad(physics_wind_angle)))
 	_material.set_shader_param("wind_angle", Vector3(angle_vector.x, 0.0, angle_vector.y))
 
 
 func set_blendshape_index(index: int) -> void:
 	if _first_enter_tree:
-		blendshape_index = index
+		styling_blendshape_index = index
 		return
 	
 	if index != -1:
@@ -281,54 +542,54 @@ func set_blendshape_index(index: int) -> void:
 					if index < 0 or index > b_shapes - 1:
 						push_warning("There are only " + str(b_shapes) + " blend shapes on the mesh, index has to be between '0' and '" + str(b_shapes - 1) + "', or '-1' to disable blend shape styling.")
 						return
-					blendshape_index = index
+					styling_blendshape_index = index
 					_update_fur(0.1)
 					return
 	else:
-		blendshape_index = -1
+		styling_blendshape_index = -1
 		_update_fur(0.1)
 		return
 	push_warning("There are no blend shapes on parent mesh.")
-	blendshape_index = -1
+	styling_blendshape_index = -1
 	_update_fur(0.1)
 
 
 func set_normal_bias(value : float) -> void:
-	if blendshape_index == -1:
+	if styling_blendshape_index == -1:
 		push_warning("Normal Bias only affects fur using blendshape styling.")
 		return
-	normal_bias = value
-	_material.set_shader_param("normal_bias", normal_bias)
+	styling_normal_bias = value
+	_material.set_shader_param("normal_bias", styling_normal_bias)
 
 
 func set_LOD0_distance(value : float) -> void:
-	if value > LOD1_distance:
-		LOD0_distance = LOD1_distance
+	if value > lod_LOD1_distance:
+		lod_LOD0_distance = lod_LOD1_distance
 	else:
-		LOD0_distance = value
+		lod_LOD0_distance = value
 
 
 func set_LOD1_distance(value : float) -> void:
-	if value < LOD0_distance:
-		LOD1_distance = LOD0_distance
+	if value < lod_LOD0_distance:
+		lod_LOD1_distance = lod_LOD0_distance
 	else:
-		LOD1_distance = value
+		lod_LOD1_distance = value
 
 # Private Methods
 
 func _process_fur_physics(delta: float) -> void:
 	var position_diff := _current_physics_object().global_transform.origin - _physics_pos
-	_trans_momentum += position_diff * spring
-	_trans_momentum += Vector3(0.0, -1.0, 0.0) * gravity
+	_trans_momentum += position_diff * physics_spring
+	_trans_momentum += Vector3(0.0, -1.0, 0.0) * physics_gravity
 	_physics_pos += _trans_momentum * delta
-	_trans_momentum *= damping * -1 + 1
+	_trans_momentum *= physics_damping * -1 + 1
 	
 	_material.set_shader_param("physics_pos_offset", -position_diff)
 	
 	var rot_diff := _physics_rot.inverse() * _current_physics_object().global_transform.basis.get_rotation_quat()
-	_rot_momentum += rot_diff.get_euler() * spring
+	_rot_momentum += rot_diff.get_euler() * physics_spring
 	_physics_rot *= Quat(_rot_momentum * delta)
-	_rot_momentum *= damping * -1 + 1
+	_rot_momentum *= physics_damping * -1 + 1
 
 	_material.set_shader_param("physics_rot_offset", rot_diff)
 
@@ -339,22 +600,22 @@ func _process_LOD(delta : float) -> void:
 		return
 
 	var distance := _camera.global_transform.origin.distance_to(global_transform.origin)
-	if distance <= LOD0_distance:
+	if distance <= lod_LOD0_distance:
 		_current_LOD = 0	
-	if LOD0_distance < distance and distance <= LOD1_distance:
+	if lod_LOD0_distance < distance and distance <= lod_LOD1_distance:
 		_current_LOD = 1
-	if distance > LOD1_distance:
+	if distance > lod_LOD1_distance:
 		_current_LOD = 2
 	
 	match _current_LOD:
 		0:
 			_material.set_shader_param("LOD", 1.0)
 		1:
-			var lod_value = lerp(1.0, 0.25, (distance - LOD0_distance) / (LOD1_distance - LOD0_distance))
+			var lod_value = lerp(1.0, 0.25, (distance - lod_LOD0_distance) / (lod_LOD1_distance - lod_LOD0_distance))
 			_material.set_shader_param("LOD", lod_value)
 		2:
 			_material.set_shader_param("LOD", 0.25)
-			_fur_contract = clamp(distance - LOD1_distance - 1, 0.0, 1.1)
+			_fur_contract = clamp(distance - lod_LOD1_distance - 1, 0.0, 1.1)
 			_material.set_shader_param("fur_contract", _fur_contract)
 			if _fur_object == null:
 				return
@@ -374,22 +635,22 @@ func _analyse_parent() -> void:
 			
 			is_arraymesh = _parent_object.mesh.is_class("ArrayMesh")
 			if is_arraymesh:
-				if _parent_object.mesh.get_blend_shape_count() - 1 > blendshape_index:
-					blendshape_index = -1
+				if _parent_object.mesh.get_blend_shape_count() - 1 > styling_blendshape_index:
+					styling_blendshape_index = -1
 			
 			if _parent_object.skin != null:
 				_parent_has_skin_assigned = true
 				_skeleton_object = _parent_object.get_parent()
 	
 	if not _parent_is_mesh_instance or not _parent_has_mesh_assigned or not is_arraymesh:
-		blendshape_index = -1
+		styling_blendshape_index = -1
 
 
 func _current_physics_object() -> Spatial:
-	if custom_physics_pivot.is_empty():
+	if physics_custom_physics_pivot.is_empty():
 		return self
 	else:
-		return get_node(custom_physics_pivot) as Spatial
+		return get_node(physics_custom_physics_pivot) as Spatial
 
 
 func _update_physics_object(delay : float) -> void:
@@ -407,14 +668,14 @@ func _update_fur(delay : float) -> void:
 		return
 	
 	if _parent_has_skin_assigned:
-		FurHelperMethods.generate_mesh_shells(self, _parent_object, layers, _material, blendshape_index)
-		_fur_object = FurHelperMethods.generate_combined(self, _parent_object, _material)
+		FurHelperMethods.generate_mesh_shells(self, _parent_object, shape_layers, _material, styling_blendshape_index)
+		_fur_object = FurHelperMethods.generate_combined(self, _parent_object, _material, adv_cast_shadow)
 	else:
 		_multimeshInstance = MultiMeshInstance.new()
 		add_child(_multimeshInstance)
 		# uncomment to debug whether MMI is created
 		#_multimeshInstance.set_owner(get_tree().get_edited_scene_root()) 
-		FurHelperMethods.generate_mmi(layers, _multimeshInstance, _parent_object.mesh, _material, blendshape_index)
+		FurHelperMethods.generate_mmi(shape_layers, _multimeshInstance, _parent_object.mesh, _material, styling_blendshape_index, adv_cast_shadow)
 		_fur_object = _multimeshInstance
 
 
@@ -426,16 +687,23 @@ func _delayed_position_correction() -> void:
 	transform = Transform.IDENTITY
 
 
-func set_custom_shader(shader: Shader) -> void:
-	if custom_shader == shader:
+func set_custom_shader(shader : Shader) -> void:
+	if adv_custom_shader == shader:
 		return
-	custom_shader = shader
-	if custom_shader == null:
+	adv_custom_shader = shader
+	if adv_custom_shader == null:
 		_material.shader = load(DEFAULT_SHADER_PATH)
 	else:
-		_material.shader = custom_shader
+		_material.shader = adv_custom_shader
 		
 		if Engine.editor_hint:
 			# Ability to fork default shader
 			if shader.code == "":
 				shader.code = _default_shader.code
+
+func set_cast_shadow(value : bool) -> void:
+	if _first_enter_tree:
+		adv_cast_shadow = value
+		return
+	adv_cast_shadow = value
+	_fur_object.cast_shadow = value

@@ -3,7 +3,7 @@
 
 # Static functions used for generation of fur shells
 
-static func generate_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, material : Material, blendshape_index : int) -> void:
+static func generate_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, material : Material, blendshape_index : int, cast_shadow : bool) -> void:
 	var mdt = MeshDataTool.new()
 	if mmi.multimesh == null:
 		mmi.multimesh = MultiMesh.new()
@@ -29,7 +29,7 @@ static func generate_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, mat
 		var grey = float(i) / float(layers)
 		mmi.multimesh.set_instance_color(i, Color(1.0, 1.0, 1.0, grey))
 	
-	mmi.cast_shadow = 0
+	mmi.cast_shadow = 1 if cast_shadow else 0
 
 
 static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendshape_index: int) -> Mesh:
@@ -135,7 +135,7 @@ static func generate_mesh_shells(shell_fur_object : Spatial, parent_object : Spa
 		new_object.mesh = new_mesh
 
 
-static func generate_combined(shell_fur_object : Spatial, parent_object : Spatial, material : Material) -> Spatial:
+static func generate_combined(shell_fur_object : Spatial, parent_object : Spatial, material : Material, cast_shadow : bool) -> Spatial:
 	var st = SurfaceTool.new()
 	for child in shell_fur_object.get_children():
 		st.append_from(child.mesh, 0, Transform.IDENTITY)
@@ -149,5 +149,5 @@ static func generate_combined(shell_fur_object : Spatial, parent_object : Spatia
 	combined_obj.set_surface_material(0, material)
 	combined_obj.set_skin(parent_object.get_skin())
 	combined_obj.set_skeleton_path("../../..")
-	combined_obj.cast_shadow = 0
+	combined_obj.cast_shadow = 1 if cast_shadow else 0
 	return combined_obj
