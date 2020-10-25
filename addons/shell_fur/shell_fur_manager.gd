@@ -21,6 +21,40 @@ const PATTERNS = [
 	"res://addons/shell_fur/noise_patterns/moss.png",
 	]
 
+const DEFAULT_PARAMETERS = {
+	shape_layers = 40,
+	shape_pattern_selector = 0,
+	shape_density = 5.0,
+	shape_length = 0.5,
+	shape_length_rand = 0.3,
+	shape_length_texture = null,
+	shape_length_tiling = Vector2(1.0, 1.0),
+	shape_thickness_base = 0.75,
+	shape_thickness_tip = 0.3,
+	mat_base_color = Color(0.43, 0.35, 0.29),
+	mat_tip_color = Color(0.78, 0.63, 0.52),
+	mat_color_texture = null,
+	mat_color_tiling = Vector2(1.0, 1.0),
+	mat_transmission = Color(0.3, 0.3, 0.3),
+	mat_ao = 1.0,
+	mat_roughness = 1.0,
+	mat_normal_adjustment = 0.0,
+	physics_custom_physics_pivot = NodePath(),
+	physics_gravity = 0.1,
+	physics_spring = 4.0,
+	physics_damping = 0.1,
+	physics_wind_strength = 0.0,
+	physics_wind_speed = 1.0,
+	physics_wind_scale = 1.0,
+	physics_wind_angle = 0.0,
+	styling_blendshape_index = -1,
+	styling_normal_bias = 0,
+	lod_LOD0_distance = 10.0,
+	lod_LOD1_distance = 100.0,
+	adv_cast_shadow = false,
+	adv_custom_shader = null
+}
+
 # Shape
 var shape_layers := 40 setget set_layers
 var shape_pattern_texture : Texture setget set_pattern_texture
@@ -62,8 +96,8 @@ var lod_LOD0_distance := 10.0 setget set_LOD0_distance
 var lod_LOD1_distance := 100.0 setget set_LOD1_distance 
 
 # Advanced
-var adv_custom_shader : Shader setget set_custom_shader
 var adv_cast_shadow : bool setget set_cast_shadow
+var adv_custom_shader : Shader setget set_custom_shader
 
 var _parent_is_mesh_instance = false 
 var _parent_has_mesh_assigned = false 
@@ -82,7 +116,19 @@ var _physics_rot : Quat
 var _fur_contract := 0.0
 var _current_LOD := 0
 
+
 # Built-in Methods
+func property_can_revert(p_name: String) -> bool:
+	if not DEFAULT_PARAMETERS.has(p_name):
+		return false
+	if get(p_name) != DEFAULT_PARAMETERS[p_name]:
+		return true
+	return false
+
+
+func property_get_revert(p_name: String): # returns Variant
+	return DEFAULT_PARAMETERS[p_name]
+
 
 func _get_property_list() -> Array:
 	return [
@@ -388,16 +434,16 @@ func _exit_tree() -> void:
 	_parent_has_mesh_assigned = false
 	_parent_has_skin_assigned = false
 
-# Getter Methods
 
+# Getter Methods
 func get_current_LOD() -> int:
 	if _fur_object != null:
 		if _fur_object.visible == false:
 			return 3
 	return _current_LOD
 
-# Setter Methods
 
+# Setter Methods
 func set_layers(new_layers : int) -> void:
 	shape_layers = new_layers
 	if _first_enter_tree:
@@ -575,8 +621,31 @@ func set_LOD1_distance(value : float) -> void:
 	else:
 		lod_LOD1_distance = value
 
-# Private Methods
 
+func set_custom_shader(shader : Shader) -> void:
+	if adv_custom_shader == shader:
+		return
+	adv_custom_shader = shader
+	if adv_custom_shader == null:
+		_material.shader = load(DEFAULT_SHADER_PATH)
+	else:
+		_material.shader = adv_custom_shader
+		
+		if Engine.editor_hint:
+			# Ability to fork default shader
+			if shader.code == "":
+				shader.code = _default_shader.code
+
+
+func set_cast_shadow(value : bool) -> void:
+	if _first_enter_tree:
+		adv_cast_shadow = value
+		return
+	adv_cast_shadow = value
+	_fur_object.cast_shadow = value
+
+
+# Private Methods
 func _process_fur_physics(delta: float) -> void:
 	var position_diff := _current_physics_object().global_transform.origin - _physics_pos
 	_trans_momentum += position_diff * physics_spring
@@ -685,25 +754,3 @@ func _delayed_position_correction() -> void:
 	# delayed
 	yield(get_tree().create_timer(0.1), "timeout")
 	transform = Transform.IDENTITY
-
-
-func set_custom_shader(shader : Shader) -> void:
-	if adv_custom_shader == shader:
-		return
-	adv_custom_shader = shader
-	if adv_custom_shader == null:
-		_material.shader = load(DEFAULT_SHADER_PATH)
-	else:
-		_material.shader = adv_custom_shader
-		
-		if Engine.editor_hint:
-			# Ability to fork default shader
-			if shader.code == "":
-				shader.code = _default_shader.code
-
-func set_cast_shadow(value : bool) -> void:
-	if _first_enter_tree:
-		adv_cast_shadow = value
-		return
-	adv_cast_shadow = value
-	_fur_object.cast_shadow = value
