@@ -59,6 +59,7 @@ When done with the Test Suite, delete all added fur nodes so it is ready for the
 }
 
 [node name="Part 1 - Apply and Tranfer" type="Spatial" parent="."]
+visible = false
 
 [node name="Case 1 - Apply Fur" type="Node" parent="Part 1 - Apply and Tranfer"]
 __meta__ = {
@@ -118,7 +119,6 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -2 )
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -2 )
 
 [node name="Part 2 - Parameters" type="Spatial" parent="."]
-visible = false
 
 [node name="Case 3 - Shape" type="Node" parent="Part 2 - Parameters"]
 __meta__ = {
@@ -183,7 +183,7 @@ mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
 mat_roughness = 1.0
 mat_normal_adjustment = 0.0
-physics_custom_physics_pivot = NodePath("")
+physics_custom_physics_pivot = NodePath("../../BoneAttachment")
 physics_gravity = 0.1
 physics_spring = 4.0
 physics_damping = 0.1
@@ -199,7 +199,7 @@ adv_cast_shadow = false
 adv_custom_shader = null
 
 [node name="BoneAttachment" type="BoneAttachment" parent="Part 2 - Parameters/SkinnedMesh_2Mat_2Blend/SkinnedMesh_2Mat_2Blend_Armature/Skeleton" index="1"]
-transform = Transform( 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0.00164485, 0 )
+transform = Transform( 1.06312e-07, 2.67489e-08, -1, -0.985838, 0.167701, -1.0032e-07, 0.167701, 0.985838, 4.41986e-08, 9.58093e-08, 0.0791279, 0.359776 )
 bone_name = "lower_arm"
 
 [node name="Ground Plane" type="MeshInstance" parent="Part 2 - Parameters"]
@@ -250,8 +250,8 @@ physics_wind_scale = 1.0
 physics_wind_angle = 0.0
 styling_blendshape_index = -1
 styling_normal_bias = 0.0
-lod_LOD0_distance = 1.0
-lod_LOD1_distance = 4.0
+lod_LOD0_distance = 3.0
+lod_LOD1_distance = 7.0
 adv_cast_shadow = false
 adv_custom_shader = null
 
@@ -289,8 +289,8 @@ physics_wind_scale = 1.0
 physics_wind_angle = 0.0
 styling_blendshape_index = -1
 styling_normal_bias = 0.0
-lod_LOD0_distance = 4.0
-lod_LOD1_distance = 7.0
+lod_LOD0_distance = 7.0
+lod_LOD1_distance = 12.0
 adv_cast_shadow = false
 adv_custom_shader = null
 
@@ -329,8 +329,8 @@ physics_wind_scale = 1.0
 physics_wind_angle = 0.0
 styling_blendshape_index = -1
 styling_normal_bias = 0.0
-lod_LOD0_distance = 7.0
-lod_LOD1_distance = 13.0
+lod_LOD0_distance = 12.0
+lod_LOD1_distance = 16.0
 adv_cast_shadow = false
 adv_custom_shader = null
 

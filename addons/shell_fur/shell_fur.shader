@@ -75,7 +75,7 @@ vec3 projectOnPlane( vec3 vec, vec3 normal ) {
 }
 
 void vertex() {
-	if (LOD >= COLOR.a) {
+	if (LOD >= COLOR.a) { // Skipping vertex calculations if layer is beyond LOD threshhold
 		lod_adjusted_layer_value = COLOR.a / LOD;
 		// Rescaling the color values into vectors.
 		extrusion_vec = ((vec3(COLOR.xyz) * 2.0 - 1.0) * blend_shape_multiplier); 
@@ -86,19 +86,23 @@ void vertex() {
 		VERTEX += (vec4(interpolated_extrude * fur_length * lod_adjusted_layer_value + offset_from_surface, 0.0) * physics_rot_offset).xyz;
 		VERTEX -= fur_contract * extrusion_vec * fur_length;
 		
-		vec3 winduv = VERTEX * wind_scale;
-		winduv.y += TIME * wind_speed;	
-		vec3 wind_angle_world = (vec4(wind_angle, 0) * WORLD_MATRIX).xyz;
-		vec3 wind_dir_flattened = projectOnPlane(wind_angle_world, NORMAL);
-		vec3 wind_vec = wind_dir_flattened * perlin3D(winduv, 0) * wind_strength;
+		vec3 wind_vec = vec3(0.0);
+		if (wind_strength > 0.01) { // Skipping wind calculations if wind_strength is less than 0.01
+			vec3 winduv = VERTEX * wind_scale;
+			winduv.y += TIME * wind_speed;	
+			vec3 wind_angle_world = (vec4(wind_angle, 0) * WORLD_MATRIX).xyz;
+			vec3 wind_dir_flattened = projectOnPlane(wind_angle_world, NORMAL);
+			wind_vec = wind_dir_flattened * perlin3D(winduv, 0) * wind_strength;
+		}
+		
 		vec3 physics_pos_offset_world = (vec4(physics_pos_offset, 0) * WORLD_MATRIX).xyz;
 		forces_vec = (physics_pos_offset_world + wind_vec) * length(extrusion_vec) * smoothstep(0.0, 2.0, lod_adjusted_layer_value);
 		VERTEX += forces_vec;
 	}
 }
 
-void fragment() {
-	if (LOD < COLOR.a) {
+void fragment() { // Discarding fragment if layer is beyond LOD threshhold
+	if (LOD < COLOR.a) { 
 		discard;
 	}
 	

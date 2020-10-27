@@ -99,21 +99,20 @@ var lod_LOD1_distance := 100.0 setget set_LOD1_distance
 var adv_cast_shadow : bool setget set_cast_shadow
 var adv_custom_shader : Shader setget set_custom_shader
 
+
+var material: ShaderMaterial = null
+var fur_object : Spatial
+
+var _lod_system
+var _physics_system
 var _parent_is_mesh_instance = false 
 var _parent_has_mesh_assigned = false 
 var _parent_has_skin_assigned = false
-var _material: ShaderMaterial = null
 var _default_shader: Shader = null
 var _multimeshInstance : MultiMeshInstance = null
 var _first_enter_tree := true
-var _fur_object : Spatial
 var _parent_object : Spatial
 var _skeleton_object
-var _trans_momentum : Vector3
-var _rot_momentum : Vector3
-var _physics_pos : Vector3
-var _physics_rot : Quat
-var _fur_contract := 0.0
 var _current_LOD := 0
 
 
@@ -385,16 +384,20 @@ func _get_property_list() -> Array:
 
 func _init() -> void:
 	_default_shader = load(DEFAULT_SHADER_PATH) as Shader
-	_material = ShaderMaterial.new()
-	_material.shader = _default_shader
-
+	material = ShaderMaterial.new()
+	material.shader = _default_shader
+	_lod_system = load("res://addons/shell_fur/shell_fur_lod.gd").new()
+	_lod_system.init(self)
+	_physics_system = load("res://addons/shell_fur/shell_fur_physics.gd").new()
+	_physics_system.init(self)
+	
 
 func _enter_tree() -> void:	
 	if Engine.editor_hint and _first_enter_tree:
 		_first_enter_tree = false
 
 	_analyse_parent()
-	_update_physics_object(0.5)
+	_physics_system.update_physics_object(0.5)
 	
 	if _parent_has_mesh_assigned:
 		# Delaying the fur update to avoid throwing below error on reparenting
@@ -412,13 +415,13 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
-	_update_physics_object(0.0)
+	_physics_system.update_physics_object(0.0)
 
 
 func _physics_process(delta: float) -> void:
-	_process_fur_physics(delta)
+	_physics_system.process(delta)
 	if not Engine.editor_hint:
-		_process_LOD(delta)
+		_lod_system.process(delta)
 
 
 func _get_configuration_warning() -> String:
@@ -437,8 +440,8 @@ func _exit_tree() -> void:
 
 # Getter Methods
 func get_current_LOD() -> int:
-	if _fur_object != null:
-		if _fur_object.visible == false:
+	if fur_object != null:
+		if fur_object.visible == false:
 			return 3
 	return _current_LOD
 
@@ -448,13 +451,13 @@ func set_layers(new_layers : int) -> void:
 	shape_layers = new_layers
 	if _first_enter_tree:
 		return
-	_material.set_shader_param("layers", new_layers)
+	material.set_shader_param("layers", new_layers)
 	_update_fur(0.0)
 
 
 func set_pattern_texture(texture : Texture) -> void:
 	shape_pattern_texture = texture
-	_material.set_shader_param("pattern_texture", texture)
+	material.set_shader_param("pattern_texture", texture)
 
 
 func set_pattern_selector(index : int) -> void:
@@ -464,111 +467,110 @@ func set_pattern_selector(index : int) -> void:
 
 func set_density(new_desity : float) -> void:
 	shape_density = new_desity
-	_material.set_shader_param("density", new_desity)
+	material.set_shader_param("density", new_desity)
 
 
 func set_length(new_length : float) -> void:
 	shape_length = new_length
-	_material.set_shader_param("fur_length", new_length)
+	material.set_shader_param("fur_length", new_length)
 
 
 func set_length_rand(new_length_rand : float) -> void:
 	shape_length_rand = new_length_rand
-	_material.set_shader_param("length_rand", new_length_rand)
+	material.set_shader_param("length_rand", new_length_rand)
 
 
 func set_length_texture(texture : Texture) -> void:
 	shape_length_texture = texture
-	_material.set_shader_param("length_texture", texture)
+	material.set_shader_param("length_texture", texture)
 
 
 func set_length_tiling(tiling : Vector2) -> void:
 	shape_length_tiling = tiling
-	_material.set_shader_param("length_tiling", tiling)
+	material.set_shader_param("length_tiling", tiling)
 
 
 func set_thickness_base(thickness : float) -> void:
 	shape_thickness_base = thickness
-	_material.set_shader_param("thickness_base", thickness)
+	material.set_shader_param("thickness_base", thickness)
 
 
 func set_thickness_tip(thickness : float) -> void:
 	shape_thickness_tip = thickness
-	_material.set_shader_param("thickness_tip", thickness)
+	material.set_shader_param("thickness_tip", thickness)
 
 
 func set_color_texture(texture : Texture) -> void:
 	mat_color_texture = texture
-	_material.set_shader_param("color_texture", texture)
+	material.set_shader_param("color_texture", texture)
 
 
 func set_color_tiling(tiling : Vector2) -> void:
 	mat_color_tiling = tiling
-	_material.set_shader_param("color_tiling", tiling)
+	material.set_shader_param("color_tiling", tiling)
 
 
 func set_base_color(new_color : Color) -> void:
 	mat_base_color = new_color;
-	_material.set_shader_param("base_color", new_color)
+	material.set_shader_param("base_color", new_color)
 
 
 func set_tip_color(new_color : Color) -> void:
 	mat_tip_color = new_color;
-	_material.set_shader_param("tip_color", new_color)
+	material.set_shader_param("tip_color", new_color)
 
 
 func set_transmission(new_color : Color) -> void:
 	mat_transmission = new_color;
-	_material.set_shader_param("transmission", new_color)
+	material.set_shader_param("transmission", new_color)
 
 
 func set_ao(new_ao : float) -> void:
 	mat_ao = new_ao
-	_material.set_shader_param("ao", new_ao)
+	material.set_shader_param("ao", new_ao)
 
 
 func set_roughness(new_roughness : float) -> void:
 	mat_roughness = new_roughness
-	_material.set_shader_param("roughness", new_roughness)
+	material.set_shader_param("roughness", new_roughness)
 
 
 func set_normal_adjustment(new_normal_adjustment : float) -> void:
 	mat_normal_adjustment = new_normal_adjustment
-	_material.set_shader_param("normal_adjustment", new_normal_adjustment)
+	material.set_shader_param("normal_adjustment", new_normal_adjustment)
 
 
 func set_custom_physics_pivot(path : NodePath) -> void:
 	physics_custom_physics_pivot = path
 	if _first_enter_tree:
 		return
-	_physics_pos = _current_physics_object().global_transform.origin
-	_physics_rot = _current_physics_object().global_transform.basis.get_rotation_quat()
+	_physics_system.update_physics_object(0.0)
 
 
 func set_gravity(new_gravity : float) -> void:
 	physics_gravity = new_gravity
-	_material.set_shader_param("gravity", new_gravity)
+	material.set_shader_param("gravity", new_gravity)
 
 
 func set_wind_strength(new_wind_strength : float) -> void:
 	physics_wind_strength = new_wind_strength
-	_material.set_shader_param("wind_strength", physics_wind_strength)
+	material.set_shader_param("wind_strength", physics_wind_strength)
 
 
 func set_wind_speed(new_wind_speed : float) -> void:
 	physics_wind_speed = new_wind_speed
-	_material.set_shader_param("wind_speed", physics_wind_speed)
+	material.set_shader_param("wind_speed", physics_wind_speed)
 
 
 func set_wind_scale(new_wind_scale : float) -> void:
 	physics_wind_scale = new_wind_scale
-	_material.set_shader_param("wind_scale", physics_wind_scale)
+	material.set_shader_param("wind_scale", physics_wind_scale)
 
 
 func set_wind_angle(new_wind_angle : float) -> void:
 	physics_wind_angle = new_wind_angle
 	var angle_vector := Vector2(cos(deg2rad(physics_wind_angle)), sin(deg2rad(physics_wind_angle)))
-	_material.set_shader_param("wind_angle", Vector3(angle_vector.x, 0.0, angle_vector.y))
+	material.set_shader_param("wind_angle", Vector3(angle_vector.x, 0.0, angle_vector.y))
 
 
 func set_blendshape_index(index: int) -> void:
@@ -604,7 +606,7 @@ func set_normal_bias(value : float) -> void:
 		push_warning("Normal Bias only affects fur using blendshape styling.")
 		return
 	styling_normal_bias = value
-	_material.set_shader_param("normal_bias", styling_normal_bias)
+	material.set_shader_param("normal_bias", styling_normal_bias)
 
 
 func set_LOD0_distance(value : float) -> void:
@@ -626,9 +628,9 @@ func set_custom_shader(shader : Shader) -> void:
 		return
 	adv_custom_shader = shader
 	if adv_custom_shader == null:
-		_material.shader = load(DEFAULT_SHADER_PATH)
+		material.shader = load(DEFAULT_SHADER_PATH)
 	else:
-		_material.shader = adv_custom_shader
+		material.shader = adv_custom_shader
 		
 		if Engine.editor_hint:
 			# Ability to fork default shader
@@ -641,56 +643,7 @@ func set_cast_shadow(value : bool) -> void:
 		adv_cast_shadow = value
 		return
 	adv_cast_shadow = value
-	_fur_object.cast_shadow = value
-
-
-# Private Methods
-func _process_fur_physics(delta: float) -> void:
-	var position_diff := _current_physics_object().global_transform.origin - _physics_pos
-	_trans_momentum += position_diff * physics_spring
-	_trans_momentum += Vector3(0.0, -1.0, 0.0) * physics_gravity
-	_physics_pos += _trans_momentum * delta
-	_trans_momentum *= physics_damping * -1 + 1
-	
-	_material.set_shader_param("physics_pos_offset", -position_diff)
-	
-	var rot_diff := _physics_rot.inverse() * _current_physics_object().global_transform.basis.get_rotation_quat()
-	_rot_momentum += rot_diff.get_euler() * physics_spring
-	_physics_rot *= Quat(_rot_momentum * delta)
-	_rot_momentum *= physics_damping * -1 + 1
-
-	_material.set_shader_param("physics_rot_offset", rot_diff)
-
-
-func _process_LOD(delta : float) -> void:
-	var _camera := get_viewport().get_camera()
-	if _camera == null:
-		return
-
-	var distance := _camera.global_transform.origin.distance_to(global_transform.origin)
-	if distance <= lod_LOD0_distance:
-		_current_LOD = 0	
-	if lod_LOD0_distance < distance and distance <= lod_LOD1_distance:
-		_current_LOD = 1
-	if distance > lod_LOD1_distance:
-		_current_LOD = 2
-	
-	match _current_LOD:
-		0:
-			_material.set_shader_param("LOD", 1.0)
-		1:
-			var lod_value = lerp(1.0, 0.25, (distance - lod_LOD0_distance) / (lod_LOD1_distance - lod_LOD0_distance))
-			_material.set_shader_param("LOD", lod_value)
-		2:
-			_material.set_shader_param("LOD", 0.25)
-			_fur_contract = clamp(distance - lod_LOD1_distance - 1, 0.0, 1.1)
-			_material.set_shader_param("fur_contract", _fur_contract)
-			if _fur_object == null:
-				return
-			if _fur_contract > 1.0 and _fur_object.visible == true:
-				_fur_object.visible = false
-			if _fur_contract < 1.0 and _fur_object.visible == false:
-				_fur_object.visible = true
+	fur_object.cast_shadow = value
 
 
 func _analyse_parent() -> void:
@@ -713,19 +666,6 @@ func _analyse_parent() -> void:
 		styling_blendshape_index = -1
 
 
-func _current_physics_object() -> Spatial:
-	if physics_custom_physics_pivot.is_empty():
-		return self
-	else:
-		return get_node(physics_custom_physics_pivot) as Spatial
-
-
-func _update_physics_object(delay : float) -> void:
-	yield(get_tree().create_timer(delay), "timeout")
-	_physics_pos = _current_physics_object().global_transform.origin
-	_physics_rot = _current_physics_object().global_transform.basis.get_rotation_quat()
-
-
 func _update_fur(delay : float) -> void:
 	yield(get_tree().create_timer(delay), "timeout")
 	for child in get_children():
@@ -735,15 +675,15 @@ func _update_fur(delay : float) -> void:
 		return
 	
 	if _parent_has_skin_assigned:
-		FurHelperMethods.generate_mesh_shells(self, _parent_object, shape_layers, _material, styling_blendshape_index)
-		_fur_object = FurHelperMethods.generate_combined(self, _parent_object, _material, adv_cast_shadow)
+		FurHelperMethods.generate_mesh_shells(self, _parent_object, shape_layers, material, styling_blendshape_index)
+		fur_object = FurHelperMethods.generate_combined(self, _parent_object, material, adv_cast_shadow)
 	else:
 		_multimeshInstance = MultiMeshInstance.new()
 		add_child(_multimeshInstance)
 		# uncomment to debug whether MMI is created
 		#_multimeshInstance.set_owner(get_tree().get_edited_scene_root()) 
-		FurHelperMethods.generate_mmi(shape_layers, _multimeshInstance, _parent_object.mesh, _material, styling_blendshape_index, adv_cast_shadow)
-		_fur_object = _multimeshInstance
+		FurHelperMethods.generate_mmi(shape_layers, _multimeshInstance, _parent_object.mesh, material, styling_blendshape_index, adv_cast_shadow)
+		fur_object = _multimeshInstance
 
 
 func _delayed_position_correction() -> void:
