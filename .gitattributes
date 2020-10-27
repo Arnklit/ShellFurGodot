@@ -9,5 +9,7 @@
 /LICENSE.md export-ignore
 /CHANGELOG.md export-ignore
 /icon.png export-ignore
+/icon.png.import export-ignore
 /project.godot export-ignore
 test_assets export-ignore
+.github/ISSUE_TEMPLATE export-ignore
