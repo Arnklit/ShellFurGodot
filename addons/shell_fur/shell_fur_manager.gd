@@ -458,7 +458,6 @@ func set_pattern_texture(texture : Texture) -> void:
 
 
 func set_pattern_selector(index : int) -> void:
-	print("set_pattern_selector getting run: " + str(index))
 	set_pattern_texture(load(PATTERNS[index]))
 	shape_pattern_selector = index
 

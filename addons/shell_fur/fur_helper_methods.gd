@@ -11,7 +11,7 @@ static func generate_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, mat
 		mmi.multimesh.color_format = MultiMesh.COLOR_FLOAT
 		mmi.multimesh.custom_data_format = MultiMesh.CUSTOM_DATA_NONE
 	
-	var new_mesh : Mesh = mesh.duplicate(true)
+	var new_mesh : Mesh = mesh.duplicate(true) as Mesh
 	
 	if blendshape_index != -1:
 		new_mesh = _blendshape_to_vertex_color(new_mesh, material, blendshape_index)
