@@ -48,7 +48,7 @@ const DEFAULT_PARAMETERS = {
 	physics_wind_scale = 1.0,
 	physics_wind_angle = 0.0,
 	styling_blendshape_index = -1,
-	styling_normal_bias = 0,
+	styling_normal_bias = 0.0,
 	lod_LOD0_distance = 10.0,
 	lod_LOD1_distance = 100.0,
 	adv_cast_shadow = false,
@@ -376,8 +376,8 @@ func _get_property_list() -> Array:
 		{
 			name = "adv_custom_shader",
 			type = TYPE_OBJECT,
-			hint = PROPERTY_HINT_RESOURCE_TYPE | PROPERTY_USAGE_STORAGE,
-			usage = PROPERTY_USAGE_EDITOR,
+			hint = PROPERTY_HINT_RESOURCE_TYPE,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 			hint_string = "Shader"
 		},
 	]
@@ -601,7 +601,7 @@ func set_blendshape_index(index: int) -> void:
 
 
 func set_normal_bias(value : float) -> void:
-	if styling_blendshape_index == -1:
+	if styling_blendshape_index == -1 and value != 0.0:
 		push_warning("Normal Bias only affects fur using blendshape styling.")
 		return
 	styling_normal_bias = value
@@ -701,10 +701,9 @@ func _analyse_parent() -> void:
 		_parent_is_mesh_instance = true
 		if _parent_object.mesh != null:
 			_parent_has_mesh_assigned = true
-			
 			is_arraymesh = _parent_object.mesh.is_class("ArrayMesh")
 			if is_arraymesh:
-				if _parent_object.mesh.get_blend_shape_count() - 1 > styling_blendshape_index:
+				if _parent_object.mesh.get_blend_shape_count() - 1 < styling_blendshape_index:
 					styling_blendshape_index = -1
 			
 			if _parent_object.skin != null:
