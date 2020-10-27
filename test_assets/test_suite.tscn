@@ -1,0 +1,110 @@
+[gd_scene load_steps=14 format=2]
+
+[ext_resource path="res://test_assets/models/Mesh_1Mat_0Blend.gltf" type="PackedScene" id=1]
+[ext_resource path="res://test_assets/models/Mesh_2Mat_0Blend.gltf" type="PackedScene" id=2]
+[ext_resource path="res://test_assets/models/Mesh_2Mat_1Blend.gltf" type="PackedScene" id=3]
+[ext_resource path="res://test_assets/models/Mesh_2Mat_2Blend.gltf" type="PackedScene" id=4]
+[ext_resource path="res://test_assets/models/SkinnedMesh_1Mat_0Blend.gltf" type="PackedScene" id=5]
+[ext_resource path="res://test_assets/models/SkinnedMesh_1Mat_1Blend.gltf" type="PackedScene" id=6]
+[ext_resource path="res://test_assets/models/SkinnedMesh_1Mat_2Blend.gltf" type="PackedScene" id=7]
+[ext_resource path="res://test_assets/models/SkinnedMesh_2Mat_0Blend.gltf" type="PackedScene" id=8]
+[ext_resource path="res://test_assets/models/SkinnedMesh_2Mat_1Blend.gltf" type="PackedScene" id=9]
+[ext_resource path="res://test_assets/models/SkinnedMesh_2Mat_2Blend.gltf" type="PackedScene" id=10]
+[ext_resource path="res://test_assets/models/Mesh_1Mat_1Blend.gltf" type="PackedScene" id=11]
+[ext_resource path="res://test_assets/models/Mesh_1Mat_2Blend.gltf" type="PackedScene" id=12]
+
+[sub_resource type="SphereMesh" id=1]
+radius = 0.5
+height = 1.0
+radial_segments = 16
+rings = 12
+
+[node name="Test Suite" type="Spatial"]
+__meta__ = {
+"_editor_description_": "This scene is set up to test all the functionality that should work before doing a new release.
+
+Instructions for each step are in the seperate nodes.
+
+When done with the Test Suite, delete all added fur nodes so it is ready for the next round."
+}
+
+[node name="Part 1" type="Spatial" parent="."]
+
+[node name="Case 1 - Apply Fur" type="Node" parent="Part 1"]
+__meta__ = {
+"_editor_description_": "* Fur throws correct error when applied to Spatial
+* Fur throws correct error when applied to CSGMesh
+* Fur can be applied and dragged between all the remaining mesh types"
+}
+
+[node name="Case 2 - Tranfer from blendshape" type="Node" parent="Part 1"]
+__meta__ = {
+"_editor_description_": "* Apple fur to Mesh_2Mat_2Blend. Set blendshape styling to second blendshape (index 1)
+* Try to drag the the fur to all the different variants and fewer or no blendshapes and ensure that it disables blendshape styling"
+}
+
+[node name="EmptySpatial" type="Spatial" parent="Part 1"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0 )
+
+[node name="CSGMesh" type="CSGMesh" parent="Part 1"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0 )
+mesh = SubResource( 1 )
+
+[node name="Mesh_1Mat_0Blend" parent="Part 1" instance=ExtResource( 1 )]
+
+[node name="Mesh_1Mat_1Blend" parent="Part 1" instance=ExtResource( 11 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0 )
+
+[node name="Mesh_1Mat_2Blend" parent="Part 1" instance=ExtResource( 12 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0 )
+
+[node name="Mesh_2Mat_0Blend" parent="Part 1" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0 )
+
+[node name="Mesh_2Mat_1Blend" parent="Part 1" instance=ExtResource( 3 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0 )
+
+[node name="Mesh_2Mat_2Blend" parent="Part 1" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 0 )
+
+[node name="SkinnedMesh_1Mat_0Blend" parent="Part 1" instance=ExtResource( 5 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2 )
+
+[node name="SkinnedMesh_1Mat_1Blend" parent="Part 1" instance=ExtResource( 6 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2 )
+
+[node name="SkinnedMesh_1Mat_2Blend" parent="Part 1" instance=ExtResource( 7 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -2 )
+
+[node name="SkinnedMesh_2Mat_0Blend" parent="Part 1" instance=ExtResource( 8 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -2 )
+
+[node name="SkinnedMesh_2Mat_1Blend" parent="Part 1" instance=ExtResource( 9 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -2 )
+
+[node name="SkinnedMesh_2Mat_2Blend" parent="Part 1" instance=ExtResource( 10 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -2 )
+
+[editable path="Part 1/Mesh_1Mat_0Blend"]
+
+[editable path="Part 1/Mesh_1Mat_1Blend"]
+
+[editable path="Part 1/Mesh_1Mat_2Blend"]
+
+[editable path="Part 1/Mesh_2Mat_0Blend"]
+
+[editable path="Part 1/Mesh_2Mat_1Blend"]
+
+[editable path="Part 1/Mesh_2Mat_2Blend"]
+
+[editable path="Part 1/SkinnedMesh_1Mat_0Blend"]
+
+[editable path="Part 1/SkinnedMesh_1Mat_1Blend"]
+
+[editable path="Part 1/SkinnedMesh_1Mat_2Blend"]
+
+[editable path="Part 1/SkinnedMesh_2Mat_0Blend"]
+
+[editable path="Part 1/SkinnedMesh_2Mat_1Blend"]
+
+[editable path="Part 1/SkinnedMesh_2Mat_2Blend"]

@@ -1,6 +1,5 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=9 format=2]
 
-[ext_resource path="res://test_assets/bending_arm_with_shape.tscn" type="PackedScene" id=1]
 [ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=2]
 [ext_resource path="res://addons/shell_fur/noise_patterns/fine_hair.png" type="Texture" id=3]
 
@@ -85,12 +84,6 @@ autoplay = "panning in and out"
 "anims/panning in and out" = SubResource( 4 )
 "next/panning in and out" = "panning in and out"
 
-[node name="bending_arm4_with_shape" parent="." instance=ExtResource( 1 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0 )
-
-[node name="BoneAttachment" parent="bending_arm4_with_shape/Armature/Skeleton" index="1"]
-transform = Transform( 1, -7.25854e-09, -2.38552e-07, -9.39762e-09, -0.99996, -0.00896813, -2.38478e-07, 0.00896813, -0.99996, -5.80998e-09, -0.800262, -0.00759613 )
-
 [node name="MeshInstance" type="MeshInstance" parent="."]
 mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
@@ -128,5 +121,3 @@ styling_normal_bias = 0.0
 lod_LOD0_distance = 10.0
 lod_LOD1_distance = 100.0
 adv_cast_shadow = false
-
-[editable path="bending_arm4_with_shape"]

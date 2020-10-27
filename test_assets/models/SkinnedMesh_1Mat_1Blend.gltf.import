@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/bending_arm4_with_shape.gltf-18235899a90d84a2e453d6c65073c30c.scn"
+path="res://.import/SkinnedMesh_1Mat_1Blend.gltf-62779b46929c137d6970632dc3a4846d.scn"
 
 [deps]
 
-source_file="res://test_assets/models/bending_arm4_with_shape.gltf"
-dest_files=[ "res://.import/bending_arm4_with_shape.gltf-18235899a90d84a2e453d6c65073c30c.scn" ]
+source_file="res://test_assets/models/SkinnedMesh_1Mat_1Blend.gltf"
+dest_files=[ "res://.import/SkinnedMesh_1Mat_1Blend.gltf-62779b46929c137d6970632dc3a4846d.scn" ]
 
 [params]
 
@@ -17,7 +17,7 @@ nodes/root_scale=1.0
 nodes/custom_script=""
 nodes/storage=0
 materials/location=1
-materials/storage=1
+materials/storage=0
 materials/keep_on_reimport=true
 meshes/compress=true
 meshes/ensure_tangents=true

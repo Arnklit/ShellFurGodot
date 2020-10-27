@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/tiger_stripes.png-a689965639b94d6e396273ab9422b1d2.s3tc.stex"
-path.etc2="res://.import/tiger_stripes.png-a689965639b94d6e396273ab9422b1d2.etc2.stex"
+path.s3tc="res://.import/tiger_stripes.png-6c48404e248c767c316e0b39928254f6.s3tc.stex"
+path.etc2="res://.import/tiger_stripes.png-6c48404e248c767c316e0b39928254f6.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://test_assets/tiger_stripes.png"
-dest_files=[ "res://.import/tiger_stripes.png-a689965639b94d6e396273ab9422b1d2.s3tc.stex", "res://.import/tiger_stripes.png-a689965639b94d6e396273ab9422b1d2.etc2.stex" ]
+source_file="res://test_assets/textures/tiger_stripes.png"
+dest_files=[ "res://.import/tiger_stripes.png-6c48404e248c767c316e0b39928254f6.s3tc.stex", "res://.import/tiger_stripes.png-6c48404e248c767c316e0b39928254f6.etc2.stex" ]
 
 [params]
 

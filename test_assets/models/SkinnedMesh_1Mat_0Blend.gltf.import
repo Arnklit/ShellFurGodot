@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/fur_plane.gltf-070922415f8056c30130cd59453e48e9.scn"
+path="res://.import/SkinnedMesh_1Mat_0Blend.gltf-b0b602ebd26796b60b1f8f12433829c6.scn"
 
 [deps]
 
-source_file="res://test_assets/models/fur_plane.gltf"
-dest_files=[ "res://.import/fur_plane.gltf-070922415f8056c30130cd59453e48e9.scn" ]
+source_file="res://test_assets/models/SkinnedMesh_1Mat_0Blend.gltf"
+dest_files=[ "res://.import/SkinnedMesh_1Mat_0Blend.gltf-b0b602ebd26796b60b1f8f12433829c6.scn" ]
 
 [params]
 
@@ -17,7 +17,7 @@ nodes/root_scale=1.0
 nodes/custom_script=""
 nodes/storage=0
 materials/location=1
-materials/storage=1
+materials/storage=0
 materials/keep_on_reimport=true
 meshes/compress=true
 meshes/ensure_tangents=true
