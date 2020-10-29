@@ -578,24 +578,25 @@ func set_blendshape_index(index: int) -> void:
 		styling_blendshape_index = index
 		return
 	
-	if index != -1:
-		if _parent_has_mesh_assigned:
-			if _parent_object.mesh.is_class("ArrayMesh"):
-				if _parent_object.mesh.get_blend_shape_count() > 0:
-					var b_shapes = _parent_object.mesh.get_blend_shape_count()
-					if index != 0 and b_shapes == 1:
-						push_warning("There is only one blend shape, index has to be '0', or '-1' to disable blend shape styling.")
-						return
-					if index < 0 or index > b_shapes - 1:
-						push_warning("There are only " + str(b_shapes) + " blend shapes on the mesh, index has to be between '0' and '" + str(b_shapes - 1) + "', or '-1' to disable blend shape styling.")
-						return
-					styling_blendshape_index = index
-					_update_fur(0.1)
-					return
-	else:
+	if index == -1:
 		styling_blendshape_index = -1
 		_update_fur(0.1)
 		return
+	
+	if _parent_has_mesh_assigned:
+		if _parent_object.mesh.is_class("ArrayMesh"):
+			if _parent_object.mesh.get_blend_shape_count() > 0:
+				var b_shapes = _parent_object.mesh.get_blend_shape_count()
+				if index != 0 and b_shapes == 1:
+					push_warning("There is only one blend shape, index has to be '0', or '-1' to disable blend shape styling.")
+					return
+				if index < 0 or index > b_shapes - 1:
+					push_warning("There are only " + str(b_shapes) + " blend shapes on the mesh, index has to be between '0' and '" + str(b_shapes - 1) + "', or '-1' to disable blend shape styling.")
+					return
+				styling_blendshape_index = index
+				_update_fur(0.1)
+				return
+	
 	push_warning("There are no blend shapes on parent mesh.")
 	styling_blendshape_index = -1
 	_update_fur(0.1)
@@ -656,6 +657,7 @@ func _analyse_parent() -> void:
 			is_arraymesh = _parent_object.mesh.is_class("ArrayMesh")
 			if is_arraymesh:
 				if _parent_object.mesh.get_blend_shape_count() - 1 < styling_blendshape_index:
+					push_warning("Blendshape index is higher than new mesh's amount of blendshapes. Disabling blendshape styling.")
 					styling_blendshape_index = -1
 			
 			if _parent_object.skin != null:
@@ -663,7 +665,9 @@ func _analyse_parent() -> void:
 				_skeleton_object = _parent_object.get_parent()
 	
 	if not _parent_is_mesh_instance or not _parent_has_mesh_assigned or not is_arraymesh:
-		styling_blendshape_index = -1
+		if styling_blendshape_index != -1:
+			push_warning("Fur is no longer assigned to a valid mesh. Disabling blendshape styling.")
+			styling_blendshape_index = -1
 
 
 func _update_fur(delay : float) -> void:
