@@ -105,7 +105,6 @@ void fragment() { // Discarding fragment if layer is beyond LOD threshhold
 	if (LOD < COLOR.a) { 
 		discard;
 	}
-	
 	NORMAL = mix(NORMAL, projectOnPlane(VIEW, extrusion_vec.xyz), normal_adjustment);
 	
 	ALBEDO = (texture(color_texture, UV * color_tiling) * mix(base_color, tip_color, lod_adjusted_layer_value)).rgb;
@@ -118,9 +117,5 @@ void fragment() { // Discarding fragment if layer is beyond LOD threshhold
 	vec2 pattern = texture(pattern_texture, UV * density).rg;
 	float scissor_thresh =  mix(-thickness_base + 1.0, -thickness_tip + 1.0, lod_adjusted_layer_value); 
 	float length_tex_value = texture(length_texture, UV * length_tiling).r;
-	if (scissor_thresh < pattern.r * length_tex_value - pattern.r * length_tex_value * pattern.g * length_rand) {
-    	ALPHA = 1.0;
-	} else {
-    	ALPHA = 0.0;
-	}
+	ALPHA = float(scissor_thresh < pattern.r * length_tex_value - pattern.r * length_tex_value * pattern.g * length_rand);
 }

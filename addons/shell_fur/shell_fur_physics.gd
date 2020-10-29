@@ -6,6 +6,7 @@ var _rot_momentum : Vector3
 var _physics_pos : Vector3
 var _physics_rot : Quat
 
+
 func init(shell_fur_object : ShellFurManager) -> void:
 	_shell_fur_object = shell_fur_object
 
@@ -13,7 +14,7 @@ func init(shell_fur_object : ShellFurManager) -> void:
 func process(delta) -> void:
 	var position_diff := _current_physics_object().global_transform.origin - _physics_pos
 	_trans_momentum += position_diff * _shell_fur_object.physics_spring
-	_trans_momentum += Vector3(0.0, -1.0, 0.0) * _shell_fur_object.physics_gravity
+	_trans_momentum += Vector3(0.0, -1.0 * _shell_fur_object.physics_gravity, 0.0)
 	_physics_pos += _trans_momentum * delta
 	_trans_momentum *= _shell_fur_object.physics_damping * -1 + 1
 	
@@ -23,7 +24,7 @@ func process(delta) -> void:
 	_rot_momentum += rot_diff.get_euler() * _shell_fur_object.physics_spring
 	_physics_rot *= Quat(_rot_momentum * delta)
 	_rot_momentum *= _shell_fur_object.physics_damping * -1 + 1
-
+	
 	_shell_fur_object.material.set_shader_param("physics_rot_offset", rot_diff)
 
 

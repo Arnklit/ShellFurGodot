@@ -5,6 +5,7 @@
 
 static func generate_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, material : Material, blendshape_index : int, cast_shadow : bool) -> void:
 	var mdt = MeshDataTool.new()
+	
 	if mmi.multimesh == null:
 		mmi.multimesh = MultiMesh.new()
 		mmi.multimesh.transform_format = MultiMesh.TRANSFORM_3D
@@ -32,18 +33,19 @@ static func generate_mmi(layers : int, mmi : MultiMeshInstance, mesh : Mesh, mat
 	mmi.cast_shadow = 1 if cast_shadow else 0
 
 
+# This function compares the base mesh and the chosen blendshape and saves out
+# the differences / extrusion vector as vertex colors to be used by the shader
 static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendshape_index: int) -> Mesh:
 	var mdt = MeshDataTool.new()
-	
 	var base_mesh_array : PoolVector3Array
 	var fur_blend_shape_mesh_array : PoolVector3Array
+	
 	for m in mesh.get_surface_count():
 		base_mesh_array += mesh.surface_get_arrays(m)[0]
 		fur_blend_shape_mesh_array += mesh.surface_get_blend_shape_arrays(m)[blendshape_index][0]
 
 	var compare_array = []
 	var compare_array_adjusted = []
-
 	var longest_diff_length = 0.0
 	var longest_diff_vec
 
@@ -74,28 +76,31 @@ static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendsh
 		mdt.set_vertex_color(i, Color(compare_array_adjusted[i].x, compare_array_adjusted[i].y, compare_array_adjusted[i].z))
 	var new_mesh = Mesh.new()
 	mdt.commit_to_surface(new_mesh)
+	
 	return new_mesh
 
 
+# This function is used when no blendshape stying will be used, to simply save
+# the normals direction as vertex colors, so the same shader code can be used
+# regardless of whether a custom extrusion vector is set.
 static func _normals_to_vertex_color(mesh: Mesh, material : Material) -> Mesh:
 	var mdt = MeshDataTool.new()
-	
 	material.set_shader_param("blend_shape_multiplier", 1.0)
 	
 	mdt.create_from_surface(_multiple_surfaces_to_single(mesh), 0)
 	for i in range(mdt.get_vertex_count()):
 		var normal_scaled = mdt.get_vertex_normal(i) * 0.5 + Vector3(0.5, 0.5, 0.5)
 		mdt.set_vertex_color(i, Color(normal_scaled.x, normal_scaled.y, normal_scaled.z))
-	
 	var new_mesh = Mesh.new()
 	mdt.commit_to_surface(new_mesh)
+	
 	return new_mesh
 
 
 static func _multiple_surfaces_to_single(mesh : Mesh) -> Mesh:
 	var st := SurfaceTool.new()
-	
 	var merging_mesh = Mesh.new()
+	
 	for surface in mesh.get_surface_count():
 		st.append_from(mesh, surface, Transform.IDENTITY)
 	merging_mesh = st.commit()
@@ -131,16 +136,18 @@ static func generate_mesh_shells(shell_fur_object : Spatial, parent_object : Spa
 			mdt.set_vertex_color(i, c)
 		var new_mesh := Mesh.new()
 		mdt.commit_to_surface(new_mesh)
-		
 		new_object.mesh = new_mesh
 
 
 static func generate_combined(shell_fur_object : Spatial, parent_object : Spatial, material : Material, cast_shadow : bool) -> Spatial:
 	var st = SurfaceTool.new()
+	
 	for child in shell_fur_object.get_children():
 		st.append_from(child.mesh, 0, Transform.IDENTITY)
 		child.free()
+	
 	var combined_obj := MeshInstance.new()
+	
 	combined_obj.name = "CombinedFurMesh"
 	combined_obj.mesh = st.commit()
 	shell_fur_object.add_child(combined_obj)
@@ -150,4 +157,5 @@ static func generate_combined(shell_fur_object : Spatial, parent_object : Spatia
 	combined_obj.set_skin(parent_object.get_skin())
 	combined_obj.set_skeleton_path("../../..")
 	combined_obj.cast_shadow = 1 if cast_shadow else 0
+	
 	return combined_obj
