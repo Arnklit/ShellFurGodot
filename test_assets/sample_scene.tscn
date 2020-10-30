@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=2]
 
-[ext_resource path="res://addons/shell_fur/noise_patterns/very_rough.png" type="Texture" id=1]
+[ext_resource path="res://addons/shell_fur/noise_patterns/rough.png" type="Texture" id=1]
 [ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=2]
 
 [sub_resource type="ProceduralSky" id=1]
