@@ -16,9 +16,11 @@ const FurHelperMethods = preload("res://addons/shell_fur/fur_helper_methods.gd")
 const DEFAULT_SHADER_PATH = "res://addons/shell_fur/shell_fur.shader"
 
 const PATTERNS = [
-	"res://addons/shell_fur/noise_patterns/fine_hair.png",
-	"res://addons/shell_fur/noise_patterns/rough_hair.png",
-	"res://addons/shell_fur/noise_patterns/moss.png",
+	"res://addons/shell_fur/noise_patterns/very_fine.png",
+	"res://addons/shell_fur/noise_patterns/fine.png",
+	"res://addons/shell_fur/noise_patterns/rough.png",
+	"res://addons/shell_fur/noise_patterns/very_rough.png",
+	"res://addons/shell_fur/noise_patterns/monster.png",
 	]
 
 const DEFAULT_PARAMETERS = {
@@ -155,7 +157,7 @@ func _get_property_list() -> Array:
 			name = "shape_pattern_selector",
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_ENUM,
-			hint_string = "Fine Hair, Rough Hair, Moss",
+			hint_string = "Very Fine, Fine, Rough, Very Rough, Monster",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
 		},
 		{

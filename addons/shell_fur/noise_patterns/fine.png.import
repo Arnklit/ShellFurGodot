@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/wide_voronoi.png-ce49dc76b03a555e11d6aad7bfefa261.s3tc.stex"
-path.etc2="res://.import/wide_voronoi.png-ce49dc76b03a555e11d6aad7bfefa261.etc2.stex"
+path.s3tc="res://.import/fine.png-5f05f17d9648f49185e971c20a965e25.s3tc.stex"
+path.etc2="res://.import/fine.png-5f05f17d9648f49185e971c20a965e25.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://test_assets/wide_voronoi.png"
-dest_files=[ "res://.import/wide_voronoi.png-ce49dc76b03a555e11d6aad7bfefa261.s3tc.stex", "res://.import/wide_voronoi.png-ce49dc76b03a555e11d6aad7bfefa261.etc2.stex" ]
+source_file="res://addons/shell_fur/noise_patterns/fine.png"
+dest_files=[ "res://.import/fine.png-5f05f17d9648f49185e971c20a965e25.s3tc.stex", "res://.import/fine.png-5f05f17d9648f49185e971c20a965e25.etc2.stex" ]
 
 [params]
 

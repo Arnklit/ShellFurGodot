@@ -13,7 +13,8 @@
 [ext_resource path="res://test_assets/models/Mesh_1Mat_1Blend.gltf" type="PackedScene" id=11]
 [ext_resource path="res://test_assets/models/Mesh_1Mat_2Blend.gltf" type="PackedScene" id=12]
 [ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=13]
-[ext_resource path="res://addons/shell_fur/noise_patterns/fine_hair.png" type="Texture" id=14]
+[ext_resource path="res://addons/shell_fur/noise_patterns/very_fine.png" type="Texture" id=14]
+
 
 [sub_resource type="SphereMesh" id=1]
 radius = 0.5
