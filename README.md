@@ -4,10 +4,9 @@
 
 Add-on that adds a fur node to Godot 3.2. Demo project available [here.](https://github.com/Arnklit/ShellFurGodotDemo)
 
-
 Instalation
 -----------
-Copy the folder addons/shell_fur into your project and activate the add-on from the **Project -> Project Settings... -> Plugins** menu.
+Copy the folder *addons/shell_fur* into your project and activate the add-on from the *Project -> Project Settings... -> Plugins* menu.
 
 Purpose
 -------
@@ -15,47 +14,120 @@ I was inspired by games like Shadow of the Colossus and Red Dead Redemption 2 wh
 
 Usage
 -----
-Select any MeshInstance node and add the ShellFur node as a child beneath it.
+Select any *MeshInstance* node and add the *ShellFur* node as a child beneath it.
 
-![image](https://user-images.githubusercontent.com/4955051/95904767-da5dd900-0d8f-11eb-8d1e-397e6bacbd66.png)
+![uc6ZJWJqa4](https://user-images.githubusercontent.com/4955051/97787441-1bd0ef80-1baa-11eb-8c2b-109b1ace5f36.gif)
 
-![image](https://user-images.githubusercontent.com/4955051/95904873-037e6980-0d90-11eb-8c85-78fd65ee06b3.png)
+The parameters for the fur is split into six sections.
 
-![image](https://user-images.githubusercontent.com/4955051/95905031-39235280-0d90-11eb-88a9-1840da7de408.png)
+<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97784319-93485400-1b95-11eb-9f4d-9b4d280c3da0.png">
 
-If you select the added fur node you will see the fur settings available in the inspector.
+Shape
+-----
 
-![image](https://user-images.githubusercontent.com/4955051/97077698-af6c5400-15dd-11eb-9da1-65d94d6947c6.png)
+**Layers:** Controls how many shells are generated around the object, more layers equals nicer strands, but will decrease performance.
 
-Most of the options should be self explanatory. But a few are a bit more specific.
+**Pattern Texture:** Manully select the pattern texture used for the fur shape. See info on making your own patterns below.
 
-- The **Pattern Selector** parameter allows you to set the pattern texture between three included patterns: Fine Hair, Rough Hair and Moss. The pattern textures consist of two channels, the red channel which decides the thickness of the hair along the strand and the green channel which is used to allow variation in length. You can manually select other textures using the **Pattern Texture** parameter, but random length will only work if you correctly set up the channels.
+**Pattern Selector:** Select between 5 included patterns.
 
-Left: Fine Hair, Middle: Rough Hair, Right: Moss.
-![image](https://user-images.githubusercontent.com/4955051/95911309-3842ee80-0d99-11eb-9acf-54d6062179e8.png)
+**Lenth:** The length of the fur. Set this to 1.0 if you are using blendshape styling and want the fur to exactly reach the blenshape length.
 
-Breakdown of Fine Hair texture - Left: Combined pattern texture, Middle: R channel, Right: G channel.
+**Length Rand:** Controls how much randomness there is in the length of the fur.
+
+**Thickness Base:** The thickness at the base of the strand.
+
+**Thickness Tip:** The thickness at the tip of the strand.
+
+<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97784402-487b0c00-1b96-11eb-8745-4ace8779f64d.png">
+
+Material
+--------
+
+**Base Color:** The colour of the fur at the base of the strand, interpolates linearly towards the tip.
+
+**Tip Color:** The colour of the fur at the tip of the strand, interpolates linearly towards the base.
+
+**Color Texture:** Texture for the colour of the strands. Values are multiplied with Base Color and Tip Color so they can be used for tinting.
+
+**Color Tiling:** UV Tiling for Color Texture.
+
+**Transmission:** The amount of light that can pass through the fur and the colour of that light.
+
+**Ao:** Fake ambient occlusion applied linearly from the base to the tip.
+
+**Roughness** The roughness value of the fur, it's difficult to achieve realistic shiny fur with this approach, you will probably get the best result leaving this value at 1.0.
+
+**Normal Adjustment** This parameter attempts to correct the normal to be along the strand, rather than using the normal of the base mesh. Most of the time it actually seems to look best to leave this low, so the fur get's shaded in the shape of the base mesh, but if you are using thick strands or need specular highlights, you may need to adjust this.
+
+<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97785969-31411c00-1ba0-11eb-96e7-243eda4c6ff6.png">
+
+Physics
+-------
+
+**Custom Physics Pivot** If you are using the fur on a skinned mesh where animation is moving the mesh, use this option to set the physics pivot to the center of gravity of your character. You can use the *Bone Attachment* node to set up a node that will follow a specific bone in your rig.
+
+**Gravity:** Down force applied on the spring physics.
+
+**Spring:** Ammount of springiness to the physics.
+
+**Damping:** Ammount of damping to the physics (to imitate air and friction resistance stopping the fur's movement over time)
+
+**Wind Strength** Ammount of wind strength, the wind is applied as a noise distortion in the vertex shader due to current limitations so it does not interact with the spring physics. If the *Wind Strength* is set to 0 the calculations are skipped in the shader.
+
+**Wind Speed** How quickly the wind noise moves accros the fur.
+
+**Wind Scale** Scale of the wind noise
+
+**Wind Angle** The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
+
+<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97786353-e379e300-1ba2-11eb-884b-a4a53b1c2eb9.png">
+
+Blendshape Styling
+------------------
+
+**Blendshape Index:** Use this option to style the fur with a blendshape. A value of -1 means disabled.
+
+**Normal Bias:** This option is used in conjunction with blendshape index. It mixes in the normal direction at the base.
+
+<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97787660-8b93aa00-1bab-11eb-998f-8bb6156a354d.png">
+
+Lod
+---
+
+**Lod 0 Distance:** The distance up to which the fur will display at full detail.
+
+**Lod 1 Distance:** This distance at which the fur will display at 25% of it's layers. The fur will smoothly interpolate between *Lod 0* and *Lod 1*. Beyond *Lod 1* distance the fur will fade away and the fur object will become hidden.
+
+<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97787878-aadf0700-1bac-11eb-91f3-fb8ec0fc7194.png">
+
+Advanced
+--------
+
+**Cast Shadow** Whether the fur should cast shadow. This is expensive performance wise, so it defaults to off.
+
+**Custom Shader** Option to use a custom shader for the fur. Selecting new will create a copy of the default shader for you to edit.
+
+TIPS
+----
+
+**Using your own fur patterns**
+
+You can use any type of noise as a pattern, but if you want to be able to have random lengths on the fur strand you will need to set up the green channel with cells with random greyscale values that present each strands length when randomness is applied.
+
+Breakdown of Fine texture - Left: Combined pattern texture, Middle: R channel, Right: G channel.
+
 ![image](https://user-images.githubusercontent.com/4955051/95909140-e64c9980-0d95-11eb-8a78-9f864b7abe19.png)
 
-- The **Normal Correction** parameter attempts to correct the normal to be along the strand, rather than using the normal of the base mesh. Most of the time it actually seems to look best to leave this low, so the fur get's shaded in the shape of the base mesh, but if you are using thick strands or need specular highlights, you'll may need to adjust this.
+**Mobile Support - experimental**
 
-Left: Normal Correction = 0.0. Right: Normal Correction = 1.0.
-![image](https://user-images.githubusercontent.com/4955051/96336316-be4f8580-1076-11eb-8f34-94042b2c8509.png)
+The shader does not work with GLES 2.0. So if your target device doesn't support GLES 3.0 the fur will not work.
 
-- The **Layers** parameter controls how many shells are generated around the object, more layers equals nicer strands, but will decrease performance.
+There is a shell_fur_mobile.shader file located in addons/shell_fur/shaders that you can use with the Custom Shader option under the Advanced section. It has depth_draw_alpha_prepass disabled (since that appeared buggy in my android testing) and shadows disabled for performance improvements.
 
-12 layers on the left. 40 layers on the right.
-![image](https://user-images.githubusercontent.com/4955051/95906679-58bb7a80-0d92-11eb-946c-f3f319004f56.png)
+In my testing there appeared to be a bug in android where skinned meshes with blendshapes don't render on Android. https://github.com/godotengine/godot/issues/43217. So if you want to use blendshape styling, you might need to work around this by having a seperate mesh where you have removed the blendshape that is getting rendered. I had to do this in my current android demo scene, so have a look at the demo project to see how I did it there.
 
-- The **Blendshape Index** option allows you to style the fur with a blendshape, -1 means disabled.
-
-Top: Base mesh, Middle: Blendshape, Bottom: Fur styled by blendshape.
-![image](https://user-images.githubusercontent.com/4955051/95907763-f794a680-0d93-11eb-948b-23ab3420f41a.png)
-
-- The **Normal Bias** option is used in conjunction withe blendshape styling. It mixes in the normal direction at the base.
-
-Top: Normal Bias = 0.0, Bottom: Normal Bias = 1.0.
-![image](https://user-images.githubusercontent.com/4955051/96336117-492f8080-1075-11eb-81fb-9522ac33770a.png)
+No testing has been done on iOS devices.
 
 Current Limitations
 -------------------
