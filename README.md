@@ -1,8 +1,12 @@
 # Shell Fur Add-on for Godot Engine
 
-![DemoScene](https://user-images.githubusercontent.com/4955051/97077434-8b0f7800-15db-11eb-98eb-7cecf1648304.png)
+[![Shell Fur Add-on for Godot v0.1.0 Released - Feature Overview](https://user-images.githubusercontent.com/4955051/97077434-8b0f7800-15db-11eb-98eb-7cecf1648304.png)](https://youtu.be/7EUjxwGTPAI "Shell Fur Add-on for Godot v0.1.0 Released - Feature Overview")
 
 Add-on that adds a fur node to Godot 3.2. Demo project available [here.](https://github.com/Arnklit/ShellFurGodotDemo)
+
+[Discord Server](https://discord.gg/mjGvWwQwv2)
+
+[Patreon](https://www.patreon.com/arnklit)
 
 Instalation
 -----------
@@ -18,12 +22,15 @@ Select any *MeshInstance* node and add the *ShellFur* node as a child beneath it
 
 ![uc6ZJWJqa4](https://user-images.githubusercontent.com/4955051/97787441-1bd0ef80-1baa-11eb-8c2b-109b1ace5f36.gif)
 
-The parameters for the fur is split into six sections.
+&nbsp;
+&nbsp;
 
-<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97784319-93485400-1b95-11eb-9f4d-9b4d280c3da0.png">
+The parameters for the fur is split into six sections.
 
 Shape
 -----
+
+<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97784319-93485400-1b95-11eb-9f4d-9b4d280c3da0.png">
 
 **Layers:** Controls how many shells are generated around the object, more layers equals nicer strands, but will decrease performance.
 
@@ -39,10 +46,14 @@ Shape
 
 **Thickness Tip:** The thickness at the tip of the strand.
 
-<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97784402-487b0c00-1b96-11eb-8745-4ace8779f64d.png">
+&nbsp;
+&nbsp;
+&nbsp;
 
 Material
 --------
+
+<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97784402-487b0c00-1b96-11eb-8745-4ace8779f64d.png">
 
 **Base Color:** The colour of the fur at the base of the strand, interpolates linearly towards the tip.
 
@@ -60,10 +71,14 @@ Material
 
 **Normal Adjustment** This parameter attempts to correct the normal to be along the strand, rather than using the normal of the base mesh. Most of the time it actually seems to look best to leave this low, so the fur get's shaded in the shape of the base mesh, but if you are using thick strands or need specular highlights, you may need to adjust this.
 
-<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97785969-31411c00-1ba0-11eb-96e7-243eda4c6ff6.png">
+&nbsp;
+&nbsp;
+&nbsp;
 
 Physics
 -------
+
+<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97785969-31411c00-1ba0-11eb-96e7-243eda4c6ff6.png">
 
 **Custom Physics Pivot** If you are using the fur on a skinned mesh where animation is moving the mesh, use this option to set the physics pivot to the center of gravity of your character. You can use the *Bone Attachment* node to set up a node that will follow a specific bone in your rig.
 
@@ -81,32 +96,45 @@ Physics
 
 **Wind Angle** The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
 
-<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97786353-e379e300-1ba2-11eb-884b-a4a53b1c2eb9.png">
+&nbsp;
+&nbsp;
+&nbsp;
 
 Blendshape Styling
 ------------------
+
+<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97786353-e379e300-1ba2-11eb-884b-a4a53b1c2eb9.png">
 
 **Blendshape Index:** Use this option to style the fur with a blendshape. A value of -1 means disabled.
 
 **Normal Bias:** This option is used in conjunction with blendshape index. It mixes in the normal direction at the base.
 
-<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97787660-8b93aa00-1bab-11eb-998f-8bb6156a354d.png">
+&nbsp;
+&nbsp;
 
 Lod
 ---
+
+<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97787660-8b93aa00-1bab-11eb-998f-8bb6156a354d.png">
 
 **Lod 0 Distance:** The distance up to which the fur will display at full detail.
 
 **Lod 1 Distance:** This distance at which the fur will display at 25% of it's layers. The fur will smoothly interpolate between *Lod 0* and *Lod 1*. Beyond *Lod 1* distance the fur will fade away and the fur object will become hidden.
 
-<img align="right" width="500" src="https://user-images.githubusercontent.com/4955051/97787878-aadf0700-1bac-11eb-91f3-fb8ec0fc7194.png">
+&nbsp;
+&nbsp;
 
 Advanced
 --------
 
+<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97787878-aadf0700-1bac-11eb-91f3-fb8ec0fc7194.png">
+
 **Cast Shadow** Whether the fur should cast shadow. This is expensive performance wise, so it defaults to off.
 
 **Custom Shader** Option to use a custom shader for the fur. Selecting new will create a copy of the default shader for you to edit.
+
+&nbsp;
+&nbsp;
 
 TIPS
 ----
