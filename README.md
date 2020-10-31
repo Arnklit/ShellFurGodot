@@ -47,9 +47,9 @@ Shape
 **Thickness Tip:** The thickness at the tip of the strand.
 
 &nbsp;
+
 &nbsp;
-&nbsp;
-&nbsp;
+
 &nbsp;
 
 Material
@@ -74,7 +74,7 @@ Material
 **Normal Adjustment** This parameter attempts to correct the normal to be along the strand, rather than using the normal of the base mesh. Most of the time it actually seems to look best to leave this low, so the fur get's shaded in the shape of the base mesh, but if you are using thick strands or need specular highlights, you may need to adjust this.
 
 &nbsp;
-&nbsp;
+
 &nbsp;
 
 Physics
@@ -99,7 +99,7 @@ Physics
 **Wind Angle** The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
 
 &nbsp;
-&nbsp;
+
 &nbsp;
 
 Blendshape Styling
@@ -112,7 +112,6 @@ Blendshape Styling
 **Normal Bias:** This option is used in conjunction with blendshape index. It mixes in the normal direction at the base.
 
 &nbsp;
-&nbsp;
 
 Lod
 ---
@@ -124,7 +123,6 @@ Lod
 **Lod 1 Distance:** This distance at which the fur will display at 25% of it's layers. The fur will smoothly interpolate between *Lod 0* and *Lod 1*. Beyond *Lod 1* distance the fur will fade away and the fur object will become hidden.
 
 &nbsp;
-&nbsp;
 
 Advanced
 --------
@@ -135,7 +133,6 @@ Advanced
 
 **Custom Shader** Option to use a custom shader for the fur. Selecting new will create a copy of the default shader for you to edit.
 
-&nbsp;
 &nbsp;
 
 TIPS
