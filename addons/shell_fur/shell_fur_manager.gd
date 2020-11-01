@@ -115,7 +115,6 @@ var _multimeshInstance : MultiMeshInstance = null
 var _first_enter_tree := true
 var _parent_object : Spatial
 var _skeleton_object
-var _current_LOD := 0
 
 
 # Built-in Methods
@@ -445,10 +444,7 @@ func _exit_tree() -> void:
 
 # Getter Methods
 func get_current_LOD() -> int:
-	if fur_object != null:
-		if fur_object.visible == false:
-			return 3
-	return _current_LOD
+	return _lod_system.current_LOD
 
 
 # Setter Methods

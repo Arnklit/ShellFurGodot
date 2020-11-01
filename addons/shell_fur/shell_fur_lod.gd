@@ -1,7 +1,8 @@
 const ShellFurManager = preload("res://addons/shell_fur/shell_fur_manager.gd")
 
+var current_LOD : int
+
 var _shell_fur : ShellFurManager
-var _current_LOD : int
 var _fur_contract := 0.0
 
 func init(shell_fur_object : ShellFurManager) -> void:
@@ -14,16 +15,16 @@ func process(delta : float) -> void:
 	
 	var distance := _camera.global_transform.origin.distance_to(_shell_fur.global_transform.origin)
 	if distance <= _shell_fur.lod_LOD0_distance:
-		_current_LOD = 0	
+		current_LOD = 0	
 	if _shell_fur.lod_LOD0_distance < distance and distance <= _shell_fur.lod_LOD1_distance:
-		_current_LOD = 1
+		current_LOD = 1
 	if distance > _shell_fur.lod_LOD1_distance:
-		_current_LOD = 2
+		current_LOD = 2
 	
 	# To avoid calls to the fur child object before it's been generated
 	if _shell_fur.fur_object == null:
 		return
-	match _current_LOD:
+	match current_LOD:
 		0:
 			_shell_fur.material.set_shader_param("LOD", 1.0)
 		1:
