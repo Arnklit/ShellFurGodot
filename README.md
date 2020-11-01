@@ -52,6 +52,10 @@ Shape
 
 &nbsp;
 
+*<p align=center>The five built-in fur patterns</p>*
+
+![image](https://user-images.githubusercontent.com/4955051/97798110-fe883980-1c1a-11eb-9efd-66369c21b8d0.png)
+
 Material
 --------
 
@@ -102,6 +106,11 @@ Physics
 
 &nbsp;
 
+*<p align=center>Example of physics forces with a Custom Physics Pivot set</p>*
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/4955051/97798318-fcbf7580-1c1c-11eb-8385-af9971fdd95b.gif">
+</p>
+
 Blendshape Styling
 ------------------
 
@@ -150,9 +159,9 @@ Breakdown of Fine texture - Left: Combined pattern texture, Middle: R channel, R
 
 The shader does not work with GLES 2.0. So if your target device doesn't support GLES 3.0 the fur will not work.
 
-There is a shell_fur_mobile.shader file located in addons/shell_fur/shaders that you can use with the Custom Shader option under the Advanced section. It has depth_draw_alpha_prepass disabled (since that appeared buggy in my android testing) and shadows disabled for performance improvements.
+There is a *shell_fur_mobile.shader* file located in *addons/shell_fur/shaders* that you can use with the *Custom Shader* option under the *Advanced* section. It has *depth_draw_alpha_prepass* disabled (since that appeared buggy in my android testing) and has *shadows_disabled* set for performance improvements.
 
-In my testing there appeared to be a bug in android where skinned meshes with blendshapes don't render on Android. https://github.com/godotengine/godot/issues/43217. So if you want to use blendshape styling, you might need to work around this by having a seperate mesh where you have removed the blendshape that is getting rendered. I had to do this in my current android demo scene, so have a look at the demo project to see how I did it there.
+In my testing there appeared to be a bug where skinned meshes with blendshapes don't render on Android. https://github.com/godotengine/godot/issues/43217. So if you want to use blendshape styling, you might need to work around this by having a seperate mesh where you have removed the blendshape that is getting rendered. I had to do this in my current android demo scene, so have a look at the demo project to see how I did it there.
 
 No testing has been done on iOS devices.
 
