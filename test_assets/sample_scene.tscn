@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=2]
 
-[ext_resource path="res://addons/shell_fur/noise_patterns/rough.png" type="Texture" id=1]
+[ext_resource path="res://addons/shell_fur/noise_patterns/very_fine.png" type="Texture" id=1]
 [ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=2]
 
 [sub_resource type="ProceduralSky" id=1]
@@ -9,9 +9,8 @@
 background_mode = 2
 background_sky = SubResource( 1 )
 tonemap_mode = 3
-ssao_enabled = true
-ssao_radius = 0.5
-ssao_radius2 = 0.25
+ssao_radius = 0.25
+ssao_radius2 = 0.1
 ssao_quality = 2
 
 [sub_resource type="Animation" id=3]
@@ -72,6 +71,7 @@ light_color = Color( 1, 0.94902, 0.776471, 1 )
 shadow_enabled = true
 
 [node name="CameraRig" type="Spatial" parent="."]
+visible = false
 
 [node name="Camera Pivot" type="Spatial" parent="CameraRig"]
 
@@ -92,14 +92,14 @@ material/0 = SubResource( 6 )
 script = ExtResource( 2 )
 shape_layers = 40
 shape_pattern_texture = ExtResource( 1 )
-shape_pattern_selector = 2
+shape_pattern_selector = 0
 shape_density = 5.0
-shape_length = 0.676
-shape_length_rand = 0.259
+shape_length = 0.5
+shape_length_rand = 0.3
 shape_length_texture = null
 shape_length_tiling = Vector2( 1, 1 )
-shape_thickness_base = 0.813
-shape_thickness_tip = 0.073
+shape_thickness_base = 0.75
+shape_thickness_tip = 0.3
 mat_base_color = Color( 0.43, 0.35, 0.29, 1 )
 mat_tip_color = Color( 0.78, 0.63, 0.52, 1 )
 mat_color_texture = null
@@ -109,7 +109,7 @@ mat_ao = 1.0
 mat_roughness = 1.0
 mat_normal_adjustment = 0.0
 physics_custom_physics_pivot = NodePath("")
-physics_gravity = 1.797
+physics_gravity = 1.908
 physics_spring = 4.0
 physics_damping = 0.1
 physics_wind_strength = 0.0

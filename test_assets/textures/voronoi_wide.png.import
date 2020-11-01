@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/voronoi_wide.png-485e9f98d1ad864612f398a52051c4f2.s3tc.stex"
-path.etc2="res://.import/voronoi_wide.png-485e9f98d1ad864612f398a52051c4f2.etc2.stex"
+path.s3tc="res://.import/voronoi_wide.png-712929690ed1085d753a122d55147501.s3tc.stex"
+path.etc2="res://.import/voronoi_wide.png-712929690ed1085d753a122d55147501.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://test_assets/voronoi_wide.png"
-dest_files=[ "res://.import/voronoi_wide.png-485e9f98d1ad864612f398a52051c4f2.s3tc.stex", "res://.import/voronoi_wide.png-485e9f98d1ad864612f398a52051c4f2.etc2.stex" ]
+source_file="res://test_assets/textures/voronoi_wide.png"
+dest_files=[ "res://.import/voronoi_wide.png-712929690ed1085d753a122d55147501.s3tc.stex", "res://.import/voronoi_wide.png-712929690ed1085d753a122d55147501.etc2.stex" ]
 
 [params]
 

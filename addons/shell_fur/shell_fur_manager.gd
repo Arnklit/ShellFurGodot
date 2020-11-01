@@ -13,7 +13,7 @@ extends Spatial
 
 const FurHelperMethods = preload("res://addons/shell_fur/fur_helper_methods.gd")
 
-const DEFAULT_SHADER_PATH = "res://addons/shell_fur/shell_fur.shader"
+const DEFAULT_SHADER_PATH = "res://addons/shell_fur/shaders/shell_fur.shader"
 
 const PATTERNS = [
 	"res://addons/shell_fur/noise_patterns/very_fine.png",
@@ -407,7 +407,10 @@ func _enter_tree() -> void:
 		# Not sure why this is thrown, since it's not a problem when first
 		# adding the node.
 		_delayed_position_correction()
-		set_pattern_texture(load(PATTERNS[shape_pattern_selector]))
+		if shape_pattern_texture != null:
+			set_pattern_texture(shape_pattern_texture)
+		else:
+			set_pattern_texture(load(PATTERNS[shape_pattern_selector]))
 		# Force colors
 		set_tip_color(mat_tip_color)
 		set_base_color(mat_base_color)
@@ -463,8 +466,10 @@ func set_pattern_texture(texture : Texture) -> void:
 
 
 func set_pattern_selector(index : int) -> void:
-	set_pattern_texture(load(PATTERNS[index]))
 	shape_pattern_selector = index
+	if _first_enter_tree:
+		return
+	set_pattern_texture(load(PATTERNS[index]))
 
 
 func set_density(new_desity : float) -> void:

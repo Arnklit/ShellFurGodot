@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode depth_draw_alpha_prepass;
+//render_mode depth_draw_alpha_prepass;
 
 uniform sampler2D pattern_texture : hint_black;
 uniform vec4 base_color : hint_color = vec4(0.43, 0.35, 0.29, 1.0);
