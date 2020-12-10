@@ -169,3 +169,8 @@ Current Limitations
 -------------------
 - Since the fur is made up of shells that are paralel to the surface, the fur can look pretty bad when seen from the side. This is somewhat mitigated by using the blendshape styling but could be further improved by adding in generated fur fins around the contour of the mesh.
 - Limitations to skinned meshes. When the fur is applied to skinned meshes, MultiMeshInstance method cannot be used, so a custom mesh is generated with many layers. This is heavy on skinning performance and currently blendshapes are not copied over, so the fur will not adhere to blendshape changes on the base mesh. Using material passes would bypass this issue, but would cause a lot of drawcalls. I'm still looking into a solution for this.
+
+Acknowledgements
+---------------
+* A special thanks to my first ever patron *Marcus Richter* for his support.
+* Kiri (@ExpiredPopsicle) was a huge help in answering questions and pointing me in the right direction with this.
