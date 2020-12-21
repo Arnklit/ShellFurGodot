@@ -172,5 +172,5 @@ Current Limitations
 
 Acknowledgements
 ---------------
-* A special thanks to my first ever patron *Marcus Richter* for his support.
+* Thanks to my patrons *Marcus Richter, Dmitriy Keane, spacechace0 and Johannes Wuesnch* for all their support.
 * Kiri (@ExpiredPopsicle) was a huge help in answering questions and pointing me in the right direction with this.
