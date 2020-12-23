@@ -8,7 +8,7 @@ Add-on that adds a fur node to Godot 3.2. Demo project available [here.](https:/
 
 [Patreon](https://www.patreon.com/arnklit)
 
-Instalation
+Installation
 -----------
 Copy the folder *addons/shell_fur* into your project and activate the add-on from the *Project -> Project Settings... -> Plugins* menu.
 
