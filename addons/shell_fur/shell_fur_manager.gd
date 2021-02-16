@@ -61,23 +61,23 @@ const DEFAULT_PARAMETERS = {
 var shape_layers := 40 setget set_layers
 var shape_pattern_texture : Texture setget set_pattern_texture
 var shape_pattern_selector : int setget set_pattern_selector
-var shape_density := 5.0 setget set_density
-var shape_length := 0.5 setget set_length
-var shape_length_rand := 0.3 setget set_length_rand
-var shape_length_texture : Texture setget set_length_texture
-var shape_length_tiling := Vector2(1.0, 1.0) setget set_length_tiling
-var shape_thickness_base := 0.75 setget set_thickness_base
-var shape_thickness_tip := 0.3 setget set_thickness_tip
+#var shape_density := 5.0 setget set_density
+#var shape_length := 0.5 setget set_length
+#var shape_length_rand := 0.3 setget set_length_rand
+#var shape_length_texture : Texture setget set_length_texture
+#var shape_length_tiling := Vector2(1.0, 1.0) setget set_length_tiling
+#var shape_thickness_base := 0.75 setget set_thickness_base
+#var shape_thickness_tip := 0.3 setget set_thickness_tip
 
 # Material
-var mat_base_color := Color(0.43, 0.35, 0.29) setget set_base_color
-var mat_tip_color := Color(0.78, 0.63, 0.52) setget set_tip_color
-var mat_color_texture : Texture setget set_color_texture
-var mat_color_tiling := Vector2(1.0, 1.0) setget set_color_tiling
-var mat_transmission := Color(0.3, 0.3, 0.3) setget set_transmission
-var mat_ao := 1.0 setget set_ao
-var mat_roughness := 1.0 setget set_roughness
-var mat_normal_adjustment := 0.0 setget set_normal_adjustment
+#var mat_base_color := Color(0.43, 0.35, 0.29) setget set_base_color
+#var mat_tip_color := Color(0.78, 0.63, 0.52) setget set_tip_color
+#var mat_color_texture : Texture setget set_color_texture
+#var mat_color_tiling := Vector2(1.0, 1.0) setget set_color_tiling
+#var mat_transmission := Color(0.3, 0.3, 0.3) setget set_transmission
+#var mat_ao := 1.0 setget set_ao
+#var mat_roughness := 1.0 setget set_roughness
+#var mat_normal_adjustment := 0.0 setget set_normal_adjustment
 
 # Physics
 var physics_custom_physics_pivot : NodePath setget set_custom_physics_pivot
@@ -411,8 +411,9 @@ func _enter_tree() -> void:
 		else:
 			set_pattern_texture(load(PATTERNS[shape_pattern_selector]))
 		# Force colors
-		set_tip_color(mat_tip_color)
-		set_base_color(mat_base_color)
+		# TODO force colors when it's a gradient if needed
+#		set_tip_color(mat_tip_color)
+#		set_base_color(mat_base_color)
 	
 	# Updates the fur if it's needed, clears the fur if it's not
 	_update_fur(0.05)
@@ -466,81 +467,7 @@ func set_pattern_selector(index : int) -> void:
 	if _first_enter_tree:
 		return
 	set_pattern_texture(load(PATTERNS[index]))
-
-
-func set_density(new_desity : float) -> void:
-	shape_density = new_desity
-	material.set_shader_param("density", new_desity)
-
-
-func set_length(new_length : float) -> void:
-	shape_length = new_length
-	material.set_shader_param("fur_length", new_length)
-
-
-func set_length_rand(new_length_rand : float) -> void:
-	shape_length_rand = new_length_rand
-	material.set_shader_param("length_rand", new_length_rand)
-
-
-func set_length_texture(texture : Texture) -> void:
-	shape_length_texture = texture
-	material.set_shader_param("length_texture", texture)
-
-
-func set_length_tiling(tiling : Vector2) -> void:
-	shape_length_tiling = tiling
-	material.set_shader_param("length_tiling", tiling)
-
-
-func set_thickness_base(thickness : float) -> void:
-	shape_thickness_base = thickness
-	material.set_shader_param("thickness_base", thickness)
-
-
-func set_thickness_tip(thickness : float) -> void:
-	shape_thickness_tip = thickness
-	material.set_shader_param("thickness_tip", thickness)
-
-
-func set_color_texture(texture : Texture) -> void:
-	mat_color_texture = texture
-	material.set_shader_param("color_texture", texture)
-
-
-func set_color_tiling(tiling : Vector2) -> void:
-	mat_color_tiling = tiling
-	material.set_shader_param("color_tiling", tiling)
-
-
-func set_base_color(new_color : Color) -> void:
-	mat_base_color = new_color;
-	material.set_shader_param("base_color", new_color)
-
-
-func set_tip_color(new_color : Color) -> void:
-	mat_tip_color = new_color;
-	material.set_shader_param("tip_color", new_color)
-
-
-func set_transmission(new_color : Color) -> void:
-	mat_transmission = new_color;
-	material.set_shader_param("transmission", new_color)
-
-
-func set_ao(new_ao : float) -> void:
-	mat_ao = new_ao
-	material.set_shader_param("ao", new_ao)
-
-
-func set_roughness(new_roughness : float) -> void:
-	mat_roughness = new_roughness
-	material.set_shader_param("roughness", new_roughness)
-
-
-func set_normal_adjustment(new_normal_adjustment : float) -> void:
-	mat_normal_adjustment = new_normal_adjustment
-	material.set_shader_param("normal_adjustment", new_normal_adjustment)
+	property_list_changed_notify()
 
 
 func set_custom_physics_pivot(path : NodePath) -> void:
@@ -552,7 +479,6 @@ func set_custom_physics_pivot(path : NodePath) -> void:
 
 func set_gravity(new_gravity : float) -> void:
 	physics_gravity = new_gravity
-	material.set_shader_param("gravity", new_gravity)
 
 
 func set_wind_strength(new_wind_strength : float) -> void:

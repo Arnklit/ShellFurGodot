@@ -1,3 +1,6 @@
+addons/godot-plugin-refresher/
+addons/Todo_Manager/
+
 # Godot-specific ignores
 .import/
 export.cfg
