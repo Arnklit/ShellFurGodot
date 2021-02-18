@@ -34,7 +34,7 @@ uniform float look_ao = 1.0;
 uniform float look_roughness = 1.0;
 uniform float look_normal_adjustment = 0.0;
 
-// Internal uniforms and varyings, do not customize these
+// Internal uniforms - DO NOT CUSTOMIZE THESE
 uniform float i_wind_strength = 0.0;
 uniform float i_wind_speed = 1.0;
 uniform float i_wind_scale = 1.0;
@@ -133,6 +133,7 @@ void fragment() { // Discarding fragment if layer is beyond LOD threshhold
 	if (scissor_thresh > pattern.r * ldt_texture_data.r - pattern.r * ldt_texture_data.r * pattern.g * shape_length_rand) {
 		discard;
 	}
+	
 	NORMAL = mix(NORMAL, projectOnPlane(VIEW, extrusion_vec.xyz), look_normal_adjustment);
 	
 	ALBEDO = (texture(look_color_texture, UV * look_color_uv_scale.xy) * mix(look_base_color, look_tip_color, lod_adjusted_layer_value)).rgb;

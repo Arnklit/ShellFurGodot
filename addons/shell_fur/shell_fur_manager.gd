@@ -23,6 +23,12 @@ const PATTERNS = [
 	"res://addons/shell_fur/noise_patterns/monster.png",
 	]
 
+const MATERIAL_CATEGORIES = {
+	shape_ = "Shape",
+	look_ = "Look",
+	custom_ = "Custom"
+}
+
 const DEFAULT_PARAMETERS = {
 	shape_layers = 40,
 	shape_pattern_selector = 0,
@@ -57,10 +63,11 @@ const DEFAULT_PARAMETERS = {
 	adv_custom_shader = null
 }
 
+var layers := 40 setget set_layers
+var pattern_selector : int setget set_pattern_selector
+
 # Shape
-var shape_layers := 40 setget set_layers
-var shape_pattern_texture : Texture setget set_pattern_texture
-var shape_pattern_selector : int setget set_pattern_selector
+#var shape_pattern_texture : Texture setget set_pattern_texture
 #var shape_density := 5.0 setget set_density
 #var shape_length := 0.5 setget set_length
 #var shape_length_rand := 0.3 setget set_length_rand
@@ -131,79 +138,19 @@ func property_get_revert(p_name: String): # returns Variant
 
 
 func _get_property_list() -> Array:
-	return [
+	var props = [
 		{
-			name = "Shape",
-			type = TYPE_NIL,
-			hint_string = "shape_",
-			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "shape_layers",
+			name = "layers",
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0, 100",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
 		},
 		{
-			name = "shape_pattern_texture",
-			type = TYPE_OBJECT,
-			hint = PROPERTY_HINT_RESOURCE_TYPE,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
-			hint_string = "Texture"
-		},
-		{
-			name = "shape_pattern_selector",
+			name = "pattern_selector",
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_ENUM,
 			hint_string = "Very Fine, Fine, Rough, Very Rough, Monster",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "shape_density",
-			type = TYPE_REAL,
-			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0.0, 100.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "shape_length",
-			type = TYPE_REAL,
-			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0.0, 5.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-				{
-			name = "shape_length_rand",
-			type = TYPE_REAL,
-			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0.0, 1.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "shape_length_texture",
-			type = TYPE_OBJECT,
-			hint = PROPERTY_HINT_RESOURCE_TYPE,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
-			hint_string = "Texture"
-		},
-		{
-			name = "shape_length_tiling",
-			type = TYPE_VECTOR2,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "shape_thickness_base",
-			type = TYPE_REAL,
-			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0.0, 1.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "shape_thickness_tip",
-			type = TYPE_REAL,
-			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0.0, 1.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
 		},
 		{
@@ -213,56 +160,53 @@ func _get_property_list() -> Array:
 			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
 		},
 		{
-			name = "mat_base_color",
-			type = TYPE_COLOR,
-			hint = PROPERTY_HINT_COLOR_NO_ALPHA,
+			name = "mat_shader_type",
+			type = TYPE_INT,
+			hint = PROPERTY_HINT_ENUM,
+			hint_string = "Regular, Mobile, Custom",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
 		},
 		{
-			name = "mat_tip_color",
-			type = TYPE_COLOR,
-			hint = PROPERTY_HINT_COLOR_NO_ALPHA,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "mat_color_texture",
+			name = "mat_custom_shader",
 			type = TYPE_OBJECT,
 			hint = PROPERTY_HINT_RESOURCE_TYPE,
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
-			hint_string = "Texture"
-		},
-		{
-			name = "mat_color_tiling",
-			type = TYPE_VECTOR2,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "mat_transmission",
-			type = TYPE_COLOR,
-			hint = PROPERTY_HINT_COLOR_NO_ALPHA,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "mat_ao",
-			type = TYPE_REAL,
-			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0.0, 2.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "mat_roughness",
-			type = TYPE_REAL,
-			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0.0, 1.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "mat_normal_adjustment",
-			type = TYPE_REAL,
-			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0.0, 1.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
+			hint_string = "Shader"
+		}
+	]
+	
+	var props2 = []
+	var mat_categories = MATERIAL_CATEGORIES.duplicate(true)
+	
+	if material.shader != null:
+		var shader_params := VisualServer.shader_get_param_list(material.shader.get_rid())
+		shader_params = FurHelperMethods.reorder_params(shader_params)
+		for p in shader_params:
+			if p.name.begins_with("i_"):
+				continue
+			var hit_category = null
+			for category in mat_categories:
+				if p.name.begins_with(category):
+					props2.append({
+						name = str("Material/", mat_categories[category]),
+						type = TYPE_NIL,
+						hint_string = str("mat_", category),
+						usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+					})
+					hit_category = category
+					break
+			if hit_category != null:
+				mat_categories.erase(hit_category)
+			var cp := {}
+			for k in p:
+				cp[k] = p[k]
+			cp.name = str("mat_", p.name)
+			if "curve" in cp.name:
+				cp.hint = PROPERTY_HINT_EXP_EASING
+				cp.hint_string = "EASE"
+			props2.append(cp)
+	
+	var props3 = [
 		{
 			name = "Physics",
 			type = TYPE_NIL,
@@ -372,15 +316,9 @@ func _get_property_list() -> Array:
 			name = "adv_cast_shadow",
 			type = TYPE_BOOL,
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "adv_custom_shader",
-			type = TYPE_OBJECT,
-			hint = PROPERTY_HINT_RESOURCE_TYPE,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
-			hint_string = "Shader"
-		},
+		}
 	]
+	return props + props2 + props3
 
 
 func _init() -> void:
@@ -406,10 +344,10 @@ func _enter_tree() -> void:
 		# Not sure why this is thrown, since it's not a problem when first
 		# adding the node.
 		_delayed_position_correction()
-		if shape_pattern_texture != null:
-			set_pattern_texture(shape_pattern_texture)
-		else:
-			set_pattern_texture(load(PATTERNS[shape_pattern_selector]))
+#		if shape_pattern_texture != null:
+#			set_pattern_texture(shape_pattern_texture)
+#		else:
+#			set_pattern_texture(load(PATTERNS[shape_pattern_selector]))
 		# Force colors
 		# TODO force colors when it's a gradient if needed
 #		set_tip_color(mat_tip_color)
@@ -450,23 +388,23 @@ func get_current_LOD() -> int:
 
 # Setter Methods
 func set_layers(new_layers : int) -> void:
-	shape_layers = new_layers
+	layers = new_layers
 	if _first_enter_tree:
 		return
 	material.set_shader_param("layers", new_layers)
 	_update_fur(0.0)
 
 
-func set_pattern_texture(texture : Texture) -> void:
-	shape_pattern_texture = texture
-	material.set_shader_param("pattern_texture", texture)
+#func set_pattern_texture(texture : Texture) -> void:
+#	shape_pattern_texture = texture
+#	material.set_shader_param("pattern_texture", texture)
 
 
 func set_pattern_selector(index : int) -> void:
-	shape_pattern_selector = index
+	pattern_selector = index
 	if _first_enter_tree:
 		return
-	set_pattern_texture(load(PATTERNS[index]))
+	# set_pattern_texture(load(PATTERNS[index])) # TODO - Do we just set_shader_param here?
 	property_list_changed_notify()
 
 
@@ -608,14 +546,14 @@ func _update_fur(delay : float) -> void:
 		return
 	
 	if _parent_has_skin_assigned:
-		FurHelperMethods.generate_mesh_shells(self, _parent_object, shape_layers, material, styling_blendshape_index)
+		FurHelperMethods.generate_mesh_shells(self, _parent_object, layers, material, styling_blendshape_index)
 		fur_object = FurHelperMethods.generate_combined(self, _parent_object, material, adv_cast_shadow)
 	else:
 		_multimeshInstance = MultiMeshInstance.new()
 		add_child(_multimeshInstance)
 		# uncomment to debug whether MMI is created
 		#_multimeshInstance.set_owner(get_tree().get_edited_scene_root()) 
-		FurHelperMethods.generate_mmi(shape_layers, _multimeshInstance, _parent_object.mesh, material, styling_blendshape_index, adv_cast_shadow)
+		FurHelperMethods.generate_mmi(layers, _multimeshInstance, _parent_object.mesh, material, styling_blendshape_index, adv_cast_shadow)
 		fur_object = _multimeshInstance
 
 
