@@ -28,9 +28,10 @@ window/vsync/use_vsync=false
 
 [editor_plugins]
 
-enabled=PoolStringArray( "Todo_Manager", "godot-plugin-refresher", "shell_fur" )
+enabled=PoolStringArray( "shell_fur" )
 
 [rendering]
 
 quality/filters/msaa=2
+quality/filters/use_fxaa=true
 environment/default_environment="res://test_assets/default_env.tres"

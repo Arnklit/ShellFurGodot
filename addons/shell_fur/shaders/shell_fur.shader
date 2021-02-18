@@ -13,26 +13,28 @@ render_mode depth_draw_alpha_prepass;
 // If "curve" is in the name, the inspector will represent and easing curve.
 // mat4´s with "color" in their name will get parsed as gradients.
 
-// Shape
-uniform sampler2D shape_pattern_texture : hint_black;
-uniform float shape_pattern_uv_scale = 5.0;
-uniform float shape_length = 0.5;
-uniform float shape_length_rand = 0.3;
-uniform float shape_density = 1.0; // TODO - implement
-uniform float shape_thickness_base = 0.75;
-uniform float shape_thickness_tip = 0.3;
-uniform sampler2D shape_ldt_texture : hint_white;
-uniform vec3 shape_ldt_uv_scale = vec3(1.0, 1.0, 0.0);
+// Main
+uniform float pattern_uv_scale : hint_range(0.0, 100.0) = 5.0;
+uniform sampler2D pattern_texture : hint_black;
+uniform vec4 transmission : hint_color = vec4(0.3, 0.3, 0.3, 1.0);
+uniform float ao : hint_range(0.0, 1.0) = 1.0;
+uniform float roughness : hint_range(0.0, 1.0) = 1.0;
+uniform float normal_adjustment : hint_range(0.0, 1.0) = 0.0;
 
-// Look
-uniform vec4 look_base_color : hint_color = vec4(0.43, 0.35, 0.29, 1.0); // TODO - Change color to albedo
-uniform vec4 look_tip_color : hint_color = vec4(0.78, 0.63, 0.52, 1.0);
-uniform sampler2D look_color_texture : hint_albedo;
-uniform vec3 look_color_uv_scale = vec3(1.0, 1.0, 0.0);
-uniform vec4 look_transmission = vec4(0.3, 0.3, 0.3, 1.0);
-uniform float look_ao = 1.0;
-uniform float look_roughness = 1.0;
-uniform float look_normal_adjustment = 0.0;
+// Albedo
+uniform vec4 albedo_base_color : hint_color = vec4(0.43, 0.35, 0.29, 1.0); // TODO - Change color to albedo
+uniform vec4 albedo_tip_color : hint_color = vec4(0.78, 0.63, 0.52, 1.0);
+uniform vec3 albedo_uv_scale = vec3(1.0, 1.0, 0.0);
+uniform sampler2D albedo_texture : hint_albedo;
+
+// Shape
+uniform float shape_length : hint_range(0.0, 5.0) = 0.5;
+uniform float shape_length_rand : hint_range(0.0, 1.0) = 0.3;
+uniform float shape_density : hint_range(0.0, 1.0) = 1.0; // TODO - implement
+uniform float shape_thickness_base : hint_range(0.0, 1.0) = 0.75;
+uniform float shape_thickness_tip : hint_range(0.0, 1.0) = 0.3;
+uniform vec3 shape_ldt_uv_scale = vec3(1.0, 1.0, 0.0);
+uniform sampler2D shape_ldt_texture : hint_white;
 
 // Internal uniforms - DO NOT CUSTOMIZE THESE
 uniform float i_wind_strength = 0.0;
@@ -124,7 +126,7 @@ void fragment() { // Discarding fragment if layer is beyond LOD threshhold
 	}
 	// Workaround for issue https://github.com/godotengine/godot/issues/36669
 	// to allow opaque prepass.
-	vec2 pattern = texture(shape_pattern_texture, UV * shape_pattern_uv_scale).rg;
+	vec2 pattern = texture(pattern_texture, UV * pattern_uv_scale).rg;
 	float scissor_thresh =  mix(-shape_thickness_base + 1.0, -shape_thickness_tip + 1.0, lod_adjusted_layer_value); 
 	vec3 ldt_texture_data = texture(shape_ldt_texture, UV * shape_ldt_uv_scale.xy).rgb; // TODO - implement density and length texture data
 
@@ -134,10 +136,10 @@ void fragment() { // Discarding fragment if layer is beyond LOD threshhold
 		discard;
 	}
 	
-	NORMAL = mix(NORMAL, projectOnPlane(VIEW, extrusion_vec.xyz), look_normal_adjustment);
+	NORMAL = mix(NORMAL, projectOnPlane(VIEW, extrusion_vec.xyz), normal_adjustment);
 	
-	ALBEDO = (texture(look_color_texture, UV * look_color_uv_scale.xy) * mix(look_base_color, look_tip_color, lod_adjusted_layer_value)).rgb;
-	TRANSMISSION = look_transmission.rgb;
-	ROUGHNESS = look_roughness;
-	AO = 1.0 - (-lod_adjusted_layer_value + 1.0) * look_ao;
+	ALBEDO = (texture(albedo_texture, UV * albedo_uv_scale.xy) * mix(albedo_base_color, albedo_tip_color, lod_adjusted_layer_value)).rgb;
+	TRANSMISSION = transmission.rgb;
+	ROUGHNESS = roughness;
+	AO = 1.0 - (-lod_adjusted_layer_value + 1.0) * ao;
 }

@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=2]
 
-[ext_resource path="res://addons/shell_fur/noise_patterns/very_fine.png" type="Texture" id=1]
+[ext_resource path="res://addons/shell_fur/noise_patterns/monster.png" type="Texture" id=1]
 [ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=2]
 
 [sub_resource type="ProceduralSky" id=1]
@@ -90,27 +90,31 @@ material/0 = SubResource( 6 )
 
 [node name="ShellFur" type="Spatial" parent="MeshInstance"]
 script = ExtResource( 2 )
-shape_layers = 40
-shape_pattern_texture = ExtResource( 1 )
-shape_pattern_selector = 0
-shape_density = 5.0
-shape_length = 0.5
-shape_length_rand = 0.3
-shape_length_texture = null
-shape_length_tiling = Vector2( 1, 1 )
-shape_thickness_base = 0.75
-shape_thickness_tip = 0.3
-mat_base_color = Color( 0.43, 0.35, 0.29, 1 )
-mat_tip_color = Color( 0.78, 0.63, 0.52, 1 )
-mat_color_texture = null
-mat_color_tiling = Vector2( 1, 1 )
+layers = 40
+pattern_selector = 4
+cast_shadow = false
+mat_shader_type = 0
+mat_custom_shader = null
+mat_pattern_uv_scale = 15.924
+mat_pattern_texture = ExtResource( 1 )
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
 mat_roughness = 1.0
 mat_normal_adjustment = 0.0
+mat_albedo_base_color = Color( 0.43, 0.35, 0.29, 1 )
+mat_albedo_tip_color = Color( 0.78, 0.63, 0.52, 1 )
+mat_albedo_uv_scale = Vector3( 1, 1, 0 )
+mat_albedo_texture = null
+mat_shape_length = 0.37
+mat_shape_length_rand = 0.439
+mat_shape_density = 1.0
+mat_shape_thickness_base = 0.75
+mat_shape_thickness_tip = 0.3
+mat_shape_ldt_uv_scale = Vector3( 1, 1, 0 )
+mat_shape_ldt_texture = null
 physics_custom_physics_pivot = NodePath("")
-physics_gravity = 1.908
-physics_spring = 4.0
+physics_gravity = 0.773
+physics_spring = 1.815
 physics_damping = 0.1
 physics_wind_strength = 0.0
 physics_wind_speed = 1.0
@@ -120,5 +124,3 @@ styling_blendshape_index = -1
 styling_normal_bias = 0.0
 lod_LOD0_distance = 10.0
 lod_LOD1_distance = 100.0
-adv_cast_shadow = false
-adv_custom_shader = null
