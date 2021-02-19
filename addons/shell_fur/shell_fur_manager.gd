@@ -295,10 +295,6 @@ func _get(property : String):
 
 func property_can_revert(property : String) -> bool:
 	if property.begins_with("mat_"):
-#		if "color" in property:
-#			# TODO - we are disabling revert for color parameters due to this
-#			# bug: https://github.com/godotengine/godot/issues/45388
-#			return false
 		var param_name = property.right(len("mat_"))
 		return material.property_can_revert(str("shader_param/", param_name))
 
@@ -315,18 +311,6 @@ func property_get_revert(property : String):
 		var revert_value = material.property_get_revert(str("shader_param/", param_name))
 		return revert_value
 	return DEFAULT_PARAMETERS[property]
-
-
-#func property_can_revert(p_name: String) -> bool:
-#	if not DEFAULT_PARAMETERS.has(p_name):
-#		return false
-#	if get(p_name) != DEFAULT_PARAMETERS[p_name]:
-#		return true
-#	return false
-#
-#
-#func property_get_revert(p_name: String): # returns Variant
-#	return DEFAULT_PARAMETERS[p_name]
 
 
 func _init() -> void:
@@ -351,14 +335,13 @@ func _enter_tree() -> void:
 		# Not sure why this is thrown, since it's not a problem when first
 		# adding the node.
 		_delayed_position_correction()
-#		if shape_pattern_texture != null:
-#			set_pattern_texture(shape_pattern_texture)
-#		else:
-#			set_pattern_texture(load(PATTERNS[shape_pattern_selector]))
-		# Force colors
-		# TODO force colors when it's a gradient if needed
-#		set_tip_color(mat_tip_color)
-#		set_base_color(mat_base_color)
+		material.set_shader_param("pattern_texture", load(PATTERNS[pattern_selector]))
+		# For some reason we have to set some values like colors for them to 
+		# show correctly. Even though we are just setting them to themselves.
+		# To allow for custom shaders, we simply set all shader params to thier own value.
+		var shader_params := VisualServer.shader_get_param_list(material.shader.get_rid())
+		for sp in shader_params:
+			material.set_shader_param(sp.name, material.get_shader_param(sp.name))
 	
 	# Updates the fur if it's needed, clears the fur if it's not
 	_update_fur(0.05)

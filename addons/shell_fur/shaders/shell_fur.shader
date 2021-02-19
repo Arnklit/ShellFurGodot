@@ -22,8 +22,7 @@ uniform float roughness : hint_range(0.0, 1.0) = 1.0;
 uniform float normal_adjustment : hint_range(0.0, 1.0) = 0.0;
 
 // Albedo
-uniform vec4 albedo_base_color : hint_color = vec4(0.43, 0.35, 0.29, 1.0); // TODO - Change color to albedo
-uniform vec4 albedo_tip_color : hint_color = vec4(0.78, 0.63, 0.52, 1.0);
+uniform mat4 albedo_color = mat4(vec4(0.43, 0.78, 0.0, 0.0), vec4(0.35, 0.63, 0.0, 0.0), vec4(0.29, 0.52, 0.0, 0.0), vec4(0.0));
 uniform vec3 albedo_uv_scale = vec3(1.0, 1.0, 0.0);
 uniform sampler2D albedo_texture : hint_albedo;
 
@@ -52,6 +51,20 @@ uniform float i_fur_contract = 0.0;
 varying vec3 extrusion_vec;
 varying vec3 forces_vec;
 varying float lod_adjusted_layer_value;
+
+float lin2srgb(float lin) {
+	return pow(lin, 2.2);
+}
+
+mat4 gradient_lin2srgb(mat4 lin_mat) {
+	mat4 srgb_mat = mat4(
+		vec4(lin2srgb(lin_mat[0].x), lin2srgb(lin_mat[0].y), lin2srgb(lin_mat[0].z), lin2srgb(lin_mat[0].w)),
+		vec4(lin2srgb(lin_mat[1].x), lin2srgb(lin_mat[1].y), lin2srgb(lin_mat[1].z), lin2srgb(lin_mat[1].w)),
+		vec4(0.0),
+		vec4(0.0)
+	);
+	return srgb_mat;
+}
 
 int rand3(vec3 uv, int seed) {
 	return int(4769.*fract(cos(floor(uv.y-5234.)*755.)*245.* sin(floor(uv.x-534.)*531.)*643.)*sin(floor(uv.z-53345.)*765.)*139.);
@@ -138,7 +151,10 @@ void fragment() { // Discarding fragment if layer is beyond LOD threshhold
 	
 	NORMAL = mix(NORMAL, projectOnPlane(VIEW, extrusion_vec.xyz), normal_adjustment);
 	
-	ALBEDO = (texture(albedo_texture, UV * albedo_uv_scale.xy) * mix(albedo_base_color, albedo_tip_color, lod_adjusted_layer_value)).rgb;
+	mat4 albedo_color_srgb = gradient_lin2srgb(albedo_color);
+	vec3 albedo_base_color = vec3(albedo_color_srgb[0].x, albedo_color_srgb[0].y, albedo_color_srgb[0].z);
+	vec3 albedo_tip_color = vec3(albedo_color_srgb[1].x, albedo_color_srgb[1].y, albedo_color_srgb[1].z);
+	ALBEDO = (texture(albedo_texture, UV * albedo_uv_scale.xy).rgb * mix(albedo_base_color, albedo_tip_color, lod_adjusted_layer_value));
 	TRANSMISSION = transmission.rgb;
 	ROUGHNESS = roughness;
 	AO = 1.0 - (-lod_adjusted_layer_value + 1.0) * ao;
