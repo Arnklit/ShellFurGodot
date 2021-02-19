@@ -7,10 +7,10 @@ render_mode depth_draw_alpha_prepass;
 // parameters below and they will automatically get parsed and displayed in
 // the ShellFur inspector.
 
-// Use prefixes: shape_, look_  and custom_
+// Use prefixes: albedo_, shape_ and custom_
 // to automatically put your parameters into categories in the inspector.
 
-// If "curve" is in the name, the inspector will represent and easing curve.
+// If "curve" is in the name, the inspector will represent an easing curve.
 // mat4´s with "color" in their name will get parsed as gradients.
 
 // Main
@@ -29,7 +29,6 @@ uniform sampler2D albedo_texture : hint_albedo;
 // Shape
 uniform float shape_length : hint_range(0.0, 5.0) = 0.5;
 uniform float shape_length_rand : hint_range(0.0, 1.0) = 0.3;
-uniform float shape_density : hint_range(0.0, 1.0) = 1.0; // TODO - implement
 uniform float shape_thickness_base : hint_range(0.0, 1.0) = 0.75;
 uniform float shape_thickness_tip : hint_range(0.0, 1.0) = 0.3;
 uniform vec3 shape_ldt_uv_scale = vec3(1.0, 1.0, 0.0);

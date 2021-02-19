@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/fur_node_icon.png-70334cc9d2fa644676de56fe1bb4b2d1.stex"
+path="res://.import/fur_node_icon.svg-e36258f5e2232b9188ca7ac73c8b5d1a.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/shell_fur/fur_node_icon.png"
-dest_files=[ "res://.import/fur_node_icon.png-70334cc9d2fa644676de56fe1bb4b2d1.stex" ]
+source_file="res://addons/shell_fur/fur_node_icon.svg"
+dest_files=[ "res://.import/fur_node_icon.svg-e36258f5e2232b9188ca7ac73c8b5d1a.stex" ]
 
 [params]
 
