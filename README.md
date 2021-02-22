@@ -38,7 +38,7 @@ Shape
 
 **Pattern Selector:** Select between 5 included patterns.
 
-**Lenth:** The length of the fur. Set this to 1.0 if you are using blendshape styling and want the fur to exactly reach the blenshape length.
+**Length:** The length of the fur. Set this to 1.0 if you are using blendshape styling and want the fur to exactly reach the blenshape length.
 
 **Length Rand:** Controls how much randomness there is in the length of the fur.
 
