@@ -29,6 +29,7 @@ uniform sampler2D albedo_texture : hint_albedo;
 // Shape
 uniform float shape_length : hint_range(0.0, 5.0) = 0.5;
 uniform float shape_length_rand : hint_range(0.0, 1.0) = 0.3;
+uniform float shape_density : hint_range(0.0, 1.0) = 1.0;
 uniform float shape_thickness_base : hint_range(0.0, 1.0) = 0.75;
 uniform float shape_thickness_tip : hint_range(0.0, 1.0) = 0.3;
 uniform vec3 shape_ldt_uv_scale = vec3(1.0, 1.0, 0.0);
@@ -138,13 +139,17 @@ void fragment() { // Discarding fragment if layer is beyond LOD threshhold
 	}
 	// Workaround for issue https://github.com/godotengine/godot/issues/36669
 	// to allow opaque prepass.
-	vec2 pattern = texture(pattern_texture, UV * pattern_uv_scale).rg;
+	vec4 pattern = texture(pattern_texture, UV * pattern_uv_scale);
 	float scissor_thresh =  mix(-shape_thickness_base + 1.0, -shape_thickness_tip + 1.0, lod_adjusted_layer_value); 
 	vec3 ldt_texture_data = texture(shape_ldt_texture, UV * shape_ldt_uv_scale.xy).rgb; // TODO - implement density and length texture data
 
 //	ALPHA = float(scissor_thresh < pattern.r * length_tex_value - pattern.r * length_tex_value * pattern.g * length_rand);
 	
 	if (scissor_thresh > pattern.r * ldt_texture_data.r - pattern.r * ldt_texture_data.r * pattern.g * shape_length_rand) {
+		discard;
+	}
+	
+	if (shape_density * ldt_texture_data.g <= pattern.b) {
 		discard;
 	}
 	

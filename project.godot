@@ -28,7 +28,7 @@ window/vsync/use_vsync=false
 
 [editor_plugins]
 
-enabled=PoolStringArray( "Todo_Manager", "godot-plugin-refresher", "shell_fur" )
+enabled=PoolStringArray( "shell_fur" )
 
 [rendering]
 
