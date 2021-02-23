@@ -1,8 +1,7 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=9 format=2]
 
-[ext_resource path="res://addons/shell_fur/noise_patterns/very_fine.png" type="Texture" id=1]
+[ext_resource path="res://addons/shell_fur/noise_patterns/fine.png" type="Texture" id=1]
 [ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=2]
-[ext_resource path="res://test_assets/textures/ldt_thickness_test.png" type="Texture" id=3]
 
 [sub_resource type="ProceduralSky" id=1]
 
@@ -92,11 +91,11 @@ material/0 = SubResource( 6 )
 [node name="ShellFur" type="Spatial" parent="MeshInstance"]
 script = ExtResource( 2 )
 layers = 40
-pattern_selector = 0
+pattern_selector = 1
 cast_shadow = false
 mat_shader_type = 0
 mat_custom_shader = null
-mat_pattern_uv_scale = 16.765
+mat_pattern_uv_scale = 31.948
 mat_pattern_texture = ExtResource( 1 )
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
@@ -106,14 +105,15 @@ mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0,
 mat_albedo_uv_scale = Vector3( 1, 1, 0 )
 mat_albedo_texture = null
 mat_shape_length = 0.326
-mat_shape_length_rand = 0.0
+mat_shape_length_rand = 0.183
 mat_shape_density = 1.0
 mat_shape_thickness_base = 1.0
 mat_shape_thickness_tip = 0.0
+mat_shape_thickness_rand = 0.172
 mat_shape_ldt_uv_scale = Vector3( 1, 1, 0 )
-mat_shape_ldt_texture = ExtResource( 3 )
+mat_shape_ldt_texture = null
 physics_custom_physics_pivot = NodePath("")
-physics_gravity = 0.1
+physics_gravity = 1.482
 physics_spring = 4.0
 physics_damping = 0.1
 physics_wind_strength = 0.0
