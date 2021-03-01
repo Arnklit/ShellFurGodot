@@ -172,5 +172,5 @@ Current Limitations
 
 Acknowledgements
 ---------------
-* Thanks to my patrons *Marcus Richter, Dmitriy Keane, spacechace0 and Johannes Wuesnch* for all their support.
+* Thanks to my patrons *Little Mouse Games, Winston, Johannes Wuensch, spacechase0, Dmitriy Keane and Marcus Richter* for all their support.
 * Kiri (@ExpiredPopsicle) was a huge help in answering questions and pointing me in the right direction with this.
