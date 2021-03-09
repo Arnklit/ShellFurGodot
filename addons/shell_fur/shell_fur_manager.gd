@@ -508,6 +508,10 @@ func set_custom_shader(shader : Shader) -> void:
 		set_shader_type(SHADER_TYPES.REGULAR)
 
 
+func set_shader_param(param : String, value) -> void:
+	material.set_shader_param(param, value)
+
+
 func set_cast_shadow(value : bool) -> void:
 	if _first_enter_tree:
 		cast_shadow = value
