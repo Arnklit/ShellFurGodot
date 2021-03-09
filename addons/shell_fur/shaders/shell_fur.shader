@@ -33,9 +33,10 @@ uniform float shape_density : hint_range(0.0, 1.0) = 1.0;
 uniform float shape_thickness_base : hint_range(0.0, 1.0) = 0.75;
 uniform float shape_thickness_tip : hint_range(0.0, 1.0) = 0.3;
 uniform float shape_thickness_rand : hint_range(0.0, 1.0) = 0.0;
-uniform float shape_growth : hint_range(0.0, 1.0) = 1.0;
-uniform vec3 shape_ldt_uv_scale = vec3(1.0, 1.0, 0.0);
-uniform sampler2D shape_ldt_texture : hint_white;
+uniform float shape_growth : hint_range(0.0, 2.0) = 1.0;
+uniform float shape_growth_rand : hint_range(0.0, 1.0) = 0.0;
+uniform vec3 shape_ldtg_uv_scale = vec3(1.0, 1.0, 0.0);
+uniform sampler2D shape_ldtg_texture : hint_white;
 
 // Internal uniforms - DO NOT CUSTOMIZE THESE
 uniform float i_wind_strength = 0.0;
@@ -198,21 +199,22 @@ void fragment() { // Discarding fragment if layer is beyond LOD threshhold
 		discard;
 	}
 	
-	vec3 ldt_texture_data = texture(shape_ldt_texture, UV * shape_ldt_uv_scale.xy).rgb; // TODO - implement density and length texture data
+	vec4 ldtg_texture_data = texture(shape_ldtg_texture, UV * shape_ldtg_uv_scale.xy);
 	
 	vec4 pattern = texture(pattern_texture, UV * pattern_uv_scale);
-	// We multiply the thicknesses with ldt texture's B channel and a random value based on the pattern's B channel ids to allow for control
+	// We multiply the thicknesses with ldtg texture's B channel and a random value based on the pattern's B channel ids to allow for control
 	// of the thickness through texture.
 	float t_rand = 1.0 - shape_thickness_rand * pattern.b;
-	float thickness_base = shape_thickness_base * ldt_texture_data.b * t_rand; 
-	float thickness_tip = shape_thickness_tip * ldt_texture_data.b * pattern.b * t_rand;
-	float scissor_thresh =  mix(-thickness_base + 1.0, -thickness_tip + 1.0, lod_adjusted_layer_value) + (1.0 - shape_growth); 
+	float g_rand = 1.0 - shape_growth_rand * ((pattern.g + pattern.b) / 2.0); // We use two random channels to generate an extra "random" for growth
+	float thickness_base = shape_thickness_base * ldtg_texture_data.b * t_rand; 
+	float thickness_tip = shape_thickness_tip * ldtg_texture_data.b * pattern.b * t_rand;
+	float scissor_thresh =  mix(-thickness_base + 1.0, -thickness_tip + 1.0, lod_adjusted_layer_value) + clamp(1.0 - shape_growth + (1.0 - g_rand * ldtg_texture_data.a), 0.0, 1.0); 
 
 //	ALPHA = float(scissor_thresh < pattern.r * length_tex_value - pattern.r * length_tex_value * pattern.g * length_rand);
 	
 	// We use the unique id's in pattern.b to discard if density is under the threshold
 	// density is multiplied by the ldt textures G channel to allow fine control
-	if (shape_density * ldt_texture_data.g <= pattern.b) {
+	if (shape_density * ldtg_texture_data.g <= pattern.b) {
 		discard;
 	}
 	
@@ -220,7 +222,7 @@ void fragment() { // Discarding fragment if layer is beyond LOD threshhold
 	// We discard the parts of mesh that does not make up the strand, we multiply
 	// by ldt texture R channel and the unique ids in pattern's G channel to allow
 	// for randomized and controlled length
-	if (scissor_thresh > pattern.r * ldt_texture_data.r - pattern.r * ldt_texture_data.r * pattern.g * shape_length_rand) {
+	if (scissor_thresh > pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand) {
 		discard;
 	}
 	
