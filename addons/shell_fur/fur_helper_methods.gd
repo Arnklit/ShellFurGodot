@@ -175,6 +175,7 @@ static func generate_combined(shell_fur_object : Spatial, parent_object : Spatia
 		st.append_from(child.mesh, 0, Transform.IDENTITY)
 		child.free()
 	
+	st.index()
 	var combined_obj := MeshInstance.new()
 	
 	combined_obj.name = "CombinedFurMesh"

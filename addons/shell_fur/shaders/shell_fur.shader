@@ -19,7 +19,6 @@ uniform sampler2D pattern_texture : hint_black;
 uniform vec4 transmission : hint_color = vec4(0.3, 0.3, 0.3, 1.0);
 uniform float ao : hint_range(0.0, 1.0) = 1.0;
 uniform float roughness : hint_range(0.0, 1.0) = 1.0;
-uniform float normal_adjustment : hint_range(0.0, 1.0) = 0.0;
 
 // Albedo
 uniform mat4 albedo_color = mat4(vec4(0.43, 0.78, 0.0, 0.0), vec4(0.35, 0.63, 0.0, 0.0), vec4(0.29, 0.52, 0.0, 0.0), vec4(0.0));
@@ -36,9 +35,9 @@ uniform float shape_thickness_rand : hint_range(0.0, 1.0) = 0.0;
 uniform float shape_growth : hint_range(0.0, 2.0) = 1.0;
 uniform float shape_growth_rand : hint_range(0.0, 1.0) = 0.0;
 uniform vec3 shape_ldtg_uv_scale = vec3(1.0, 1.0, 0.0);
-uniform sampler2D shape_ldtg_texture : hint_white;
+uniform sampler2D shape_ldtg_texture : hint_white; // Length, Desity, Thickness, Growth
 
-// Internal uniforms - DO NOT CUSTOMIZE THESE
+// Internal uniforms - DO NOT CUSTOMIZE THESE IF YOU ARE CLONING THE SHADER
 uniform float i_wind_strength = 0.0;
 uniform float i_wind_speed = 1.0;
 uniform float i_wind_scale = 1.0;
@@ -160,7 +159,7 @@ float cnoise(vec3 P)
   vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
   vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
   float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
-  return 2.2 * n_xyz;
+  return 1.1 * n_xyz + 0.5;
 }
 
 vec3 projectOnPlane( vec3 vec, vec3 normal ) {
@@ -202,32 +201,30 @@ void fragment() { // Discarding fragment if layer is beyond LOD threshhold
 	vec4 ldtg_texture_data = texture(shape_ldtg_texture, UV * shape_ldtg_uv_scale.xy);
 	
 	vec4 pattern = texture(pattern_texture, UV * pattern_uv_scale);
-	// We multiply the thicknesses with ldtg texture's B channel and a random value based on the pattern's B channel ids to allow for control
-	// of the thickness through texture.
+	// We multiply the thicknesses with ldtg texture's B channel and a random value based on 
+	// the pattern's B channel ids to allow for control of the thickness through texture.
 	float t_rand = 1.0 - shape_thickness_rand * pattern.b;
 	float g_rand = 1.0 - shape_growth_rand * ((pattern.g + pattern.b) / 2.0); // We use two random channels to generate an extra "random" for growth
 	float thickness_base = shape_thickness_base * ldtg_texture_data.b * t_rand; 
 	float thickness_tip = shape_thickness_tip * ldtg_texture_data.b * pattern.b * t_rand;
 	float scissor_thresh =  mix(-thickness_base + 1.0, -thickness_tip + 1.0, lod_adjusted_layer_value) + clamp(1.0 - shape_growth + (1.0 - g_rand * ldtg_texture_data.a), 0.0, 1.0); 
-
-//	ALPHA = float(scissor_thresh < pattern.r * length_tex_value - pattern.r * length_tex_value * pattern.g * length_rand);
 	
 	// We use the unique id's in pattern.b to discard if density is under the threshold
-	// density is multiplied by the ldt textures G channel to allow fine control
-	if (shape_density * ldtg_texture_data.g <= pattern.b) {
+	// density is multiplied by the ldtg textures G channel to allow fine control
+	if (shape_density * ldtg_texture_data.g * 1.02 <= pattern.b + 0.01) {
 		discard;
 	}
-	
+
 	// Workaround for issue https://github.com/godotengine/godot/issues/36669
+	// Below two lines should work but they do not, so we use discard instead
+	//ALPHA_SCISSOR = scissor_thresh;
+	//ALPHA = pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand;
 	// We discard the parts of mesh that does not make up the strand, we multiply
-	// by ldt texture R channel and the unique ids in pattern's G channel to allow
+	// by ldtg texture R channel and the unique ids in pattern's G channel to allow
 	// for randomized and controlled length
 	if (scissor_thresh > pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand) {
 		discard;
 	}
-	
-	
-	NORMAL = mix(NORMAL, projectOnPlane(VIEW, extrusion_vec.xyz), normal_adjustment);
 	
 	mat4 albedo_color_srgb = gradient_lin2srgb(albedo_color);
 	vec3 albedo_base_color = vec3(albedo_color_srgb[0].x, albedo_color_srgb[0].y, albedo_color_srgb[0].z);

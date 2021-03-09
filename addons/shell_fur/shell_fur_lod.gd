@@ -37,7 +37,6 @@ func process(delta : float) -> void:
 				_shell_fur.fur_object.visible = true
 		2:
 			_shell_fur.material.set_shader_param("i_LOD", 0.25)
-			#_fur_contract = clamp(distance - _shell_fur.lod_LOD1_distance - 1, 0.0, 1.1)
 			_fur_contract = move_toward(_fur_contract, 1.1, delta)
 			if _fur_contract > 1.0 and _shell_fur.fur_object.visible == true:
 				_shell_fur.fur_object.visible = false

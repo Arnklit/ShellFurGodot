@@ -165,24 +165,29 @@ bones/1/bound_children = [ NodePath("BoneAttachment") ]
 
 [node name="ShellFur" type="Spatial" parent="Part 2 - Parameters/SkinnedMesh_2Mat_2Blend/SkinnedMesh_2Mat_2Blend_Armature/Skeleton/SkinnedMesh_2Mat_2Blend" index="0"]
 script = ExtResource( 13 )
-shape_layers = 40
-shape_pattern_texture = ExtResource( 14 )
-shape_pattern_selector = 0
-shape_density = 5.0
-shape_length = 0.5
-shape_length_rand = 0.3
-shape_length_texture = null
-shape_length_tiling = Vector2( 1, 1 )
-shape_thickness_base = 0.75
-shape_thickness_tip = 0.3
-mat_base_color = Color( 0.43, 0.35, 0.29, 1 )
-mat_tip_color = Color( 0.78, 0.63, 0.52, 1 )
-mat_color_texture = null
-mat_color_tiling = Vector2( 1, 1 )
+layers = 40
+pattern_selector = 0
+cast_shadow = false
+mat_shader_type = 0
+mat_custom_shader = null
+mat_pattern_uv_scale = 5.0
+mat_pattern_texture = ExtResource( 14 )
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
 mat_roughness = 1.0
-mat_normal_adjustment = 0.0
+mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
+mat_albedo_uv_scale = Vector3( 1, 1, 0 )
+mat_albedo_texture = null
+mat_shape_length = 0.5
+mat_shape_length_rand = 0.3
+mat_shape_density = 1.0
+mat_shape_thickness_base = 0.75
+mat_shape_thickness_tip = 0.3
+mat_shape_thickness_rand = 0.0
+mat_shape_growth = 1.0
+mat_shape_growth_rand = 0.0
+mat_shape_ldtg_uv_scale = Vector3( 1, 1, 0 )
+mat_shape_ldtg_texture = null
 physics_custom_physics_pivot = NodePath("")
 physics_gravity = 0.1
 physics_spring = 4.0
@@ -195,8 +200,6 @@ styling_blendshape_index = -1
 styling_normal_bias = 0.0
 lod_LOD0_distance = 10.0
 lod_LOD1_distance = 100.0
-adv_cast_shadow = false
-adv_custom_shader = null
 
 [node name="BoneAttachment" type="BoneAttachment" parent="Part 2 - Parameters/SkinnedMesh_2Mat_2Blend/SkinnedMesh_2Mat_2Blend_Armature/Skeleton" index="1"]
 transform = Transform( 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0.00164485, 0 )
@@ -221,24 +224,29 @@ material/0 = null
 
 [node name="ShellFur" type="Spatial" parent="Part 3 - LOD/LOD_Mesh1"]
 script = ExtResource( 13 )
-shape_layers = 40
-shape_pattern_texture = ExtResource( 14 )
-shape_pattern_selector = 0
-shape_density = 5.0
-shape_length = 0.5
-shape_length_rand = 0.3
-shape_length_texture = null
-shape_length_tiling = Vector2( 1, 1 )
-shape_thickness_base = 0.75
-shape_thickness_tip = 0.3
-mat_base_color = Color( 0.43, 0.35, 0.29, 1 )
-mat_tip_color = Color( 0.78, 0.63, 0.52, 1 )
-mat_color_texture = null
-mat_color_tiling = Vector2( 1, 1 )
+layers = 40
+pattern_selector = 0
+cast_shadow = false
+mat_shader_type = 0
+mat_custom_shader = null
+mat_pattern_uv_scale = 5.0
+mat_pattern_texture = ExtResource( 14 )
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
 mat_roughness = 1.0
-mat_normal_adjustment = 0.0
+mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
+mat_albedo_uv_scale = Vector3( 1, 1, 0 )
+mat_albedo_texture = null
+mat_shape_length = 0.5
+mat_shape_length_rand = 0.3
+mat_shape_density = 1.0
+mat_shape_thickness_base = 0.75
+mat_shape_thickness_tip = 0.3
+mat_shape_thickness_rand = 0.0
+mat_shape_growth = 1.0
+mat_shape_growth_rand = 0.0
+mat_shape_ldtg_uv_scale = Vector3( 1, 1, 0 )
+mat_shape_ldtg_texture = null
 physics_custom_physics_pivot = NodePath("")
 physics_gravity = 0.1
 physics_spring = 4.0
@@ -251,8 +259,6 @@ styling_blendshape_index = -1
 styling_normal_bias = 0.0
 lod_LOD0_distance = 3.0
 lod_LOD1_distance = 7.0
-adv_cast_shadow = false
-adv_custom_shader = null
 
 [node name="LOD_Mesh2" type="MeshInstance" parent="Part 3 - LOD"]
 mesh = SubResource( 4 )
@@ -260,24 +266,29 @@ material/0 = null
 
 [node name="ShellFur" type="Spatial" parent="Part 3 - LOD/LOD_Mesh2"]
 script = ExtResource( 13 )
-shape_layers = 40
-shape_pattern_texture = ExtResource( 14 )
-shape_pattern_selector = 0
-shape_density = 5.0
-shape_length = 0.5
-shape_length_rand = 0.3
-shape_length_texture = null
-shape_length_tiling = Vector2( 1, 1 )
-shape_thickness_base = 0.75
-shape_thickness_tip = 0.3
-mat_base_color = Color( 0.43, 0.35, 0.29, 1 )
-mat_tip_color = Color( 0.78, 0.63, 0.52, 1 )
-mat_color_texture = null
-mat_color_tiling = Vector2( 1, 1 )
+layers = 40
+pattern_selector = 0
+cast_shadow = false
+mat_shader_type = 0
+mat_custom_shader = null
+mat_pattern_uv_scale = 5.0
+mat_pattern_texture = ExtResource( 14 )
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
 mat_roughness = 1.0
-mat_normal_adjustment = 0.0
+mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
+mat_albedo_uv_scale = Vector3( 1, 1, 0 )
+mat_albedo_texture = null
+mat_shape_length = 0.5
+mat_shape_length_rand = 0.3
+mat_shape_density = 1.0
+mat_shape_thickness_base = 0.75
+mat_shape_thickness_tip = 0.3
+mat_shape_thickness_rand = 0.0
+mat_shape_growth = 1.0
+mat_shape_growth_rand = 0.0
+mat_shape_ldtg_uv_scale = Vector3( 1, 1, 0 )
+mat_shape_ldtg_texture = null
 physics_custom_physics_pivot = NodePath("")
 physics_gravity = 0.1
 physics_spring = 4.0
@@ -290,8 +301,6 @@ styling_blendshape_index = -1
 styling_normal_bias = 0.0
 lod_LOD0_distance = 7.0
 lod_LOD1_distance = 12.0
-adv_cast_shadow = false
-adv_custom_shader = null
 
 [node name="LOD_Mesh3" type="MeshInstance" parent="Part 3 - LOD"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0 )
@@ -300,24 +309,29 @@ material/0 = null
 
 [node name="ShellFur" type="Spatial" parent="Part 3 - LOD/LOD_Mesh3"]
 script = ExtResource( 13 )
-shape_layers = 40
-shape_pattern_texture = ExtResource( 14 )
-shape_pattern_selector = 0
-shape_density = 5.0
-shape_length = 0.5
-shape_length_rand = 0.3
-shape_length_texture = null
-shape_length_tiling = Vector2( 1, 1 )
-shape_thickness_base = 0.75
-shape_thickness_tip = 0.3
-mat_base_color = Color( 0.43, 0.35, 0.29, 1 )
-mat_tip_color = Color( 0.78, 0.63, 0.52, 1 )
-mat_color_texture = null
-mat_color_tiling = Vector2( 1, 1 )
+layers = 40
+pattern_selector = 0
+cast_shadow = false
+mat_shader_type = 0
+mat_custom_shader = null
+mat_pattern_uv_scale = 5.0
+mat_pattern_texture = ExtResource( 14 )
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
 mat_roughness = 1.0
-mat_normal_adjustment = 0.0
+mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
+mat_albedo_uv_scale = Vector3( 1, 1, 0 )
+mat_albedo_texture = null
+mat_shape_length = 0.5
+mat_shape_length_rand = 0.3
+mat_shape_density = 1.0
+mat_shape_thickness_base = 0.75
+mat_shape_thickness_tip = 0.3
+mat_shape_thickness_rand = 0.0
+mat_shape_growth = 1.0
+mat_shape_growth_rand = 0.0
+mat_shape_ldtg_uv_scale = Vector3( 1, 1, 0 )
+mat_shape_ldtg_texture = null
 physics_custom_physics_pivot = NodePath("")
 physics_gravity = 0.1
 physics_spring = 4.0
@@ -330,8 +344,6 @@ styling_blendshape_index = -1
 styling_normal_bias = 0.0
 lod_LOD0_distance = 12.0
 lod_LOD1_distance = 16.0
-adv_cast_shadow = false
-adv_custom_shader = null
 
 [node name="Camera" type="Camera" parent="Part 3 - LOD"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4 )
@@ -347,27 +359,15 @@ light_color = Color( 1, 0.960784, 0.745098, 1 )
 shadow_enabled = true
 
 [editable path="Part 1 - Apply and Tranfer/Mesh_1Mat_0Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/Mesh_1Mat_1Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/Mesh_1Mat_2Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/Mesh_2Mat_0Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/Mesh_2Mat_1Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/Mesh_2Mat_2Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/SkinnedMesh_1Mat_0Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/SkinnedMesh_1Mat_1Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/SkinnedMesh_1Mat_2Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/SkinnedMesh_2Mat_0Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/SkinnedMesh_2Mat_1Blend"]
-
 [editable path="Part 1 - Apply and Tranfer/SkinnedMesh_2Mat_2Blend"]
-
 [editable path="Part 2 - Parameters/SkinnedMesh_2Mat_2Blend"]

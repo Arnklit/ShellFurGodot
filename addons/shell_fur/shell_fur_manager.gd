@@ -245,7 +245,6 @@ func _get_property_list() -> Array:
 		{
 			name = "styling_blendshape_index",
 			type = TYPE_INT,
-			hint_string = "0.0, 360.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
 		},
 		{
