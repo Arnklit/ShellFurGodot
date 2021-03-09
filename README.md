@@ -172,5 +172,10 @@ Current Limitations
 
 Acknowledgements
 ---------------
-* Thanks to my patrons *Little Mouse Games, Winston, Johannes Wuensch, spacechase0, Dmitriy Keane and Marcus Richter* for all their support.
-* Kiri (@ExpiredPopsicle) was a huge help in answering questions and pointing me in the right direction with this.
+- Thanks to my patrons *Little Mouse Games, Winston, Johannes Wuensch, spacechase0, Dmitriy Keane and Marcus Richter* for all their support.
+- Kiri (@ExpiredPopsicle) was a huge help in answering questions and pointing me in the right direction with this.
+
+License
+-------
+- ShellFur is under MIT license, see LICENSE.md for details.
+- The 3D noise function used for wind is under MIT license by Stefan Gustavson https://github.com/ashima/webgl-noise
