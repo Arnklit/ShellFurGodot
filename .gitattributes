@@ -12,4 +12,5 @@
 /icon.png.import export-ignore
 /project.godot export-ignore
 test_assets export-ignore
+tests export-ignore
 .github/ISSUE_TEMPLATE export-ignore
