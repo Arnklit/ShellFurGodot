@@ -175,6 +175,10 @@ Acknowledgements
 - Thanks to my patrons *Little Mouse Games, Winston, Johannes Wuensch, spacechase0, Dmitriy Keane and Marcus Richter* for all their support.
 - Kiri (@ExpiredPopsicle) was a huge help in answering questions and pointing me in the right direction with this.
 
+Contributing
+------------
+If you want to contribute to the project or just work on your own version, clone the repository and add [WAT - Unit Testing Framework](https://github.com/AlexDarigan/WAT-GDScript) into the project as I don't include it in this repository, but I've started using it for running automated tests. I also use [Todo Manager](https://github.com/OrigamiDev-Pete/TODO_Manager) and [Godot Plugin Refresher](https://github.com/godot-extended-libraries/godot-plugin-refresher) when working on the project, so you might want to consider adding them as well. If you want to add something in, simply do a pull request and I'll have a look at it.
+
 License
 -------
 - ShellFur is under MIT license, see LICENSE.md for details.
