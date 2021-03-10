@@ -1,16 +1,15 @@
 // Copyright © 2021 Kasper Arnklit Frandsen - MIT License
 // See `LICENSE.md` included in the source distribution for details.
 shader_type spatial;
-render_mode depth_draw_alpha_prepass, specular_schlick_ggx;
+render_mode depth_draw_alpha_prepass, diffuse_burley, specular_schlick_ggx;
 
 // If you are making your own shader, you can customize or add your own
 // parameters below and they will automatically get parsed and displayed in
 // the ShellFur inspector.
 
-// Use prefixes: albedo_, shape_ and custom_
-// to automatically put your parameters into categories in the inspector.
+// Use prefixes: albedo_, shape_ and custom_ to automatically put your 
+// parameters into categories in the inspector.
 
-// If "curve" is in the name, the inspector will represent an easing curve.
 // mat4´s with "color" in their name will get parsed as gradients.
 
 // Main
@@ -21,7 +20,12 @@ uniform float ao : hint_range(0.0, 1.0) = 1.0;
 uniform float roughness : hint_range(0.0, 1.0) = 1.0;
 
 // Albedo
-uniform mat4 albedo_color = mat4(vec4(0.43, 0.78, 0.0, 0.0), vec4(0.35, 0.63, 0.0, 0.0), vec4(0.29, 0.52, 0.0, 0.0), vec4(0.0));
+uniform mat4 albedo_color = mat4(
+	vec4(0.43, 0.78, 0.0, 0.0), 
+	vec4(0.35, 0.63, 0.0, 0.0), 
+	vec4(0.29, 0.52, 0.0, 0.0), 
+	vec4(0.0)
+);
 uniform vec3 albedo_uv_scale = vec3(1.0, 1.0, 0.0);
 uniform sampler2D albedo_texture : hint_albedo;
 
@@ -92,7 +96,7 @@ vec3 fade(vec3 t) {
   return t*t*t*(t*(t*6.0-15.0)+10.0);
 }
 
-// Classic Perlin noise
+// Classic Perlin noise by Stefan Gustavson, see README for license
 float cnoise(vec3 P)
 {
   vec3 Pi0 = floor(P); // Integer part for indexing
@@ -175,7 +179,7 @@ void vertex() {
 		vec3 normal_biased_extrude = mix(NORMAL * i_blend_shape_multiplier, extrusion_vec, lod_adjusted_layer_value);
 		vec3 interpolated_extrude = mix(extrusion_vec, normal_biased_extrude, smoothstep(0.0, 2.0, i_normal_bias));
 		vec3 offset_from_surface = interpolated_extrude * shape_length / float(i_layers);
-		VERTEX += (vec4(interpolated_extrude * shape_length * lod_adjusted_layer_value + offset_from_surface, 0.0) * i_physics_rot_offset).xyz;
+		VERTEX += (vec4(interpolated_extrude * shape_length * lod_adjusted_layer_value + offset_from_surface, 1.0) * i_physics_rot_offset).xyz;
 		VERTEX -= i_fur_contract * extrusion_vec * shape_length;
 		
 		vec3 wind_vec = vec3(0.0);
@@ -187,13 +191,14 @@ void vertex() {
 			wind_vec = wind_dir_flattened * cnoise(winduv) * i_wind_strength;
 		}
 		
-		vec3 physics_pos_offset_world = (vec4(i_physics_pos_offset, 0) * WORLD_MATRIX).xyz;
+		vec3 physics_pos_offset_world = (vec4(i_physics_pos_offset, 0.0) * WORLD_MATRIX).xyz;
 		forces_vec = (physics_pos_offset_world + wind_vec) * length(extrusion_vec) * smoothstep(0.0, 2.0, lod_adjusted_layer_value);
 		VERTEX += forces_vec;
 	}
 }
 
-void fragment() { // Discarding fragment if layer is beyond LOD threshhold
+void fragment() { 
+	// Discarding fragment if layer is beyond LOD threshhold
 	if (i_LOD < COLOR.a) { 
 		discard;
 	}

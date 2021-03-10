@@ -19,12 +19,12 @@ const PATTERNS = [
 	"res://addons/shell_fur/noise_patterns/rough.png",
 	"res://addons/shell_fur/noise_patterns/very_rough.png",
 	"res://addons/shell_fur/noise_patterns/monster.png",
-	]
+]
 
 const MATERIAL_CATEGORIES = {
 	shape_ = "Shape",
 	albedo_ = "Albedo",
-	custom_ = "Custom"
+	custom_ = "Custom",
 }
 
 enum SHADER_TYPES {REGULAR, MOBILE, CUSTOM}
@@ -36,7 +36,7 @@ const BUILTIN_SHADERS = [
 	{
 		name = "Mobile",
 		shader_path = "res://addons/shell_fur/shaders/shell_fur_mobile.shader",
-	}
+	},
 ]
 
 const DEFAULT_PARAMETERS = {
@@ -53,10 +53,10 @@ const DEFAULT_PARAMETERS = {
 	physics_wind_speed = 1.0,
 	physics_wind_scale = 1.0,
 	physics_wind_angle = 0.0,
-	styling_blendshape_index = -1,
+	styling_blendshape = 0,
 	styling_normal_bias = 0.0,
 	lod_LOD0_distance = 10.0,
-	lod_LOD1_distance = 100.0
+	lod_LOD1_distance = 100.0,
 }
 
 var layers := 40 setget set_layers
@@ -66,10 +66,12 @@ var cast_shadow := false setget set_cast_shadow
 # Material
 var mat_shader_type := 0 setget set_shader_type
 var mat_custom_shader : Shader setget set_custom_shader
+# Note that the rest of the material inspector gets generated from the
+# uniforms in the selected shader
 
 # Physics
 var physics_custom_physics_pivot : NodePath setget set_custom_physics_pivot
-var physics_gravity := 0.1 setget set_gravity
+var physics_gravity := 0.1
 var physics_spring := 4.0 
 var physics_damping := 0.1
 var physics_wind_strength := 0.0 setget set_wind_strength
@@ -78,16 +80,18 @@ var physics_wind_scale := 1.0 setget set_wind_scale
 var physics_wind_angle := 0.0 setget set_wind_angle
 
 # Blendshape Styling
-var styling_blendshape_index := -1 setget set_blendshape_index
+var styling_blendshape := 0 setget set_blendshape
 var styling_normal_bias := 0.0 setget set_normal_bias
 
 # Level of Detail
 var lod_LOD0_distance := 10.0 setget set_LOD0_distance
 var lod_LOD1_distance := 100.0 setget set_LOD1_distance 
 
-var material: ShaderMaterial = null
+# Public variables
 var fur_object : Spatial
 
+# Private variables
+var _material: ShaderMaterial = null
 var _lod_system
 var _physics_system
 var _parent_is_mesh_instance = false 
@@ -102,53 +106,50 @@ var _skeleton_object
 
 # Built-in Methods
 func _get_property_list() -> Array:
-	var props = [
-		{
+	var props = []
+	props.append({
 			name = "layers",
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0, 100",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "pattern_selector",
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_ENUM,
 			hint_string = "Very Fine, Fine, Rough, Very Rough, Monster",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "cast_shadow",
 			type = TYPE_BOOL,
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "Material",
 			type = TYPE_NIL,
 			hint_string = "mat_",
 			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "mat_shader_type",
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_ENUM,
 			hint_string = "Regular, Mobile, Custom",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "mat_custom_shader",
 			type = TYPE_OBJECT,
 			hint = PROPERTY_HINT_RESOURCE_TYPE,
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 			hint_string = "Shader"
-		}
-	]
+		})
 	
-	var props2 = []
 	var mat_categories = MATERIAL_CATEGORIES.duplicate(true)
-	
-	if material.shader != null:
-		var shader_params := VisualServer.shader_get_param_list(material.shader.get_rid())
+	if _material.shader != null:
+		var shader_params := VisualServer.shader_get_param_list(_material.shader.get_rid())
 		shader_params = FurHelperMethods.reorder_params(shader_params)
 		for p in shader_params:
 			if p.name.begins_with("i_"):
@@ -156,7 +157,7 @@ func _get_property_list() -> Array:
 			var hit_category = null
 			for category in mat_categories:
 				if p.name.begins_with(category):
-					props2.append({
+					props.append({
 						name = str("Material/", mat_categories[category]),
 						type = TYPE_NIL,
 						hint_string = str("mat_", category),
@@ -170,118 +171,128 @@ func _get_property_list() -> Array:
 			for k in p:
 				cp[k] = p[k]
 			cp.name = str("mat_", p.name)
-			if "curve" in cp.name:
-				cp.hint = PROPERTY_HINT_EXP_EASING
-				cp.hint_string = "EASE"
-			props2.append(cp)
+			props.append(cp)
 	
-	var props3 = [
-		{
+	props.append({
 			name = "Physics",
 			type = TYPE_NIL,
 			hint_string = "physics_",
 			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "physics_custom_physics_pivot",
 			type = TYPE_NODE_PATH,
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "physics_gravity",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 4.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "physics_spring",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 10.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "physics_damping",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 1.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "physics_wind_strength",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 5.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-			{
+		})
+	props.append({
 			name = "physics_wind_speed",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 5.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "physics_wind_scale",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 5.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "physics_wind_angle",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 360.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-				{
+		})
+	props.append({
 			name = "Blendshape Styling",
 			type = TYPE_NIL,
 			hint_string = "styling_",
 			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "styling_blendshape_index",
+		})
+	
+	var blendshapes_string := "Disabled"
+	if _parent_has_mesh_assigned:
+		if _parent_object.mesh.is_class("ArrayMesh"):
+			if _parent_object.mesh.get_blend_shape_count() > 0:
+				var b_shapes = _parent_object.mesh.get_blend_shape_count()
+				for b in b_shapes:
+					blendshapes_string += str(", ") + str(_parent_object.mesh.get_blend_shape_name(b))
+		
+	props.append({
+			name = "styling_blendshape",
 			type = TYPE_INT,
+			hint = PROPERTY_HINT_ENUM,
+			hint_string = blendshapes_string,
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
-			name = "styling_normal_bias",
-			type = TYPE_REAL,
-			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0.0, 1.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	
+	if styling_blendshape != 0:
+		props.append({
+				name = "styling_normal_bias",
+				type = TYPE_REAL,
+				hint = PROPERTY_HINT_RANGE,
+				hint_string = "0.0, 1.0",
+				usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			})
+	
+	props.append({
 			name = "Lod",
 			type = TYPE_NIL,
 			hint_string = "lod_",
 			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "lod_LOD0_distance",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 100.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		},
-		{
+		})
+	props.append({
 			name = "lod_LOD1_distance",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 1000.0",
 			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		}
-	]
-	return props + props2 + props3
+		})
+	
+	return props
 
 
 func _set(property: String, value) -> bool:
 	if property.begins_with("mat_"):
 		var param_name = property.right(len("mat_"))
-		material.set_shader_param(param_name, value)
+		set_shader_param(param_name, value)
 		return true
 	return false
 
@@ -289,13 +300,13 @@ func _set(property: String, value) -> bool:
 func _get(property : String):
 	if property.begins_with("mat_"):
 		var param_name = property.right(len("mat_"))
-		return  material.get_shader_param(param_name)
+		return get_shader_param(param_name)
 
 
 func property_can_revert(property : String) -> bool:
 	if property.begins_with("mat_"):
 		var param_name = property.right(len("mat_"))
-		return material.property_can_revert(str("shader_param/", param_name))
+		return _material.property_can_revert(str("shader_param/", param_name))
 
 	if not DEFAULT_PARAMETERS.has(property):
 		return false
@@ -307,21 +318,21 @@ func property_can_revert(property : String) -> bool:
 func property_get_revert(property : String):
 	if property.begins_with("mat_"):
 		var param_name = property.right(len("mat_"))
-		var revert_value = material.property_get_revert(str("shader_param/", param_name))
+		var revert_value = _material.property_get_revert(str("shader_param/", param_name))
 		return revert_value
 	return DEFAULT_PARAMETERS[property]
 
 
 func _init() -> void:
-	material = ShaderMaterial.new()
-	material.shader = load(BUILTIN_SHADERS[mat_shader_type].shader_path) as Shader
+	_material = ShaderMaterial.new()
+	_material.shader = load(BUILTIN_SHADERS[mat_shader_type].shader_path) as Shader
 	_lod_system = load("res://addons/shell_fur/shell_fur_lod.gd").new()
 	_lod_system.init(self)
 	_physics_system = load("res://addons/shell_fur/shell_fur_physics.gd").new()
 	_physics_system.init(self)
 	
 
-func _enter_tree() -> void:	
+func _enter_tree() -> void:
 	if Engine.editor_hint and _first_enter_tree:
 		_first_enter_tree = false
 
@@ -334,13 +345,13 @@ func _enter_tree() -> void:
 		# Not sure why this is thrown, since it's not a problem when first
 		# adding the node.
 		_delayed_position_correction()
-		material.set_shader_param("pattern_texture", load(PATTERNS[pattern_selector]))
+		set_shader_param("pattern_texture", load(PATTERNS[pattern_selector]))
 		# For some reason we have to set some values like colors for them to 
 		# show correctly. Even though we are just setting them to themselves.
 		# To allow for custom shaders, we simply set all shader params to thier own value.
-		var shader_params := VisualServer.shader_get_param_list(material.shader.get_rid())
+		var shader_params := VisualServer.shader_get_param_list(_material.shader.get_rid())
 		for sp in shader_params:
-			material.set_shader_param(sp.name, material.get_shader_param(sp.name))
+			set_shader_param(sp.name, get_shader_param(sp.name))
 	
 	# Updates the fur if it's needed, clears the fur if it's not
 	_update_fur(0.05)
@@ -360,7 +371,7 @@ func _get_configuration_warning() -> String:
 	if not _parent_is_mesh_instance:
 		return "Parent must be a MeshInstance node!"
 	if not _parent_has_mesh_assigned:
-		return "Parent MeshInstance has to have a mesh assigned! Assign a mesh to parent and re-parent this node to recalculate."
+		return "Parent MeshInstance has to have a mesh assigned! Assign a mesh to parent and re-parent fur node to recalculate."
 	return ""
 
 
@@ -375,12 +386,20 @@ func get_current_LOD() -> int:
 	return _lod_system.current_LOD
 
 
+func get_shader_param(param : String):
+	return _material.get_shader_param(param)
+
+
 # Setter Methods
+func set_shader_param(param : String, value) -> void:
+	_material.set_shader_param(param, value)
+
+
 func set_layers(new_layers : int) -> void:
 	layers = new_layers
 	if _first_enter_tree:
 		return
-	material.set_shader_param("i_layers", new_layers)
+	set_shader_param("i_layers", new_layers)
 	_update_fur(0.0)
 
 
@@ -388,8 +407,48 @@ func set_pattern_selector(index : int) -> void:
 	pattern_selector = index
 	if _first_enter_tree:
 		return
-	material.set_shader_param("pattern_texture", load(PATTERNS[index]))
+	set_shader_param("pattern_texture", load(PATTERNS[index]))
 	property_list_changed_notify()
+
+
+func set_cast_shadow(value : bool) -> void:
+	if _first_enter_tree:
+		cast_shadow = value
+		return
+	cast_shadow = value
+	fur_object.cast_shadow = value
+
+
+func set_shader_type(type: int):
+	if type == mat_shader_type:
+		return
+	mat_shader_type = type
+	
+	if mat_shader_type == SHADER_TYPES.CUSTOM:
+		_material.shader = mat_custom_shader
+	else:
+		_material.shader = load(BUILTIN_SHADERS[mat_shader_type].shader_path)
+	
+	property_list_changed_notify()
+
+
+func set_custom_shader(shader : Shader) -> void:
+	if mat_custom_shader == shader:
+		return
+	mat_custom_shader = shader
+	if mat_custom_shader != null:
+		_material.shader = mat_custom_shader
+		
+		if Engine.editor_hint:
+			# Ability to fork default shader
+			if shader.code == "":
+				var selected_shader = load(BUILTIN_SHADERS[mat_shader_type].shader_path) as Shader
+				shader.code = selected_shader.code
+	
+	if shader != null:
+		set_shader_type(SHADER_TYPES.CUSTOM)
+	else:
+		set_shader_type(SHADER_TYPES.REGULAR)
 
 
 func set_custom_physics_pivot(path : NodePath) -> void:
@@ -399,66 +458,39 @@ func set_custom_physics_pivot(path : NodePath) -> void:
 	_physics_system.update_physics_object(0.0)
 
 
-func set_gravity(new_gravity : float) -> void:
-	physics_gravity = new_gravity
-
-
 func set_wind_strength(new_wind_strength : float) -> void:
 	physics_wind_strength = new_wind_strength
-	material.set_shader_param("i_wind_strength", physics_wind_strength)
+	set_shader_param("i_wind_strength", physics_wind_strength)
 
 
 func set_wind_speed(new_wind_speed : float) -> void:
 	physics_wind_speed = new_wind_speed
-	material.set_shader_param("i_wind_speed", physics_wind_speed)
+	set_shader_param("i_wind_speed", physics_wind_speed)
 
 
 func set_wind_scale(new_wind_scale : float) -> void:
 	physics_wind_scale = new_wind_scale
-	material.set_shader_param("i_wind_scale", physics_wind_scale)
+	set_shader_param("i_wind_scale", physics_wind_scale)
 
 
 func set_wind_angle(new_wind_angle : float) -> void:
 	physics_wind_angle = new_wind_angle
 	var angle_vector := Vector2(cos(deg2rad(physics_wind_angle)), sin(deg2rad(physics_wind_angle)))
-	material.set_shader_param("i_wind_angle", Vector3(angle_vector.x, 0.0, angle_vector.y))
+	set_shader_param("i_wind_angle", Vector3(angle_vector.x, 0.0, angle_vector.y))
 
 
-func set_blendshape_index(index: int) -> void:
+func set_blendshape(index: int) -> void:
+	styling_blendshape = index
 	if _first_enter_tree:
-		styling_blendshape_index = index
 		return
 	
-	if index == -1:
-		styling_blendshape_index = -1
-		_update_fur(0.1)
-		return
-	
-	if _parent_has_mesh_assigned:
-		if _parent_object.mesh.is_class("ArrayMesh"):
-			if _parent_object.mesh.get_blend_shape_count() > 0:
-				var b_shapes = _parent_object.mesh.get_blend_shape_count()
-				if index != 0 and b_shapes == 1:
-					push_warning("There is only one blend shape, index has to be '0', or '-1' to disable blend shape styling.")
-					return
-				if index < 0 or index > b_shapes - 1:
-					push_warning("There are only " + str(b_shapes) + " blend shapes on the mesh, index has to be between '0' and '" + str(b_shapes - 1) + "', or '-1' to disable blend shape styling.")
-					return
-				styling_blendshape_index = index
-				_update_fur(0.1)
-				return
-	
-	push_warning("There are no blend shapes on parent mesh.")
-	styling_blendshape_index = -1
+	property_list_changed_notify()
 	_update_fur(0.1)
 
 
 func set_normal_bias(value : float) -> void:
-	if styling_blendshape_index == -1 and value != 0.0:
-		push_warning("Normal Bias only affects fur using blendshape styling.")
-		return
 	styling_normal_bias = value
-	material.set_shader_param("i_normal_bias", styling_normal_bias)
+	set_shader_param("i_normal_bias", styling_normal_bias)
 
 
 func set_LOD0_distance(value : float) -> void:
@@ -475,50 +507,7 @@ func set_LOD1_distance(value : float) -> void:
 		lod_LOD1_distance = value
 
 
-func set_shader_type(type: int):
-	if type == mat_shader_type:
-		return
-	mat_shader_type = type
-	
-	if mat_shader_type == SHADER_TYPES.CUSTOM:
-		material.shader = mat_custom_shader
-	else:
-		material.shader = load(BUILTIN_SHADERS[mat_shader_type].shader_path)
-	
-	property_list_changed_notify()
-
-
-func set_custom_shader(shader : Shader) -> void:
-	if mat_custom_shader == shader:
-		return
-	mat_custom_shader = shader
-	if mat_custom_shader != null:
-		material.shader = mat_custom_shader
-		
-		if Engine.editor_hint:
-			# Ability to fork default shader
-			if shader.code == "":
-				var selected_shader = load(BUILTIN_SHADERS[mat_shader_type].shader_path) as Shader
-				shader.code = selected_shader.code
-	
-	if shader != null:
-		set_shader_type(SHADER_TYPES.CUSTOM)
-	else:
-		set_shader_type(SHADER_TYPES.REGULAR)
-
-
-func set_shader_param(param : String, value) -> void:
-	material.set_shader_param(param, value)
-
-
-func set_cast_shadow(value : bool) -> void:
-	if _first_enter_tree:
-		cast_shadow = value
-		return
-	cast_shadow = value
-	fur_object.cast_shadow = value
-
-
+# Private functions
 func _analyse_parent() -> void:
 	var is_arraymesh
 	_parent_object = get_parent()
@@ -528,18 +517,18 @@ func _analyse_parent() -> void:
 			_parent_has_mesh_assigned = true
 			is_arraymesh = _parent_object.mesh.is_class("ArrayMesh")
 			if is_arraymesh:
-				if _parent_object.mesh.get_blend_shape_count() - 1 < styling_blendshape_index:
+				if _parent_object.mesh.get_blend_shape_count() < styling_blendshape:
 					push_warning("Blendshape index is higher than new mesh's amount of blendshapes. Disabling blendshape styling.")
-					styling_blendshape_index = -1
+					styling_blendshape = 0
 			
 			if _parent_object.skin != null:
 				_parent_has_skin_assigned = true
 				_skeleton_object = _parent_object.get_parent()
 	
 	if not _parent_is_mesh_instance or not _parent_has_mesh_assigned or not is_arraymesh:
-		if styling_blendshape_index != -1:
+		if styling_blendshape != 0:
 			push_warning("Fur is no longer assigned to a valid mesh. Disabling blendshape styling.")
-			styling_blendshape_index = -1
+			styling_blendshape = 0
 
 
 func _update_fur(delay : float) -> void:
@@ -551,14 +540,14 @@ func _update_fur(delay : float) -> void:
 		return
 	
 	if _parent_has_skin_assigned:
-		FurHelperMethods.generate_mesh_shells(self, _parent_object, layers, material, styling_blendshape_index)
-		fur_object = FurHelperMethods.generate_combined(self, _parent_object, material, cast_shadow)
+		FurHelperMethods.generate_mesh_shells(self, _parent_object, layers, _material, styling_blendshape - 1)
+		fur_object = FurHelperMethods.generate_combined(self, _parent_object, _material, cast_shadow)
 	else:
 		_multimeshInstance = MultiMeshInstance.new()
 		add_child(_multimeshInstance)
-		# uncomment to debug whether MMI is created
+		# Uncomment to debug whether MMI is created
 		#_multimeshInstance.set_owner(get_tree().get_edited_scene_root()) 
-		FurHelperMethods.generate_mmi(layers, _multimeshInstance, _parent_object.mesh, material, styling_blendshape_index, cast_shadow)
+		FurHelperMethods.generate_mmi(layers, _multimeshInstance, _parent_object.mesh, _material, styling_blendshape - 1, cast_shadow)
 		fur_object = _multimeshInstance
 
 

@@ -196,8 +196,7 @@ physics_wind_strength = 0.0
 physics_wind_speed = 1.0
 physics_wind_scale = 1.0
 physics_wind_angle = 0.0
-styling_blendshape_index = -1
-styling_normal_bias = 0.0
+styling_blendshape = 0
 lod_LOD0_distance = 10.0
 lod_LOD1_distance = 100.0
 
@@ -255,8 +254,7 @@ physics_wind_strength = 0.0
 physics_wind_speed = 1.0
 physics_wind_scale = 1.0
 physics_wind_angle = 0.0
-styling_blendshape_index = -1
-styling_normal_bias = 0.0
+styling_blendshape = 0
 lod_LOD0_distance = 3.0
 lod_LOD1_distance = 7.0
 
@@ -297,8 +295,7 @@ physics_wind_strength = 0.0
 physics_wind_speed = 1.0
 physics_wind_scale = 1.0
 physics_wind_angle = 0.0
-styling_blendshape_index = -1
-styling_normal_bias = 0.0
+styling_blendshape = 0
 lod_LOD0_distance = 7.0
 lod_LOD1_distance = 12.0
 
@@ -340,8 +337,7 @@ physics_wind_strength = 0.0
 physics_wind_speed = 1.0
 physics_wind_scale = 1.0
 physics_wind_angle = 0.0
-styling_blendshape_index = -1
-styling_normal_bias = 0.0
+styling_blendshape = 0
 lod_LOD0_distance = 12.0
 lod_LOD1_distance = 16.0
 

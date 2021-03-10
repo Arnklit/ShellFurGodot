@@ -115,6 +115,7 @@ static func reorder_params(unordered_params : Array) -> Array:
 
 
 static func last_prefix_occurence(array : Array, search : String) -> int:
+	
 	var inverted_array = array.duplicate(true)
 	inverted_array.invert()
 	
