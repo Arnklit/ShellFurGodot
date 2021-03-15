@@ -41,7 +41,7 @@ The parameters for the fur is split into five sections.
 
 **Material**
 
-*The material subsection is dynamically generated based on the content of the shader in used. The Regular and Mobile shader have the same shader parameters, but if you choose to customize the shader any parameters you add will be displayed here. See writing custom shaders for details.*
+*The material subsection is dynamically generated based on the content of the shader in use. The Regular and Mobile shader have the same shader parameters, but if you choose to customize the shader any parameters you add will be displayed here. See writing custom shaders for details.*
 
 - **Transmission:** - The amount of light that can pass through the fur and the color of that light.
 - **Ao:** - Fake ambient occlusion applied linearly from the base to the tip.
@@ -59,6 +59,8 @@ The parameters for the fur is split into five sections.
   - **Thickness Rand** - Controls how much the thickness of each strand gets multiplied with a with a random value.
   - **Growth** - This control can be animated either with an animation player node or a script for fur growth effect.
   - **Growth Rand** - This adds a random offset to the growth of each strands.
+  - **ldtg UV Scale** - UV Scale for the ldtg texture below.
+  - **ldtg Textire** - An RGBA texture that can be used to customize the Length(R), Density(G), Thichkness(B) and Growth(A) parameters.
 
 **Physics**
 
