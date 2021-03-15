@@ -41,17 +41,17 @@ The parameters for the fur is split into five sections.
 
 **Material**
 
-*The material subsection is dynamically generated based on the content of the shader in used. The Regular and Mobile shader have the same shader parameters, but if you choose to customise the shader any parameters you add will be displayed here. See writing custom shaders for details.*
+*The material subsection is dynamically generated based on the content of the shader in used. The Regular and Mobile shader have the same shader parameters, but if you choose to customize the shader any parameters you add will be displayed here. See writing custom shaders for details.*
 
-- **Transmission:** - The amount of light that can pass through the fur and the colour of that light.
+- **Transmission:** - The amount of light that can pass through the fur and the color of that light.
 - **Ao:** - Fake ambient occlusion applied linearly from the base to the tip.
 - **Roughness** - The roughness value of the fur, it's difficult to achieve realistic shiny fur with this approach, you will probably get the best result leaving this value at 1.0.
 - **Albedo** - Subcategory for albedo parameters.
   - **Color** - Color gradient used for the albedo of the fur, left is base of the fur, right is tip. The color interpolates linearly between the two.
-  - **UV Scale** UV Scale for the albdedo texture below.
-  - **Texture** - Texture for the colour of the strands. Values are multiplied with the *Color* gradient so it can be used for tinting.
+  - **UV Scale** UV Scale for the albedo texture below.
+  - **Texture** - Texture for the color of the strands. Values are multiplied with the *Color* gradient so it can be used for tinting.
 - **Shape** - Subcategory for the shape parameters.
-  - **Length** - The length of the fur. Set this to 1.0 if you are using blendshape styling and want the fur to exactly reach the blenshape key.
+  - **Length** - The length of the fur. Set this to 1.0 if you are using blendshape styling and want the fur to exactly reach the blendshape key.
   - **Length Rand** - Controls how much randomness there is in the length of the fur.
   - **Density** - Lowering the value with randomly discard more and more hair strands for a more sparse look.
   - **Thickness Base** - The thickness at the base of the strand.
@@ -64,17 +64,17 @@ The parameters for the fur is split into five sections.
 
 - **Custom Physics Pivot** - If you are using the fur on a skinned mesh where animation is moving the mesh, use this option to set the physics pivot to the center of gravity of your character. You can use the *Bone Attachment* node to set up a node that will follow a specific bone in your rig.
 - **Gravity** - Down force applied on the spring physics.
-- **Spring** - Ammount of springiness to the physics.
-- **Damping** - Ammount of damping to the physics (to imitate air and friction resistance stopping the fur's movement over time).
-- **Wind Strength** - Ammount of wind strength, the wind is applied as a noise distortion in the vertex shader due to current limitations so it does not interact with the spring physics. If the *Wind Strength* is set to 0 the calculations are skipped in the shader.
-- **Wind Speed** - How quickly the wind noise moves accros the fur.
+- **Spring** - Amount of springiness to the physics.
+- **Damping** - Amount of damping to the physics (to imitate air and friction resistance stopping the fur's movement over time).
+- **Wind Strength** - Amount of wind strength, the wind is applied as a noise distortion in the vertex shader due to current limitations so it does not interact with the spring physics. If the *Wind Strength* is set to 0 the calculations are skipped in the shader.
+- **Wind Speed** - How quickly the wind noise moves accross the fur.
 - **Wind Scale** - Scale of the wind noise.
 - **Wind Angle** - The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
 
 **Blendshape Styling**
 
-- **Blendshape** - This pull down will list any blendshapes availble on your base mesh. Selecting one of them will activate *Blendshape Styling*.
-- **Normal Bias** - This option only appears when a blendshape is selected aboce. This option mixes the fur direction of the blendshape with the normal direction of the base shape for a more natural look.
+- **Blendshape** - This pull down will list any blendshapes available on your base mesh. Selecting one of them will activate *Blendshape Styling*.
+- **Normal Bias** - This option only appears when a blendshape is selected above. This option mixes the fur direction of the blendshape with the normal direction of the base shape for a more natural look.
 
 **Lod**
 
@@ -102,11 +102,12 @@ If you want to use your own pattern for the fur, you need use a texture with noi
 Breakdown of Very Fine texture - Left to right: Combined pattern texture, R channel, G channel, B channel and A channel.
 ![image](https://user-images.githubusercontent.com/4955051/111150649-41bdc600-8586-11eb-9dad-9def3a252be1.png)
 
-The easiest way to do this is to use this file which shows examples of how I generate fur textures. It is availble [here](https://github.com/Arnklit/media/blob/main/ShellFurAdd-on/pattern_examples.ptex). It is made in the free Texture generation program [Material Maker](https://github.com/RodZill4/material-maker).
+The easiest way to do this is to use this [file](https://github.com/Arnklit/media/blob/main/ShellFurAdd-on/pattern_examples.ptex) which shows examples of how I generate fur textures. It is made in the free Texture generation program [Material Maker](https://github.com/RodZill4/material-maker).
 
 Be sure to enable *Filter*, *Mipmaps* and *Anisotropic* and set *Srgb* to *Disable* when importing your own pattern textures.
 
 **Writing Custom Shaders**
+
 When writing custom shaders for the tool there are a few things to keep in mind.
 
 The tool uses certain uniforms that should not be customized as that will break the tool. These uniforms are prefixed with "i_" and are:
@@ -129,7 +130,7 @@ The tool uses certain uniforms that should not be customized as that will break 
 
 Uniforms that do not start with "i_" will be parsed by the ShellFur's material inspector so they can easily be used in the tool. If the uniforms start with any of the below prefixes they will automatically be sorted into subcategories in the material section.
 
-|Prefix name  |Subcatergory name|
+|Prefix name  |Subcategory name|
 |:------------|:----------------|
 |albedo_      |Albedo           |
 |shape_       |Shape            |
@@ -143,14 +144,14 @@ The shader works with GLES2, however rotational physics do not work in GLES2.
 
 I suggest using the *Mobile* shader when targeting mobile, but if you have a newer device, the *Regular* shader might work as well.
 
-In my testing there appeared to be a bug where skinned meshes with blendshapes don't render on Android. https://github.com/godotengine/godot/issues/43217. So if you want to use blendshape styling, you might need to work around this by having a seperate mesh where you have removed the blendshape, that is getting rendered. I had to do this in my current android demo scene, so have a look at the demo project to see how I did it there.
+In my testing there appeared to be a bug where skinned meshes with blendshapes don't render on Android. https://github.com/godotengine/godot/issues/43217. So if you want to use blendshape styling, you might need to work around this by having a separate mesh where you have removed the blendshape, that is getting rendered. I had to do this in my current android demo scene, so have a look at the demo project to see how I did it there.
 
 No testing has been done on iOS devices.
 
 Current Limitations
 -------------------
-- Since the fur is made up of shells that are paralel to the surface, the fur can look pretty bad when seen from the side. This is somewhat mitigated by using the blendshape styling but could be further improved by adding in generated fur fins around the contour of the mesh.
-- Limitations to skinned meshes. When the fur is applied to skinned meshes, MultiMeshInstance method cannot be used, so a custom mesh is generated with many layers. This is heavy on skinning performance and currently blendshapes are not copied over, so the fur will not adhere to blendshape changes on the base mesh. Using material passes would bypass this issue, but would cause a lot of drawcalls. I'm still looking into a solution for this.
+- Since the fur is made up of shells that are parallel to the surface, the fur can look pretty bad when seen from the side. This is somewhat mitigated by using the blendshape styling but could be further improved by adding in generated fur fins around the contour of the mesh.
+- Limitations to skinned meshes. When the fur is applied to skinned meshes, MultiMeshInstance method cannot be used, so a custom mesh is generated with many layers. This is heavy on skinning performance and currently blendshapes are not copied over, so the fur will not adhere to blendshape changes on the base mesh. Using material passes would bypass this issue, but would cause a lot of draw calls. I'm still looking into a solution for this.
 
 Acknowledgements
 ---------------
