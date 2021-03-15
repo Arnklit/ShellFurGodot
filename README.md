@@ -22,10 +22,13 @@ Select any *MeshInstance* node and add the *ShellFur* node as a child beneath it
 
 ![72mqYGVOST](https://user-images.githubusercontent.com/4955051/111127735-0f06d400-856c-11eb-8ac3-f69a85c5c072.gif)
 
+
+
+Parameters
+-----
 The parameters for the fur is split into five sections.
 
-Main
------
+**Main**
 - **Shader Type** - This allows you to select between shaders, the options are *Regular*, *Mobile* and *Custom* (*Custom* only appears when a shader is set in the *Custom Shader* field). The *Mobile* shader differs from the *Regular* shader in that it does not use depth_draw_alpha_prepass as that does not work well in my testing on Android, it also uses simpler diffuse and specular shading and disables shadows on the fur. Note: Both *Regular* and *Mobile* shaders work with GLES2.
 - **Custom Shader** - This option allows you to easily make a copy of the selected shader and edit it.
 - **Layers** - The amount of shells that are generated around the object, more layers equals nicer strands, but will decrease performance.
@@ -35,8 +38,7 @@ Main
 - **Pattern UV Scale** - The scale of the pattern texture on the model, increase this to make more dense and thin fur.
 - **Cast Shadow** - Whether the fur should cast shadow. This is expensive performance wise, so it defaults to off.
 
-Material
---------
+**Material**
 *The material subsection is dynamically generated based on the content of the shader in used. The Regular and Mobile shader have the same shader parameters, but if you choose to customise the shader any parameters you add will be displayed here. See writing custom shaders for details.*
 
 - **Transmission:** - The amount of light that can pass through the fur and the colour of that light.
@@ -56,8 +58,7 @@ Material
   - **Growth** - This control can be animated either with an animation player node or a script for fur growth effect.
   - **Growth Rand** - This adds a random offset to the growth of each strands.
 
-Physics
--------
+**Physics**
 - **Custom Physics Pivot** - If you are using the fur on a skinned mesh where animation is moving the mesh, use this option to set the physics pivot to the center of gravity of your character. You can use the *Bone Attachment* node to set up a node that will follow a specific bone in your rig.
 - **Gravity** - Down force applied on the spring physics.
 - **Spring** - Ammount of springiness to the physics.
@@ -67,13 +68,11 @@ Physics
 - **Wind Scale** - Scale of the wind noise.
 - **Wind Angle** - The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
 
-Blendshape Styling
-------------------
+**Blendshape Styling**
 - **Blendshape** - This pull down will list any blendshapes availble on your base mesh. Selecting one of them will activate *Blendshape Styling*.
 - **Normal Bias** - This option only appears when a blendshape is selected aboce. This option mixes the fur direction of the blendshape with the normal direction of the base shape for a more natural look.
 
-Lod
----
+**Lod**
 - **Lod 0 Distance** - The distance up to which the fur will display at full detail.
 - **Lod 1 Distance** - The distance at which the fur will display at 25% of it's layers. The fur will smoothly interpolate between *Lod 0* and *Lod 1*. Beyond *Lod 1* distance the fur will fade away and the fur object will become hidden.
 
@@ -88,6 +87,39 @@ Breakdown of Fine texture - Left: Combined pattern texture, Middle: R channel, R
 ![image](https://user-images.githubusercontent.com/4955051/95909140-e64c9980-0d95-11eb-8a78-9f864b7abe19.png)
 
 The easiest way to do this is to use the same file I use to generate the fur textures with. It is availble here. It is made in the free Texture generation program Material Maker.
+
+Be sure to enable *Filter*, *Mipmaps* and *Anisotropic* and set *Srgb* to *Disable* when importing your own pattern textures.
+
+**Writing Custom Shaders**
+When writing custom shaders for the tool there are a few things to keep in mind.
+
+The tool uses certain uniforms that should not be customized as that will break the tool. These uniforms are prefixed with "i_" and are:
+
+|Uniform name            |Description                                                  |
+|:-----------------------|:------------------------------------------------------------|
+|i_layers                |Used by the shader to correctly spread the layers            |
+|i_pattern_texture       |The pattern texture set by the selector in the main section  |
+|i_pattern_uv_scale      |UV scale of the above texture                                |
+|i_wind_strength         |Controls for the wind system                                 |
+|i_wind_speed            |Controls for the wind system                                 |
+|i_wind_scale            |Controls for the wind system                                 |
+|i_wind_angle            |Controls for the wind system                                 |
+|i_normal_bias           |Used to blend in the normal at the base when using blendshape|
+|i_LOD                   |Used by the LOD system                                       |
+|i_physics_pos_offset    |Used by the physics system to pass spring data               |
+|i_physics_rot_offset    |Used by the physics system to pass spring data               |
+|i_blend_shape_multiplier|Used when setting up the extrusion vectors for the shells    |
+|i_fur_contract          |Used by the LOD system to pull the fur into the mesh         |
+
+Uniforms that do not start with "i_" will be parsed by the ShellFur's material inspector so they can easily be used in the tool. If the uniforms start with any of the below prefixes they will automatically be sorted into subcategories in the material section.
+
+|Prefix name  |Subcatergory name|
+|:------------|:----------------|
+|albedo_      |Albedo           |
+|shape_       |Shape            |
+|custom_      |Custom           |
+
+*mat4 uniforms containing "color" in their name will be displayed as a gradient field with two color selectors.*
 
 **Mobile Support - experimental**
 
