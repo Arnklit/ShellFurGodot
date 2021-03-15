@@ -29,6 +29,7 @@ Parameters
 The parameters for the fur is split into five sections.
 
 **Main**
+
 - **Shader Type** - This allows you to select between shaders, the options are *Regular*, *Mobile* and *Custom* (*Custom* only appears when a shader is set in the *Custom Shader* field). The *Mobile* shader differs from the *Regular* shader in that it does not use depth_draw_alpha_prepass as that does not work well in my testing on Android, it also uses simpler diffuse and specular shading and disables shadows on the fur. Note: Both *Regular* and *Mobile* shaders work with GLES2.
 - **Custom Shader** - This option allows you to easily make a copy of the selected shader and edit it.
 - **Layers** - The amount of shells that are generated around the object, more layers equals nicer strands, but will decrease performance.
@@ -39,6 +40,7 @@ The parameters for the fur is split into five sections.
 - **Cast Shadow** - Whether the fur should cast shadow. This is expensive performance wise, so it defaults to off.
 
 **Material**
+
 *The material subsection is dynamically generated based on the content of the shader in used. The Regular and Mobile shader have the same shader parameters, but if you choose to customise the shader any parameters you add will be displayed here. See writing custom shaders for details.*
 
 - **Transmission:** - The amount of light that can pass through the fur and the colour of that light.
@@ -59,6 +61,7 @@ The parameters for the fur is split into five sections.
   - **Growth Rand** - This adds a random offset to the growth of each strands.
 
 **Physics**
+
 - **Custom Physics Pivot** - If you are using the fur on a skinned mesh where animation is moving the mesh, use this option to set the physics pivot to the center of gravity of your character. You can use the *Bone Attachment* node to set up a node that will follow a specific bone in your rig.
 - **Gravity** - Down force applied on the spring physics.
 - **Spring** - Ammount of springiness to the physics.
@@ -69,12 +72,25 @@ The parameters for the fur is split into five sections.
 - **Wind Angle** - The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
 
 **Blendshape Styling**
+
 - **Blendshape** - This pull down will list any blendshapes availble on your base mesh. Selecting one of them will activate *Blendshape Styling*.
 - **Normal Bias** - This option only appears when a blendshape is selected aboce. This option mixes the fur direction of the blendshape with the normal direction of the base shape for a more natural look.
 
 **Lod**
+
 - **Lod 0 Distance** - The distance up to which the fur will display at full detail.
 - **Lod 1 Distance** - The distance at which the fur will display at 25% of it's layers. The fur will smoothly interpolate between *Lod 0* and *Lod 1*. Beyond *Lod 1* distance the fur will fade away and the fur object will become hidden.
+
+API
+---
+
+If you want to communicate with the fur script with your own scripts you can call all the public setters and getters on the tool, in addition to the setters for the parameters seen in the inspector, these three functions may be useful.
+
+|Function                                |Return Type |Description                                                               |
+|:---------------------------------------|:-----------|:-------------------------------------------------------------------------|
+|get_current_LOD()                       |int         |Returns the current LOD level                                             |
+|get_shader_param(param : String)        |variant     |Returns the given shader parameter                                        |
+|set_shader_param(param : String, value) |void        |Sets the given shader parameter - DO NOT SET INTERNAL PARAMS (prefix "i_")|
 
 TIPS
 ----
@@ -83,10 +99,10 @@ TIPS
 
 If you want to use your own pattern for the fur, you need use a texture with noise in the R channel used for the fur strand cutoff. You can leave G, B and A channel and full value and the shader will work, but you will not have any options for random length, density, thickness and growth. To have that you'll need to have random values corresponding to the cells of each strand as seen below.
 
-Breakdown of Fine texture - Left: Combined pattern texture, Middle: R channel, Right: G channel.
-![image](https://user-images.githubusercontent.com/4955051/95909140-e64c9980-0d95-11eb-8a78-9f864b7abe19.png)
+Breakdown of Very Fine texture - Left to right: Combined pattern texture, R channel, G channel, B channel and A channel.
+![image](https://user-images.githubusercontent.com/4955051/111150649-41bdc600-8586-11eb-9dad-9def3a252be1.png)
 
-The easiest way to do this is to use the same file I use to generate the fur textures with. It is availble here. It is made in the free Texture generation program Material Maker.
+The easiest way to do this is to use this file which shows examples of how I generate fur textures. It is availble [here](https://github.com/Arnklit/media/blob/main/ShellFurAdd-on/pattern_examples.ptex). It is made in the free Texture generation program [Material Maker](https://github.com/RodZill4/material-maker).
 
 Be sure to enable *Filter*, *Mipmaps* and *Anisotropic* and set *Srgb* to *Disable* when importing your own pattern textures.
 
