@@ -20,148 +20,82 @@ Usage
 -----
 Select any *MeshInstance* node and add the *ShellFur* node as a child beneath it.
 
-![uc6ZJWJqa4](https://user-images.githubusercontent.com/4955051/97787441-1bd0ef80-1baa-11eb-8c2b-109b1ace5f36.gif)
+![72mqYGVOST](https://user-images.githubusercontent.com/4955051/111127735-0f06d400-856c-11eb-8ac3-f69a85c5c072.gif)
 
-&nbsp;
-&nbsp;
+The parameters for the fur is split into five sections.
 
-The parameters for the fur is split into six sections.
-
-Shape
+Main
 -----
-
-<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97784319-93485400-1b95-11eb-9f4d-9b4d280c3da0.png">
-
-**Layers:** Controls how many shells are generated around the object, more layers equals nicer strands, but will decrease performance.
-
-**Pattern Texture:** Manully select the pattern texture used for the fur shape. See info on making your own patterns below.
-
-**Pattern Selector:** Select between 5 included patterns.
-
-**Length:** The length of the fur. Set this to 1.0 if you are using blendshape styling and want the fur to exactly reach the blenshape length.
-
-**Length Rand:** Controls how much randomness there is in the length of the fur.
-
-**Thickness Base:** The thickness at the base of the strand.
-
-**Thickness Tip:** The thickness at the tip of the strand.
-
-&nbsp;
-
-&nbsp;
-
-&nbsp;
-
-*<p align=center>The five built-in fur patterns</p>*
-
+- **Shader Type** - This allows you to select between shaders, the options are *Regular*, *Mobile* and *Custom* (*Custom* only appears when a shader is set in the *Custom Shader* field). The *Mobile* shader differs from the *Regular* shader in that it does not use depth_draw_alpha_prepass as that does not work well in my testing on Android, it also uses simpler diffuse and specular shading and disables shadows on the fur. Note: Both *Regular* and *Mobile* shaders work with GLES2.
+- **Custom Shader** - This option allows you to easily make a copy of the selected shader and edit it.
+- **Layers** - The amount of shells that are generated around the object, more layers equals nicer strands, but will decrease performance.
+- **Pattern Selector** - This options allows you to select between the five included patterns.
 ![image](https://user-images.githubusercontent.com/4955051/97798110-fe883980-1c1a-11eb-9efd-66369c21b8d0.png)
+- **Pattern Texture** - The pattern texture in use, use this to manually set your own pattern for the fur shape, if none of the built-in ones fit your purpose. See info on making your own patterns below.
+- **Pattern UV Scale** - The scale of the pattern texture on the model, increase this to make more dense and thin fur.
+- **Cast Shadow** - Whether the fur should cast shadow. This is expensive performance wise, so it defaults to off.
 
 Material
 --------
+*The material subsection is dynamically generated based on the content of the shader in used. The Regular and Mobile shader have the same shader parameters, but if you choose to customise the shader any parameters you add will be displayed here. See writing custom shaders for details.*
 
-<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97784402-487b0c00-1b96-11eb-8745-4ace8779f64d.png">
-
-**Base Color:** The colour of the fur at the base of the strand, interpolates linearly towards the tip.
-
-**Tip Color:** The colour of the fur at the tip of the strand, interpolates linearly towards the base.
-
-**Color Texture:** Texture for the colour of the strands. Values are multiplied with Base Color and Tip Color so they can be used for tinting.
-
-**Color Tiling:** UV Tiling for Color Texture.
-
-**Transmission:** The amount of light that can pass through the fur and the colour of that light.
-
-**Ao:** Fake ambient occlusion applied linearly from the base to the tip.
-
-**Roughness** The roughness value of the fur, it's difficult to achieve realistic shiny fur with this approach, you will probably get the best result leaving this value at 1.0.
-
-**Normal Adjustment** This parameter attempts to correct the normal to be along the strand, rather than using the normal of the base mesh. Most of the time it actually seems to look best to leave this low, so the fur get's shaded in the shape of the base mesh, but if you are using thick strands or need specular highlights, you may need to adjust this.
-
-&nbsp;
-
-&nbsp;
+- **Transmission:** - The amount of light that can pass through the fur and the colour of that light.
+- **Ao:** - Fake ambient occlusion applied linearly from the base to the tip.
+- **Roughness** - The roughness value of the fur, it's difficult to achieve realistic shiny fur with this approach, you will probably get the best result leaving this value at 1.0.
+- **Albedo** - Subcategory for albedo parameters.
+  - **Color** - Color gradient used for the albedo of the fur, left is base of the fur, right is tip. The color interpolates linearly between the two.
+  - **UV Scale** UV Scale for the albdedo texture below.
+  - **Texture** - Texture for the colour of the strands. Values are multiplied with the *Color* gradient so it can be used for tinting.
+- **Shape** - Subcategory for the shape parameters.
+  - **Length** - The length of the fur. Set this to 1.0 if you are using blendshape styling and want the fur to exactly reach the blenshape key.
+  - **Length Rand** - Controls how much randomness there is in the length of the fur.
+  - **Density** - Lowering the value with randomly discard more and more hair strands for a more sparse look.
+  - **Thickness Base** - The thickness at the base of the strand.
+  - **Thickness Tip** - The thickness at the tip of the strand.
+  - **Thickness Rand** - Controls how much the thickness of each strand gets multiplied with a with a random value.
+  - **Growth** - This control can be animated either with an animation player node or a script for fur growth effect.
+  - **Growth Rand** - This adds a random offset to the growth of each strands.
 
 Physics
 -------
-
-<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97785969-31411c00-1ba0-11eb-96e7-243eda4c6ff6.png">
-
-**Custom Physics Pivot** If you are using the fur on a skinned mesh where animation is moving the mesh, use this option to set the physics pivot to the center of gravity of your character. You can use the *Bone Attachment* node to set up a node that will follow a specific bone in your rig.
-
-**Gravity:** Down force applied on the spring physics.
-
-**Spring:** Ammount of springiness to the physics.
-
-**Damping:** Ammount of damping to the physics (to imitate air and friction resistance stopping the fur's movement over time)
-
-**Wind Strength** Ammount of wind strength, the wind is applied as a noise distortion in the vertex shader due to current limitations so it does not interact with the spring physics. If the *Wind Strength* is set to 0 the calculations are skipped in the shader.
-
-**Wind Speed** How quickly the wind noise moves accros the fur.
-
-**Wind Scale** Scale of the wind noise
-
-**Wind Angle** The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
-
-&nbsp;
-
-&nbsp;
-
-*<p align=center>Example of physics forces with a Custom Physics Pivot set</p>*
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/4955051/97798318-fcbf7580-1c1c-11eb-8385-af9971fdd95b.gif">
-</p>
+- **Custom Physics Pivot** - If you are using the fur on a skinned mesh where animation is moving the mesh, use this option to set the physics pivot to the center of gravity of your character. You can use the *Bone Attachment* node to set up a node that will follow a specific bone in your rig.
+- **Gravity** - Down force applied on the spring physics.
+- **Spring** - Ammount of springiness to the physics.
+- **Damping** - Ammount of damping to the physics (to imitate air and friction resistance stopping the fur's movement over time).
+- **Wind Strength** - Ammount of wind strength, the wind is applied as a noise distortion in the vertex shader due to current limitations so it does not interact with the spring physics. If the *Wind Strength* is set to 0 the calculations are skipped in the shader.
+- **Wind Speed** - How quickly the wind noise moves accros the fur.
+- **Wind Scale** - Scale of the wind noise.
+- **Wind Angle** - The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
 
 Blendshape Styling
 ------------------
-
-<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97786353-e379e300-1ba2-11eb-884b-a4a53b1c2eb9.png">
-
-**Blendshape Index:** Use this option to style the fur with a blendshape. A value of -1 means disabled.
-
-**Normal Bias:** This option is used in conjunction with blendshape index. It mixes in the normal direction at the base.
-
-&nbsp;
+- **Blendshape** - This pull down will list any blendshapes availble on your base mesh. Selecting one of them will activate *Blendshape Styling*.
+- **Normal Bias** - This option only appears when a blendshape is selected aboce. This option mixes the fur direction of the blendshape with the normal direction of the base shape for a more natural look.
 
 Lod
 ---
-
-<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97787660-8b93aa00-1bab-11eb-998f-8bb6156a354d.png">
-
-**Lod 0 Distance:** The distance up to which the fur will display at full detail.
-
-**Lod 1 Distance:** This distance at which the fur will display at 25% of it's layers. The fur will smoothly interpolate between *Lod 0* and *Lod 1*. Beyond *Lod 1* distance the fur will fade away and the fur object will become hidden.
-
-&nbsp;
-
-Advanced
---------
-
-<img align="right" width="400" src="https://user-images.githubusercontent.com/4955051/97787878-aadf0700-1bac-11eb-91f3-fb8ec0fc7194.png">
-
-**Cast Shadow** Whether the fur should cast shadow. This is expensive performance wise, so it defaults to off.
-
-**Custom Shader** Option to use a custom shader for the fur. Selecting new will create a copy of the default shader for you to edit.
-
-&nbsp;
+- **Lod 0 Distance** - The distance up to which the fur will display at full detail.
+- **Lod 1 Distance** - The distance at which the fur will display at 25% of it's layers. The fur will smoothly interpolate between *Lod 0* and *Lod 1*. Beyond *Lod 1* distance the fur will fade away and the fur object will become hidden.
 
 TIPS
 ----
 
 **Using your own fur patterns**
 
-You can use any type of noise as a pattern, but if you want to be able to have random lengths on the fur strand you will need to set up the green channel with cells with random greyscale values that present each strands length when randomness is applied.
+If you want to use your own pattern for the fur, you need use a texture with noise in the R channel used for the fur strand cutoff. You can leave G, B and A channel and full value and the shader will work, but you will not have any options for random length, density, thickness and growth. To have that you'll need to have random values corresponding to the cells of each strand as seen below.
 
 Breakdown of Fine texture - Left: Combined pattern texture, Middle: R channel, Right: G channel.
-
 ![image](https://user-images.githubusercontent.com/4955051/95909140-e64c9980-0d95-11eb-8a78-9f864b7abe19.png)
+
+The easiest way to do this is to use the same file I use to generate the fur textures with. It is availble here. It is made in the free Texture generation program Material Maker.
 
 **Mobile Support - experimental**
 
-The shader does not work with GLES 2.0. So if your target device doesn't support GLES 3.0 the fur will not work.
+The shader works with GLES2, however rotational physics do not work in GLES2.
 
-There is a *shell_fur_mobile.shader* file located in *addons/shell_fur/shaders* that you can use with the *Custom Shader* option under the *Advanced* section. It has *depth_draw_alpha_prepass* disabled (since that appeared buggy in my android testing) and has *shadows_disabled* set for performance improvements.
+I suggest using the *Mobile* shader when targeting mobile, but if you have a newer device, the *Regular* shader might work as well.
 
-In my testing there appeared to be a bug where skinned meshes with blendshapes don't render on Android. https://github.com/godotengine/godot/issues/43217. So if you want to use blendshape styling, you might need to work around this by having a seperate mesh where you have removed the blendshape that is getting rendered. I had to do this in my current android demo scene, so have a look at the demo project to see how I did it there.
+In my testing there appeared to be a bug where skinned meshes with blendshapes don't render on Android. https://github.com/godotengine/godot/issues/43217. So if you want to use blendshape styling, you might need to work around this by having a seperate mesh where you have removed the blendshape, that is getting rendered. I had to do this in my current android demo scene, so have a look at the demo project to see how I did it there.
 
 No testing has been done on iOS devices.
 
