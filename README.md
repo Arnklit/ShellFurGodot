@@ -78,6 +78,7 @@ The parameters for the fur is split into five sections.
 - **Wind Angle** - The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
 
 *Spring physics and wind in action*
+
 ![OjUGl0gCwP](https://user-images.githubusercontent.com/4955051/111274147-9025a000-862c-11eb-8e05-665b63d36265.gif)
 
 **Blendshape Styling**
@@ -86,6 +87,7 @@ The parameters for the fur is split into five sections.
 - **Normal Bias** - This option only appears when a blendshape is selected above. This option mixes the fur direction of the blendshape with the normal direction of the base shape for a more natural look.
 
 *Blendshape styling being applied*
+
 ![JKYwI1ItFD](https://user-images.githubusercontent.com/4955051/111274654-2bb71080-862d-11eb-8696-60dab4515434.gif)
 
 **Lod**
