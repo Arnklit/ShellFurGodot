@@ -1,8 +1,7 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=9 format=2]
 
-[ext_resource path="res://addons/shell_fur/noise_patterns/very_fine.png" type="Texture" id=1]
+[ext_resource path="res://addons/shell_fur/noise_patterns/very_rough.png" type="Texture" id=1]
 [ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=2]
-[ext_resource path="res://test_assets/textures/ldtg_growth_test.png" type="Texture" id=3]
 
 [sub_resource type="ProceduralSky" id=1]
 
@@ -86,37 +85,37 @@ autoplay = "panning in and out"
 "next/panning in and out" = "panning in and out"
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
+transform = Transform( 0.999997, -0.00131767, -0.00188137, 0.00132825, 0.999983, 0.00564026, 0.00187391, -0.00564274, 0.999982, -0.00839138, -0.0207424, -0.0652213 )
 mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
 [node name="ShellFur" type="Spatial" parent="MeshInstance"]
-transform = Transform( 1, 0, 0, 0, 0.987737, 0.156124, 0, -0.156124, 0.987737, 2.38419e-07, -0.0719581, 0.0880314 )
 script = ExtResource( 2 )
+shader_type = 0
+custom_shader = null
 layers = 40
-pattern_selector = 0
+pattern_selector = 3
+pattern_texture = ExtResource( 1 )
+pattern_uv_scale = 5.0
 cast_shadow = false
-mat_shader_type = 0
-mat_custom_shader = null
-mat_pattern_uv_scale = 5.0
-mat_pattern_texture = ExtResource( 1 )
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
-mat_roughness = 0.397
-mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
+mat_roughness = 0.424
+mat_albedo_color = Transform( 0.4, 0.78, 0, 0.337255, 0.63, 0, 0.290196, 0.52, 1, 0, 0, 0 )
 mat_albedo_uv_scale = Vector3( 1, 1, 0 )
 mat_albedo_texture = null
-mat_shape_length = 0.928
-mat_shape_length_rand = 0.183
+mat_shape_length = 0.5
+mat_shape_length_rand = 0.3
 mat_shape_density = 1.0
-mat_shape_thickness_base = 1.0
-mat_shape_thickness_tip = 0.0
-mat_shape_thickness_rand = 0.172
-mat_shape_growth = 2.0
-mat_shape_growth_rand = 1.0
+mat_shape_thickness_base = 0.75
+mat_shape_thickness_tip = 0.3
+mat_shape_thickness_rand = 0.0
+mat_shape_growth = 1.0
+mat_shape_growth_rand = 0.0
 mat_shape_ldtg_uv_scale = Vector3( 1, 1, 0 )
-mat_shape_ldtg_texture = ExtResource( 3 )
+mat_shape_ldtg_texture = null
 physics_custom_physics_pivot = NodePath("")
-physics_gravity = 2.473
+physics_gravity = 0.1
 physics_spring = 4.0
 physics_damping = 0.1
 physics_wind_strength = 0.484

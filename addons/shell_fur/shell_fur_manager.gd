@@ -40,11 +40,12 @@ const BUILTIN_SHADERS = [
 ]
 
 const DEFAULT_PARAMETERS = {
+	shader_type = SHADER_TYPES.REGULAR,
 	layers = 40,
 	pattern_selector = 0,
+	pattern_uv_scale = 5.0,
 	cast_shadow = false,
 	mat_shader_type = 0,
-	mat_custom_shader = null,
 	physics_custom_physics_pivot = NodePath(),
 	physics_gravity = 0.1,
 	physics_spring = 4.0,
@@ -59,15 +60,15 @@ const DEFAULT_PARAMETERS = {
 	lod_LOD1_distance = 100.0,
 }
 
+var shader_type := 0 setget set_shader_type
+var custom_shader : Shader setget set_custom_shader
 var layers := 40 setget set_layers
 var pattern_selector := 0 setget set_pattern_selector
+var pattern_texture : Texture setget set_pattern_texture
+var pattern_uv_scale = 5.0 setget set_pattern_uv_scale
 var cast_shadow := false setget set_cast_shadow
 
-# Material
-var mat_shader_type := 0 setget set_shader_type
-var mat_custom_shader : Shader setget set_custom_shader
-# Note that the rest of the material inspector gets generated from the
-# uniforms in the selected shader
+# Material - Note the material inspector gets generated from the shader
 
 # Physics
 var physics_custom_physics_pivot : NodePath setget set_custom_physics_pivot
@@ -102,49 +103,74 @@ var _multimeshInstance : MultiMeshInstance = null
 var _first_enter_tree := true
 var _parent_object : Spatial
 var _skeleton_object
-
+var _custom_pattern := false
 
 # Built-in Methods
 func _get_property_list() -> Array:
 	var props = []
+	
+	var shader_type_hint_string = "Regular, Mobile"
+	if custom_shader != null:
+		shader_type_hint_string += str(", Custom")
+	
+	props.append({
+			name = "shader_type",
+			type = TYPE_INT,
+			hint = PROPERTY_HINT_ENUM,
+			hint_string = shader_type_hint_string,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
+		})
+	props.append({
+			name = "custom_shader",
+			type = TYPE_OBJECT,
+			hint = PROPERTY_HINT_RESOURCE_TYPE,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
+			hint_string = "Shader"
+		})
+	
 	props.append({
 			name = "layers",
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0, 100",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			hint_string = "4, 100",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
+	
+	var pattern_selector_hint_string = "Very Fine, Fine, Rough, Very Rough, Monster"
+	if _custom_pattern or pattern_selector == PATTERNS.size():
+		pattern_selector_hint_string += str(", Custom")
+	
 	props.append({
 			name = "pattern_selector",
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_ENUM,
-			hint_string = "Very Fine, Fine, Rough, Very Rough, Monster",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			hint_string = pattern_selector_hint_string,
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
+	props.append({
+			name = "pattern_texture",
+			type = TYPE_OBJECT,
+			hint = PROPERTY_HINT_RESOURCE_TYPE,
+			hint_string = "Texture",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
+	})
+	props.append({
+			name = "pattern_uv_scale",
+			type = TYPE_REAL,
+			hint = PROPERTY_HINT_RANGE,
+			hint_string = "0, 100",
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
+	})
 	props.append({
 			name = "cast_shadow",
 			type = TYPE_BOOL,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "Material",
 			type = TYPE_NIL,
 			hint_string = "mat_",
-			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
-		})
-	props.append({
-			name = "mat_shader_type",
-			type = TYPE_INT,
-			hint = PROPERTY_HINT_ENUM,
-			hint_string = "Regular, Mobile, Custom",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
-		})
-	props.append({
-			name = "mat_custom_shader",
-			type = TYPE_OBJECT,
-			hint = PROPERTY_HINT_RESOURCE_TYPE,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
-			hint_string = "Shader"
+			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	
 	var mat_categories = MATERIAL_CATEGORIES.duplicate(true)
@@ -177,67 +203,67 @@ func _get_property_list() -> Array:
 			name = "Physics",
 			type = TYPE_NIL,
 			hint_string = "physics_",
-			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "physics_custom_physics_pivot",
 			type = TYPE_NODE_PATH,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "physics_gravity",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 4.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "physics_spring",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 10.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "physics_damping",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 1.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "physics_wind_strength",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 5.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "physics_wind_speed",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 5.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "physics_wind_scale",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 5.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "physics_wind_angle",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 360.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "Blendshape Styling",
 			type = TYPE_NIL,
 			hint_string = "styling_",
-			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	
 	var blendshapes_string := "Disabled"
@@ -253,7 +279,7 @@ func _get_property_list() -> Array:
 			type = TYPE_INT,
 			hint = PROPERTY_HINT_ENUM,
 			hint_string = blendshapes_string,
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	
 	if styling_blendshape != 0:
@@ -262,28 +288,28 @@ func _get_property_list() -> Array:
 				type = TYPE_REAL,
 				hint = PROPERTY_HINT_RANGE,
 				hint_string = "0.0, 1.0",
-				usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+				usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 			})
 	
 	props.append({
 			name = "Lod",
 			type = TYPE_NIL,
 			hint_string = "lod_",
-			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "lod_LOD0_distance",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 100.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	props.append({
 			name = "lod_LOD1_distance",
 			type = TYPE_REAL,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "0.0, 1000.0",
-			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+			usage = PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE,
 		})
 	
 	return props
@@ -325,7 +351,7 @@ func property_get_revert(property : String):
 
 func _init() -> void:
 	_material = ShaderMaterial.new()
-	_material.shader = load(BUILTIN_SHADERS[mat_shader_type].shader_path) as Shader
+	_material.shader = load(BUILTIN_SHADERS[shader_type].shader_path) as Shader
 	_lod_system = load("res://addons/shell_fur/shell_fur_lod.gd").new()
 	_lod_system.init(self)
 	_physics_system = load("res://addons/shell_fur/shell_fur_physics.gd").new()
@@ -345,7 +371,7 @@ func _enter_tree() -> void:
 		# Not sure why this is thrown, since it's not a problem when first
 		# adding the node.
 		_delayed_position_correction()
-		set_shader_param("pattern_texture", load(PATTERNS[pattern_selector]))
+		set_pattern_selector(pattern_selector)
 		# For some reason we have to set some values like colors for them to 
 		# show correctly. Even though we are just setting them to themselves.
 		# To allow for custom shaders, we simply set all shader params to thier own value.
@@ -407,48 +433,68 @@ func set_pattern_selector(index : int) -> void:
 	pattern_selector = index
 	if _first_enter_tree:
 		return
-	set_shader_param("pattern_texture", load(PATTERNS[index]))
+	if index != PATTERNS.size():
+		set_pattern_texture(load(PATTERNS[index]), false)
+	else:
+		set_shader_param("i_pattern_texture", pattern_texture)
 	property_list_changed_notify()
 
 
-func set_cast_shadow(value : bool) -> void:
+func set_pattern_texture(texture : Texture, custom : bool = true) -> void:
+	pattern_texture = texture
 	if _first_enter_tree:
-		cast_shadow = value
 		return
+	_custom_pattern = custom
+	
+	set_shader_param("i_pattern_texture", texture)
+	if custom:
+		set_pattern_selector(PATTERNS.size())
+
+
+func set_pattern_uv_scale(value : float) -> void:
+	pattern_uv_scale = value
+	set_shader_param("i_pattern_uv_scale", value)
+	
+
+func set_cast_shadow(value : bool) -> void:
 	cast_shadow = value
+	if _first_enter_tree:
+		return
 	fur_object.cast_shadow = value
 
 
 func set_shader_type(type: int):
-	if type == mat_shader_type:
+	if type == shader_type:
 		return
-	mat_shader_type = type
+	shader_type = type
 	
-	if mat_shader_type == SHADER_TYPES.CUSTOM:
-		_material.shader = mat_custom_shader
+	if shader_type == SHADER_TYPES.CUSTOM:
+		_material.shader = custom_shader
 	else:
-		_material.shader = load(BUILTIN_SHADERS[mat_shader_type].shader_path)
+		_material.shader = load(BUILTIN_SHADERS[shader_type].shader_path)
 	
 	property_list_changed_notify()
 
 
 func set_custom_shader(shader : Shader) -> void:
-	if mat_custom_shader == shader:
+	if custom_shader == shader:
 		return
-	mat_custom_shader = shader
-	if mat_custom_shader != null:
-		_material.shader = mat_custom_shader
+	custom_shader = shader
+	if custom_shader != null:
+		_material.shader = custom_shader
 		
 		if Engine.editor_hint:
 			# Ability to fork default shader
 			if shader.code == "":
-				var selected_shader = load(BUILTIN_SHADERS[mat_shader_type].shader_path) as Shader
+				var selected_shader = load(BUILTIN_SHADERS[shader_type].shader_path) as Shader
 				shader.code = selected_shader.code
 	
 	if shader != null:
 		set_shader_type(SHADER_TYPES.CUSTOM)
 	else:
 		set_shader_type(SHADER_TYPES.REGULAR)
+	
+	property_list_changed_notify()
 
 
 func set_custom_physics_pivot(path : NodePath) -> void:
@@ -518,7 +564,7 @@ func _analyse_parent() -> void:
 			is_arraymesh = _parent_object.mesh.is_class("ArrayMesh")
 			if is_arraymesh:
 				if _parent_object.mesh.get_blend_shape_count() < styling_blendshape:
-					push_warning("Blendshape index is higher than new mesh's amount of blendshapes. Disabling blendshape styling.")
+					push_warning("Blendshape selection is higher than new mesh's amount of blendshapes. Disabling blendshape styling.")
 					styling_blendshape = 0
 			
 			if _parent_object.skin != null:

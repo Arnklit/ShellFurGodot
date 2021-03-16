@@ -7,22 +7,23 @@ render_mode shadows_disabled, diffuse_lambert, specular_disabled;
 // parameters below and they will automatically get parsed and displayed in
 // the ShellFur inspector.
 
-// Use prefixes: albedo_, shape_ and custom_
-// to automatically put your parameters into categories in the inspector.
+// Use prefixes: albedo_, shape_ and custom_ to automatically put your 
+// parameters into categories in the inspector.
 
-// If "curve" is in the name, the inspector will represent an easing curve.
 // mat4´s with "color" in their name will get parsed as gradients.
 
 // Main
-uniform float pattern_uv_scale : hint_range(0.0, 100.0) = 5.0;
-uniform sampler2D pattern_texture : hint_black;
 uniform vec4 transmission : hint_color = vec4(0.3, 0.3, 0.3, 1.0);
 uniform float ao : hint_range(0.0, 1.0) = 1.0;
 uniform float roughness : hint_range(0.0, 1.0) = 1.0;
-uniform float normal_adjustment : hint_range(0.0, 1.0) = 0.0;
 
 // Albedo
-uniform mat4 albedo_color = mat4(vec4(0.43, 0.78, 0.0, 0.0), vec4(0.35, 0.63, 0.0, 0.0), vec4(0.29, 0.52, 0.0, 0.0), vec4(0.0));
+uniform mat4 albedo_color = mat4(
+	vec4(0.43, 0.78, 0.0, 0.0), 
+	vec4(0.35, 0.63, 0.0, 0.0), 
+	vec4(0.29, 0.52, 0.0, 0.0), 
+	vec4(0.0)
+);
 uniform vec3 albedo_uv_scale = vec3(1.0, 1.0, 0.0);
 uniform sampler2D albedo_texture : hint_albedo;
 
@@ -33,10 +34,15 @@ uniform float shape_density : hint_range(0.0, 1.0) = 1.0;
 uniform float shape_thickness_base : hint_range(0.0, 1.0) = 0.75;
 uniform float shape_thickness_tip : hint_range(0.0, 1.0) = 0.3;
 uniform float shape_thickness_rand : hint_range(0.0, 1.0) = 0.0;
-uniform vec3 shape_ldt_uv_scale = vec3(1.0, 1.0, 0.0);
-uniform sampler2D shape_ldt_texture : hint_white;
+uniform float shape_growth : hint_range(0.0, 2.0) = 1.0;
+uniform float shape_growth_rand : hint_range(0.0, 1.0) = 0.0;
+uniform vec3 shape_ldtg_uv_scale = vec3(1.0, 1.0, 0.0);
+uniform sampler2D shape_ldtg_texture : hint_white; // Length, Desity, Thickness, Growth
 
-// Internal uniforms - DO NOT CUSTOMIZE THESE
+// Internal uniforms - DO NOT CUSTOMIZE THESE IF YOU ARE CLONING THE SHADER
+uniform int i_layers = 40;
+uniform sampler2D i_pattern_texture : hint_black;
+uniform float i_pattern_uv_scale : hint_range(0.0, 100.0) = 5.0;
 uniform float i_wind_strength = 0.0;
 uniform float i_wind_speed = 1.0;
 uniform float i_wind_scale = 1.0;
@@ -45,7 +51,6 @@ uniform float i_normal_bias = 0.0;
 uniform float i_LOD = 1.0;
 uniform vec3 i_physics_pos_offset;
 uniform mat4 i_physics_rot_offset;
-uniform int i_layers = 40;
 uniform float i_blend_shape_multiplier = 1.0;
 uniform float i_fur_contract = 0.0;
 
@@ -91,7 +96,7 @@ vec3 fade(vec3 t) {
   return t*t*t*(t*(t*6.0-15.0)+10.0);
 }
 
-// Classic Perlin noise
+// Classic Perlin noise by Stefan Gustavson, see README for license
 float cnoise(vec3 P)
 {
   vec3 Pi0 = floor(P); // Integer part for indexing
@@ -158,7 +163,7 @@ float cnoise(vec3 P)
   vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
   vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
   float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
-  return 2.2 * n_xyz;
+  return 1.1 * n_xyz + 0.5;
 }
 
 vec3 projectOnPlane( vec3 vec, vec3 normal ) {
@@ -174,7 +179,7 @@ void vertex() {
 		vec3 normal_biased_extrude = mix(NORMAL * i_blend_shape_multiplier, extrusion_vec, lod_adjusted_layer_value);
 		vec3 interpolated_extrude = mix(extrusion_vec, normal_biased_extrude, smoothstep(0.0, 2.0, i_normal_bias));
 		vec3 offset_from_surface = interpolated_extrude * shape_length / float(i_layers);
-		VERTEX += (vec4(interpolated_extrude * shape_length * lod_adjusted_layer_value + offset_from_surface, 0.0) * i_physics_rot_offset).xyz;
+		VERTEX += (vec4(interpolated_extrude * shape_length * lod_adjusted_layer_value + offset_from_surface, 1.0) * i_physics_rot_offset).xyz;
 		VERTEX -= i_fur_contract * extrusion_vec * shape_length;
 		
 		vec3 wind_vec = vec3(0.0);
@@ -186,46 +191,45 @@ void vertex() {
 			wind_vec = wind_dir_flattened * cnoise(winduv) * i_wind_strength;
 		}
 		
-		vec3 physics_pos_offset_world = (vec4(i_physics_pos_offset, 0) * WORLD_MATRIX).xyz;
+		vec3 physics_pos_offset_world = (vec4(i_physics_pos_offset, 0.0) * WORLD_MATRIX).xyz;
 		forces_vec = (physics_pos_offset_world + wind_vec) * length(extrusion_vec) * smoothstep(0.0, 2.0, lod_adjusted_layer_value);
 		VERTEX += forces_vec;
 	}
 }
 
-void fragment() { // Discarding fragment if layer is beyond LOD threshhold
+void fragment() { 
+	// Discarding fragment if layer is beyond LOD threshhold
 	if (i_LOD < COLOR.a) { 
 		discard;
 	}
 	
-	vec3 ldt_texture_data = texture(shape_ldt_texture, UV * shape_ldt_uv_scale.xy).rgb; // TODO - implement density and length texture data
+	vec4 ldtg_texture_data = texture(shape_ldtg_texture, UV * shape_ldtg_uv_scale.xy);
 	
-	// Workaround for issue https://github.com/godotengine/godot/issues/36669
-	// to allow opaque prepass.
-	vec4 pattern = texture(pattern_texture, UV * pattern_uv_scale);
-	// We multiply the thicknesses with ldt texture's B channel and a random value based on the pattern's B channel ids to allow for control
-	// of the thickness through texture.
+	vec4 pattern = texture(i_pattern_texture, UV * i_pattern_uv_scale);
+	// We multiply the thicknesses with ldtg texture's B channel and a random value based on 
+	// the pattern's B channel ids to allow for control of the thickness through texture.
 	float t_rand = 1.0 - shape_thickness_rand * pattern.b;
-	float thickness_base = shape_thickness_base * ldt_texture_data.b * t_rand; 
-	float thickness_tip = shape_thickness_tip * ldt_texture_data.b * pattern.b * t_rand;
-	float scissor_thresh =  mix(-thickness_base + 1.0, -thickness_tip + 1.0, lod_adjusted_layer_value); 
-
-//	ALPHA = float(scissor_thresh < pattern.r * length_tex_value - pattern.r * length_tex_value * pattern.g * length_rand);
+	float g_rand = 1.0 - shape_growth_rand * ((pattern.g + pattern.b) / 2.0); // We use two random channels to generate an extra "random" for growth
+	float thickness_base = shape_thickness_base * ldtg_texture_data.b * t_rand; 
+	float thickness_tip = shape_thickness_tip * ldtg_texture_data.b * pattern.b * t_rand;
+	float scissor_thresh =  mix(-thickness_base + 1.0, -thickness_tip + 1.0, lod_adjusted_layer_value) + clamp(1.0 - shape_growth + (1.0 - g_rand * ldtg_texture_data.a), 0.0, 1.0); 
 	
 	// We use the unique id's in pattern.b to discard if density is under the threshold
-	// density is multiplied by the ldt textures G channel to allow fine control
-	if (shape_density * ldt_texture_data.g <= pattern.b) {
+	// density is multiplied by the ldtg textures G channel to allow fine control
+	if (shape_density * ldtg_texture_data.g * 1.02 <= pattern.b + 0.01) {
 		discard;
 	}
-	
+
+	// Workaround for issue https://github.com/godotengine/godot/issues/36669
+	// Below two lines should work but they do not, so we use discard instead
+	//ALPHA_SCISSOR = scissor_thresh;
+	//ALPHA = pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand;
 	// We discard the parts of mesh that does not make up the strand, we multiply
-	// by ldt texture R channel and the unique ids in pattern's G channel to allow
+	// by ldtg texture R channel and the unique ids in pattern's G channel to allow
 	// for randomized and controlled length
-	if (scissor_thresh > pattern.r * ldt_texture_data.r - pattern.r * ldt_texture_data.r * pattern.g * shape_length_rand) {
+	if (scissor_thresh > pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand) {
 		discard;
 	}
-	
-	
-	NORMAL = mix(NORMAL, projectOnPlane(VIEW, extrusion_vec.xyz), normal_adjustment);
 	
 	mat4 albedo_color_srgb = gradient_lin2srgb(albedo_color);
 	vec3 albedo_base_color = vec3(albedo_color_srgb[0].x, albedo_color_srgb[0].y, albedo_color_srgb[0].z);

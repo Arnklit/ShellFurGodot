@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/ldt_length_test.png-52ee012e5213609b81bd83cb817bbe34.s3tc.stex"
-path.etc2="res://.import/ldt_length_test.png-52ee012e5213609b81bd83cb817bbe34.etc2.stex"
+path.s3tc="res://.import/ldtg_density_test.png-ba3527d82e8468895a26ff89f8005aa3.s3tc.stex"
+path.etc2="res://.import/ldtg_density_test.png-ba3527d82e8468895a26ff89f8005aa3.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://test_assets/textures/ldt_length_test.png"
-dest_files=[ "res://.import/ldt_length_test.png-52ee012e5213609b81bd83cb817bbe34.s3tc.stex", "res://.import/ldt_length_test.png-52ee012e5213609b81bd83cb817bbe34.etc2.stex" ]
+source_file="res://test_assets/textures/ldtg_density_test.png"
+dest_files=[ "res://.import/ldtg_density_test.png-ba3527d82e8468895a26ff89f8005aa3.s3tc.stex", "res://.import/ldtg_density_test.png-ba3527d82e8468895a26ff89f8005aa3.etc2.stex" ]
 
 [params]
 
@@ -25,7 +25,7 @@ flags/repeat=true
 flags/filter=true
 flags/mipmaps=true
 flags/anisotropic=false
-flags/srgb=2
+flags/srgb=1
 process/fix_alpha_border=true
 process/premult_alpha=false
 process/HDR_as_SRGB=false

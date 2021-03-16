@@ -13,8 +13,6 @@ render_mode depth_draw_alpha_prepass, diffuse_burley, specular_schlick_ggx;
 // mat4´s with "color" in their name will get parsed as gradients.
 
 // Main
-uniform float pattern_uv_scale : hint_range(0.0, 100.0) = 5.0;
-uniform sampler2D pattern_texture : hint_black;
 uniform vec4 transmission : hint_color = vec4(0.3, 0.3, 0.3, 1.0);
 uniform float ao : hint_range(0.0, 1.0) = 1.0;
 uniform float roughness : hint_range(0.0, 1.0) = 1.0;
@@ -42,6 +40,9 @@ uniform vec3 shape_ldtg_uv_scale = vec3(1.0, 1.0, 0.0);
 uniform sampler2D shape_ldtg_texture : hint_white; // Length, Desity, Thickness, Growth
 
 // Internal uniforms - DO NOT CUSTOMIZE THESE IF YOU ARE CLONING THE SHADER
+uniform int i_layers = 40;
+uniform sampler2D i_pattern_texture : hint_black;
+uniform float i_pattern_uv_scale : hint_range(0.0, 100.0) = 5.0;
 uniform float i_wind_strength = 0.0;
 uniform float i_wind_speed = 1.0;
 uniform float i_wind_scale = 1.0;
@@ -50,7 +51,6 @@ uniform float i_normal_bias = 0.0;
 uniform float i_LOD = 1.0;
 uniform vec3 i_physics_pos_offset;
 uniform mat4 i_physics_rot_offset;
-uniform int i_layers = 40;
 uniform float i_blend_shape_multiplier = 1.0;
 uniform float i_fur_contract = 0.0;
 
@@ -205,7 +205,7 @@ void fragment() {
 	
 	vec4 ldtg_texture_data = texture(shape_ldtg_texture, UV * shape_ldtg_uv_scale.xy);
 	
-	vec4 pattern = texture(pattern_texture, UV * pattern_uv_scale);
+	vec4 pattern = texture(i_pattern_texture, UV * i_pattern_uv_scale);
 	// We multiply the thicknesses with ldtg texture's B channel and a random value based on 
 	// the pattern's B channel ids to allow for control of the thickness through texture.
 	float t_rand = 1.0 - shape_thickness_rand * pattern.b;

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/ldt_thickness_test.png-d307d6f3b29a80b8686ecf9774b76ac1.s3tc.stex"
-path.etc2="res://.import/ldt_thickness_test.png-d307d6f3b29a80b8686ecf9774b76ac1.etc2.stex"
+path.s3tc="res://.import/ldtg_thickness_test.png-2e64718733a34f02e4f5ca6d52ffd48b.s3tc.stex"
+path.etc2="res://.import/ldtg_thickness_test.png-2e64718733a34f02e4f5ca6d52ffd48b.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://test_assets/textures/ldt_thickness_test.png"
-dest_files=[ "res://.import/ldt_thickness_test.png-d307d6f3b29a80b8686ecf9774b76ac1.s3tc.stex", "res://.import/ldt_thickness_test.png-d307d6f3b29a80b8686ecf9774b76ac1.etc2.stex" ]
+source_file="res://test_assets/textures/ldtg_thickness_test.png"
+dest_files=[ "res://.import/ldtg_thickness_test.png-2e64718733a34f02e4f5ca6d52ffd48b.s3tc.stex", "res://.import/ldtg_thickness_test.png-2e64718733a34f02e4f5ca6d52ffd48b.etc2.stex" ]
 
 [params]
 
