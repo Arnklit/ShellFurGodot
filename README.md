@@ -10,11 +10,15 @@ Add-on that adds a fur node to Godot 3.2. Demo project available [here.](https:/
 
 Installation
 -----------
-Copy the folder *addons/shell_fur* into your project and activate the add-on from the *Project -> Project Settings... -> Plugins* menu.
+ShellFur is available on the Godot Asset Library, so the easiest way to install it into your project is directly inside Godot. Simply go to the AssetLib screen and search for "Fur" and the add-on should appear. Select it and press Download -> Install.
+
+Alternatively you can press the green **Code** button at the top of this page and select **Download ZIP**, unzip the file and place the "shell_fur" folder in your project like so "addons/shell_fur*.
+
+Once the files are in your project, you need to activate the add-on from the *Project -> Project Settings... -> Plugins* menu.
 
 Purpose
 -------
-I was inspired by games like Shadow of the Colossus and Red Dead Redemption 2 which uses this technique to try and make my own implementation in Godot.
+I was inspired by games like Shadow of the Colossus and Red Dead Redemption 2 which use this technique, to try and make my own implementation in Godot.
 
 Usage
 -----
@@ -31,7 +35,7 @@ The parameters for the fur is split into five sections.
 **Main**
 
 - **Shader Type** - This allows you to select between shaders, the options are *Regular*, *Mobile* and *Custom* (*Custom* only appears when a shader is set in the *Custom Shader* field). The *Mobile* shader differs from the *Regular* shader in that it does not use depth_draw_alpha_prepass as that does not work well in my testing on Android, it also uses simpler diffuse and specular shading and disables shadows on the fur. Note: Both *Regular* and *Mobile* shaders work with GLES2.
-- **Custom Shader** - This option allows you to easily make a copy of the selected shader and edit it.
+- **Custom Shader** - This option allows you to use a custom shader, selecting new will clone the currently active shader for you to edit.
 - **Layers** - The amount of shells that are generated around the object, more layers equals nicer strands, but will decrease performance.
 - **Pattern Selector** - This options allows you to select between the five included patterns.
 ![image](https://user-images.githubusercontent.com/4955051/97798110-fe883980-1c1a-11eb-9efd-66369c21b8d0.png)
@@ -48,7 +52,7 @@ The parameters for the fur is split into five sections.
 - **Roughness** - The roughness value of the fur, it's difficult to achieve realistic shiny fur with this approach, you will probably get the best result leaving this value at 1.0.
 - **Albedo** - Subcategory for albedo parameters.
   - **Color** - Color gradient used for the albedo of the fur, left is base of the fur, right is tip. The color interpolates linearly between the two.
-  - **UV Scale** UV Scale for the albedo texture below.
+  - **UV Scale** - UV Scale for the albedo texture below.
   - **Texture** - Texture for the color of the strands. Values are multiplied with the *Color* gradient so it can be used for tinting.
 - **Shape** - Subcategory for the shape parameters.
   - **Length** - The length of the fur. Set this to 1.0 if you are using blendshape styling and want the fur to exactly reach the blendshape key.
@@ -73,10 +77,16 @@ The parameters for the fur is split into five sections.
 - **Wind Scale** - Scale of the wind noise.
 - **Wind Angle** - The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
 
+*Spring physics and wind in action*
+![OjUGl0gCwP](https://user-images.githubusercontent.com/4955051/111274147-9025a000-862c-11eb-8e05-665b63d36265.gif)
+
 **Blendshape Styling**
 
 - **Blendshape** - This pull down will list any blendshapes available on your base mesh. Selecting one of them will activate *Blendshape Styling*.
 - **Normal Bias** - This option only appears when a blendshape is selected above. This option mixes the fur direction of the blendshape with the normal direction of the base shape for a more natural look.
+
+*Blendshape styling being applied*
+![JKYwI1ItFD](https://user-images.githubusercontent.com/4955051/111274654-2bb71080-862d-11eb-8696-60dab4515434.gif)
 
 **Lod**
 
@@ -99,9 +109,9 @@ TIPS
 
 **Using your own fur patterns**
 
-If you want to use your own pattern for the fur, you need use a texture with noise in the R channel used for the fur strand cutoff. You can leave G, B and A channel and full value and the shader will work, but you will not have any options for random length, density, thickness and growth. To have that you'll need to have random values corresponding to the cells of each strand as seen below.
+If you want to use your own pattern for the fur, you need use a texture with noise in the R channel used for the fur strand cutoff. You can leave G, B and A channel at full value and the shader will work, but you will not have any options for random length, density, thickness and growth. To have that you'll need to have random values corresponding to the cells of each strand in those channels as seen below.
 
-Breakdown of Very Fine texture - Left to right: Combined pattern texture, R channel, G channel, B channel and A channel.
+Breakdown of *Very Fine* texture - Left to right: Combined pattern texture, R channel, G channel, B channel and A channel.
 ![image](https://user-images.githubusercontent.com/4955051/111150649-41bdc600-8586-11eb-9dad-9def3a252be1.png)
 
 The easiest way to do this is to use this [file](https://github.com/Arnklit/media/blob/main/ShellFurAdd-on/pattern_examples.ptex) which shows examples of how I generate fur textures. It is made in the free Texture generation program [Material Maker](https://github.com/RodZill4/material-maker).
