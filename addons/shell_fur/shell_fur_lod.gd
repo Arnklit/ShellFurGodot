@@ -1,3 +1,5 @@
+# Copyright © 2021 Kasper Arnklit Frandsen - MIT License
+# See `LICENSE.md` included in the source distribution for details.
 const ShellFurManager = preload("res://addons/shell_fur/shell_fur_manager.gd")
 
 var current_LOD : int
@@ -26,17 +28,16 @@ func process(delta : float) -> void:
 		return
 	match current_LOD:
 		0:
-			_shell_fur.material.set_shader_param("LOD", 1.0)
+			_shell_fur.set_shader_param("i_LOD", 1.0)
 		1:
 			var lod_value = lerp(1.0, 0.25, (distance - _shell_fur.lod_LOD0_distance) / (_shell_fur.lod_LOD1_distance - _shell_fur.lod_LOD0_distance))
-			_shell_fur.material.set_shader_param("LOD", lod_value)
+			_shell_fur.set_shader_param("i_LOD", lod_value)
 			_fur_contract = move_toward(_fur_contract, 0.0, delta)
 			if _fur_contract < 1.0 and _shell_fur.fur_object.visible == false:
 				_shell_fur.fur_object.visible = true
 		2:
-			_shell_fur.material.set_shader_param("LOD", 0.25)
-			#_fur_contract = clamp(distance - _shell_fur.lod_LOD1_distance - 1, 0.0, 1.1)
+			_shell_fur.set_shader_param("i_LOD", 0.25)
 			_fur_contract = move_toward(_fur_contract, 1.1, delta)
 			if _fur_contract > 1.0 and _shell_fur.fur_object.visible == true:
 				_shell_fur.fur_object.visible = false
-	_shell_fur.material.set_shader_param("fur_contract", _fur_contract)
+	_shell_fur.set_shader_param("i_fur_contract", _fur_contract)

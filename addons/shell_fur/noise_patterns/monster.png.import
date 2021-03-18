@@ -2,31 +2,29 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/monster.png-fad6e7cc6259e8dff2e6101cd99449ba.s3tc.stex"
-path.etc2="res://.import/monster.png-fad6e7cc6259e8dff2e6101cd99449ba.etc2.stex"
+path="res://.import/monster.png-fad6e7cc6259e8dff2e6101cd99449ba.stex"
 metadata={
-"imported_formats": [ "s3tc", "etc2" ],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://addons/shell_fur/noise_patterns/monster.png"
-dest_files=[ "res://.import/monster.png-fad6e7cc6259e8dff2e6101cd99449ba.s3tc.stex", "res://.import/monster.png-fad6e7cc6259e8dff2e6101cd99449ba.etc2.stex" ]
+dest_files=[ "res://.import/monster.png-fad6e7cc6259e8dff2e6101cd99449ba.stex" ]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/lossy_quality=0.7
 compress/hdr_mode=0
 compress/bptc_ldr=0
-compress/normal_map=1
+compress/normal_map=2
 flags/repeat=true
 flags/filter=true
 flags/mipmaps=true
 flags/anisotropic=true
 flags/srgb=0
-process/fix_alpha_border=true
+process/fix_alpha_border=false
 process/premult_alpha=false
 process/HDR_as_SRGB=false
 process/invert_color=false

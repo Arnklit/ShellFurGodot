@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<testsuites failures="0" name="TestXML" tests="1" time="0">
+	<testsuite name="Fur Helper Methods" failures="0"  tests="2" time="0">
+		<testcase name="last_prefix_occurence - When given an array" time="0"></testcase>
+		<testcase name="reorder_params - When given an unordered array" time="0"></testcase>
+	</testsuite>
+
+</testsuites>

@@ -1,3 +1,5 @@
+# Copyright © 2021 Kasper Arnklit Frandsen - MIT License
+# See `LICENSE.md` included in the source distribution for details.
 const ShellFurManager = preload("res://addons/shell_fur/shell_fur_manager.gd")
 
 var _shell_fur_object : ShellFurManager
@@ -18,14 +20,14 @@ func process(delta) -> void:
 	_physics_pos += _trans_momentum * delta
 	_trans_momentum *= _shell_fur_object.physics_damping * -1 + 1
 	
-	_shell_fur_object.material.set_shader_param("physics_pos_offset", -position_diff)
+	_shell_fur_object.set_shader_param("i_physics_pos_offset", -position_diff)
 	
 	var rot_diff := _physics_rot.inverse() * _current_physics_object().global_transform.basis.get_rotation_quat()
 	_rot_momentum += rot_diff.get_euler() * _shell_fur_object.physics_spring
 	_physics_rot *= Quat(_rot_momentum * delta)
 	_rot_momentum *= _shell_fur_object.physics_damping * -1 + 1
 	
-	_shell_fur_object.material.set_shader_param("physics_rot_offset", rot_diff)
+	_shell_fur_object.set_shader_param("i_physics_rot_offset", rot_diff)
 
 
 func _current_physics_object() -> Spatial:

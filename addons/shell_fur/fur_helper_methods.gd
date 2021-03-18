@@ -1,4 +1,4 @@
-# Copyright © 2020 Kasper Arnklit Frandsen - MIT License
+# Copyright © 2021 Kasper Arnklit Frandsen - MIT License
 # See `LICENSE.md` included in the source distribution for details.
 
 # Static functions used for generation of fur shells
@@ -69,7 +69,7 @@ static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendsh
 		var newz = _vertex_diff_to_vertex_color_value(compare_array[i].z, longest_diff_length)
 		compare_array_adjusted.append( Vector3(newx, newy, newz))
 
-	material.set_shader_param("blend_shape_multiplier", longest_diff_length)
+	material.set_shader_param("i_blend_shape_multiplier", longest_diff_length)
 
 	mdt.create_from_surface(_multiple_surfaces_to_single(mesh), 0)
 	for i in range(mdt.get_vertex_count()):
@@ -85,7 +85,7 @@ static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendsh
 # regardless of whether a custom extrusion vector is set.
 static func _normals_to_vertex_color(mesh: Mesh, material : Material) -> Mesh:
 	var mdt = MeshDataTool.new()
-	material.set_shader_param("blend_shape_multiplier", 1.0)
+	material.set_shader_param("i_blend_shape_multiplier", 1.0)
 	
 	mdt.create_from_surface(_multiple_surfaces_to_single(mesh), 0)
 	for i in range(mdt.get_vertex_count()):
@@ -95,6 +95,36 @@ static func _normals_to_vertex_color(mesh: Mesh, material : Material) -> Mesh:
 	mdt.commit_to_surface(new_mesh)
 	
 	return new_mesh
+
+
+static func reorder_params(unordered_params : Array) -> Array:
+	var ordered = []
+	
+	for param in unordered_params:
+		if param.hint_string != "Texture":
+			ordered.append(param)
+		else:
+			#find the last index in ordered with the same
+			var prefix = param.name.rsplit("_")[0]
+			var index = last_prefix_occurence(ordered, prefix)
+			if index != -1:
+				ordered.insert(index, param)
+			else:
+				ordered.append(param)
+	return ordered
+
+
+static func last_prefix_occurence(array : Array, search : String) -> int:
+	
+	var inverted_array = array.duplicate(true)
+	inverted_array.invert()
+	
+	for i in array.size():
+		var prefix = inverted_array[i].name.rsplit("_")[0]
+		if prefix ==  search:
+			return array.size() - i
+	
+	return -1
 
 
 static func _multiple_surfaces_to_single(mesh : Mesh) -> Mesh:
@@ -146,6 +176,7 @@ static func generate_combined(shell_fur_object : Spatial, parent_object : Spatia
 		st.append_from(child.mesh, 0, Transform.IDENTITY)
 		child.free()
 	
+	st.index()
 	var combined_obj := MeshInstance.new()
 	
 	combined_obj.name = "CombinedFurMesh"
