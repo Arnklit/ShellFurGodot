@@ -69,7 +69,7 @@ static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendsh
 		var newz = _vertex_diff_to_vertex_color_value(compare_array[i].z, longest_diff_length)
 		compare_array_adjusted.append( Vector3(newx, newy, newz))
 
-	material.set_shader_param("blend_shape_multiplier", longest_diff_length)
+	material.set_shader_param("i_blend_shape_multiplier", longest_diff_length)
 
 	mdt.create_from_surface(_multiple_surfaces_to_single(mesh), 0)
 	for i in range(mdt.get_vertex_count()):
@@ -85,7 +85,7 @@ static func _blendshape_to_vertex_color(mesh: Mesh, material : Material, blendsh
 # regardless of whether a custom extrusion vector is set.
 static func _normals_to_vertex_color(mesh: Mesh, material : Material) -> Mesh:
 	var mdt = MeshDataTool.new()
-	material.set_shader_param("blend_shape_multiplier", 1.0)
+	material.set_shader_param("i_blend_shape_multiplier", 1.0)
 	
 	mdt.create_from_surface(_multiple_surfaces_to_single(mesh), 0)
 	for i in range(mdt.get_vertex_count()):
