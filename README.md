@@ -20,6 +20,10 @@ Purpose
 -------
 I was inspired by games like Shadow of the Colossus and Red Dead Redemption 2 which use this technique, to try and make my own implementation in Godot.
 
+Warning
+-------
+This tool is not meant for grass and foliage. This method is way too performance expensive on fillrate when the fur takes up large parts of the screen for it to be used for effects like that. Use the effect for hero props or characters.
+
 Usage
 -----
 Select any *MeshInstance* node and add the *ShellFur* node as a child beneath it.
@@ -154,7 +158,7 @@ Uniforms that do not start with "i_" will be parsed by the ShellFur's material i
 
 **Mobile Support - experimental**
 
-The shader works with GLES2, however rotational physics do not work in GLES2.
+The shader works with GLES2, however rotational physics and Custom Physics Pivot does not work in GLES2.
 
 I suggest using the *Mobile* shader when targeting mobile, but if you have a newer device, the *Regular* shader might work as well.
 
