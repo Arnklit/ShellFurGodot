@@ -371,7 +371,13 @@ func _enter_tree() -> void:
 		# Not sure why this is thrown, since it's not a problem when first
 		# adding the node.
 		_delayed_position_correction()
-		set_pattern_selector(pattern_selector)
+		# We have to manually set the texture as that cannot be defaulted on the
+		# material, so if it's a new object is has to be set to standard (0)
+		# otherwise it should be set to something useful already and we can just
+		# set it.
+		if pattern_texture == null:
+			pattern_texture = load(PATTERNS[0])
+		set_shader_param("i_pattern_texture", pattern_texture)
 		# For some reason we have to set some values like colors for them to 
 		# show correctly. Even though we are just setting them to themselves.
 		# To allow for custom shaders, we simply set all shader params to thier own value.
