@@ -199,9 +199,7 @@ void vertex() {
 
 void fragment() { 
 	// Discarding fragment if layer is beyond LOD threshhold
-	if (i_LOD < COLOR.a) { 
-		discard;
-	}
+	float lod_alpha = float(i_LOD < COLOR.a);
 	
 	vec4 ldtg_texture_data = texture(shape_ldtg_texture, UV * shape_ldtg_uv_scale.xy);
 	
@@ -216,9 +214,7 @@ void fragment() {
 	
 	// We use the unique id's in pattern.b to discard if density is under the threshold
 	// density is multiplied by the ldtg textures G channel to allow fine control
-	if (shape_density * ldtg_texture_data.g * 1.02 <= pattern.b + 0.01) {
-		discard;
-	}
+	float density_alpha = float( shape_density * ldtg_texture_data.g * 1.02 < pattern.b + 0.01 );
 
 	// Workaround for issue https://github.com/godotengine/godot/issues/36669
 	// Below two lines should work but they do not, so we use discard instead
@@ -227,9 +223,8 @@ void fragment() {
 	// We discard the parts of mesh that does not make up the strand, we multiply
 	// by ldtg texture R channel and the unique ids in pattern's G channel to allow
 	// for randomized and controlled length
-	if (scissor_thresh > pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand) {
-		discard;
-	}
+	float shape_alpha = float(scissor_thresh < pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand);
+	ALPHA = clamp(shape_alpha - (lod_alpha + density_alpha), 0.0, 1.0);
 	
 	mat4 albedo_color_srgb = gradient_lin2srgb(albedo_color);
 	vec3 albedo_base_color = vec3(albedo_color_srgb[0].x, albedo_color_srgb[0].y, albedo_color_srgb[0].z);
