@@ -15,6 +15,7 @@ render_mode shadows_disabled, diffuse_lambert, specular_disabled;
 // Main
 uniform vec4 transmission : hint_color = vec4(0.3, 0.3, 0.3, 1.0);
 uniform float ao : hint_range(0.0, 1.0) = 1.0;
+uniform float ao_light_affect : hint_range(0.0, 1.0) = 0.0;
 uniform float roughness : hint_range(0.0, 1.0) = 1.0;
 
 // Albedo
@@ -238,4 +239,5 @@ void fragment() {
 	TRANSMISSION = transmission.rgb;
 	ROUGHNESS = roughness;
 	AO = 1.0 - (-lod_adjusted_layer_value + 1.0) * ao;
+	AO_LIGHT_AFFECT = ao_light_affect;
 }

@@ -15,6 +15,7 @@ render_mode depth_draw_alpha_prepass, diffuse_burley, specular_schlick_ggx;
 // Main
 uniform vec4 transmission : hint_color = vec4(0.3, 0.3, 0.3, 1.0);
 uniform float ao : hint_range(0.0, 1.0) = 1.0;
+uniform float ao_light_affect : hint_range(0.0, 1.0) = 0.0;
 uniform float roughness : hint_range(0.0, 1.0) = 1.0;
 
 // Albedo
@@ -198,8 +199,6 @@ void vertex() {
 }
 
 void fragment() { 
-	// Discarding fragment if layer is beyond LOD threshhold
-	float lod_alpha = float(i_LOD < COLOR.a);
 	
 	vec4 ldtg_texture_data = texture(shape_ldtg_texture, UV * shape_ldtg_uv_scale.xy);
 	
@@ -212,19 +211,16 @@ void fragment() {
 	float thickness_tip = shape_thickness_tip * ldtg_texture_data.b * pattern.b * t_rand;
 	float scissor_thresh =  mix(-thickness_base + 1.0, -thickness_tip + 1.0, lod_adjusted_layer_value) + clamp(1.0 - shape_growth + (1.0 - g_rand * ldtg_texture_data.a), 0.0, 1.0); 
 	
-	// We use the unique id's in pattern.b to discard if density is under the threshold
+	float lod_alpha = float(i_LOD > COLOR.a);
+	// We use the unique id's in pattern.b to set to 0.0 if density is under the threshold
 	// density is multiplied by the ldtg textures G channel to allow fine control
-	float density_alpha = float( shape_density * ldtg_texture_data.g * 1.02 < pattern.b + 0.01 );
+	float density_alpha = float( shape_density * ldtg_texture_data.g * 1.02 > pattern.b + 0.01 );
+	float shape_alpha = float(scissor_thresh < pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand);
 
 	// Workaround for issue https://github.com/godotengine/godot/issues/36669
-	// Below two lines should work but they do not, so we use discard instead
-	//ALPHA_SCISSOR = scissor_thresh;
-	//ALPHA = pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand;
-	// We discard the parts of mesh that does not make up the strand, we multiply
-	// by ldtg texture R channel and the unique ids in pattern's G channel to allow
-	// for randomized and controlled length
-	float shape_alpha = float(scissor_thresh < pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand);
-	ALPHA = clamp(shape_alpha - (lod_alpha + density_alpha), 0.0, 1.0);
+	// Discarding is causing too many issues when using alpha prepass, so we are 
+	// simply setting the alpha to 0 or 1 fully, hopefully this can all be handled better in Godot 4.0
+	ALPHA = density_alpha * shape_alpha * lod_alpha;
 	
 	mat4 albedo_color_srgb = gradient_lin2srgb(albedo_color);
 	vec3 albedo_base_color = vec3(albedo_color_srgb[0].x, albedo_color_srgb[0].y, albedo_color_srgb[0].z);
@@ -233,4 +229,5 @@ void fragment() {
 	TRANSMISSION = transmission.rgb;
 	ROUGHNESS = roughness;
 	AO = 1.0 - (-lod_adjusted_layer_value + 1.0) * ao;
+	AO_LIGHT_AFFECT = ao_light_affect;
 }
