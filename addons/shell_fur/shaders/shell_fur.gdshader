@@ -1,7 +1,7 @@
-// Copyright © 2021 Kasper Arnklit Frandsen - MIT License
+// Copyright © 2022 Kasper Arnklit Frandsen - MIT License
 // See `LICENSE.md` included in the source distribution for details.
 shader_type spatial;
-render_mode shadows_disabled, diffuse_lambert, specular_disabled;
+render_mode diffuse_burley, specular_schlick_ggx, depth_draw_opaque;
 
 // If you are making your own shader, you can customize or add your own
 // parameters below and they will automatically get parsed and displayed in
@@ -15,6 +15,7 @@ render_mode shadows_disabled, diffuse_lambert, specular_disabled;
 // Main
 uniform vec4 transmission : hint_color = vec4(0.3, 0.3, 0.3, 1.0);
 uniform float ao : hint_range(0.0, 1.0) = 1.0;
+uniform float ao_light_affect : hint_range(0.0, 1.0) = 0.0;
 uniform float roughness : hint_range(0.0, 1.0) = 1.0;
 
 // Albedo
@@ -204,7 +205,7 @@ void fragment() {
 	}
 	
 	vec4 ldtg_texture_data = texture(shape_ldtg_texture, UV * shape_ldtg_uv_scale.xy);
-	
+
 	vec4 pattern = texture(i_pattern_texture, UV * i_pattern_uv_scale);
 	// We multiply the thicknesses with ldtg texture's B channel and a random value based on 
 	// the pattern's B channel ids to allow for control of the thickness through texture.
@@ -213,24 +214,21 @@ void fragment() {
 	float thickness_base = shape_thickness_base * ldtg_texture_data.b * t_rand; 
 	float thickness_tip = shape_thickness_tip * ldtg_texture_data.b * pattern.b * t_rand;
 	float scissor_thresh =  mix(-thickness_base + 1.0, -thickness_tip + 1.0, lod_adjusted_layer_value) + clamp(1.0 - shape_growth + (1.0 - g_rand * ldtg_texture_data.a), 0.0, 1.0); 
-	
+
+	float lod_alpha = float(i_LOD > COLOR.a);
+	// density is multiplied by the ldtg textures G channel to allow fine control
+	float density_alpha = float( shape_density * ldtg_texture_data.g * 1.02 > pattern.b + 0.01 );
+	float shape_alpha = float(scissor_thresh < pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand);
+
 	// We use the unique id's in pattern.b to discard if density is under the threshold
 	// density is multiplied by the ldtg textures G channel to allow fine control
 	if (shape_density * ldtg_texture_data.g * 1.02 <= pattern.b + 0.01) {
 		discard;
 	}
 
-	// Workaround for issue https://github.com/godotengine/godot/issues/36669
-	// Below two lines should work but they do not, so we use discard instead
-	//ALPHA_SCISSOR = scissor_thresh;
-	//ALPHA = pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand;
-	// We discard the parts of mesh that does not make up the strand, we multiply
-	// by ldtg texture R channel and the unique ids in pattern's G channel to allow
-	// for randomized and controlled length
-	if (scissor_thresh > pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand) {
-		discard;
-	}
-	
+	ALPHA_SCISSOR = scissor_thresh;
+	ALPHA = pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand;
+
 	mat4 albedo_color_srgb = gradient_lin2srgb(albedo_color);
 	vec3 albedo_base_color = vec3(albedo_color_srgb[0].x, albedo_color_srgb[0].y, albedo_color_srgb[0].z);
 	vec3 albedo_tip_color = vec3(albedo_color_srgb[1].x, albedo_color_srgb[1].y, albedo_color_srgb[1].z);
@@ -238,4 +236,5 @@ void fragment() {
 	TRANSMISSION = transmission.rgb;
 	ROUGHNESS = roughness;
 	AO = 1.0 - (-lod_adjusted_layer_value + 1.0) * ao;
+	AO_LIGHT_AFFECT = ao_light_affect;
 }

@@ -1,7 +1,8 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=11 format=2]
 
-[ext_resource path="res://addons/shell_fur/noise_patterns/very_rough.png" type="Texture" id=1]
+[ext_resource path="res://addons/shell_fur/noise_patterns/very_fine.png" type="Texture" id=1]
 [ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=2]
+[ext_resource path="res://test_assets/sub_fur_scene.tscn" type="PackedScene" id=3]
 
 [sub_resource type="ProceduralSky" id=1]
 
@@ -60,6 +61,9 @@ rings = 12
 [sub_resource type="SpatialMaterial" id=6]
 albedo_color = Color( 0.490196, 0.384314, 0.258824, 1 )
 
+[sub_resource type="PlaneMesh" id=7]
+size = Vector2( 8, 8 )
+
 [node name="Spatial" type="Spatial"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -94,19 +98,20 @@ script = ExtResource( 2 )
 shader_type = 0
 custom_shader = null
 layers = 40
-pattern_selector = 3
+pattern_selector = 0
 pattern_texture = ExtResource( 1 )
-pattern_uv_scale = 5.0
-cast_shadow = false
+pattern_uv_scale = 14.329
+cast_shadow = true
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
-mat_roughness = 0.424
-mat_albedo_color = Transform( 0.4, 0.78, 0, 0.337255, 0.63, 0, 0.290196, 0.52, 1, 0, 0, 0 )
+mat_ao_light_affect = 0.0
+mat_roughness = 1.0
+mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
 mat_albedo_uv_scale = Vector3( 1, 1, 0 )
 mat_albedo_texture = null
-mat_shape_length = 0.5
-mat_shape_length_rand = 0.3
-mat_shape_density = 1.0
+mat_shape_length = 0.378
+mat_shape_length_rand = 0.273
+mat_shape_density = 0.484
 mat_shape_thickness_base = 0.75
 mat_shape_thickness_tip = 0.3
 mat_shape_thickness_rand = 0.0
@@ -118,10 +123,18 @@ physics_custom_physics_pivot = NodePath("")
 physics_gravity = 0.1
 physics_spring = 4.0
 physics_damping = 0.1
-physics_wind_strength = 0.484
-physics_wind_speed = 2.382
-physics_wind_scale = 0.424
-physics_wind_angle = 0.0
+physics_wind_strength = 0.634
+physics_wind_speed = 1.0
+physics_wind_scale = 1.0
+physics_wind_angle = 83.894
 styling_blendshape = 0
 lod_LOD0_distance = 10.0
 lod_LOD1_distance = 100.0
+
+[node name="MeshInstance2" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.12759, 0 )
+mesh = SubResource( 7 )
+material/0 = null
+
+[node name="SubFurScene" parent="." instance=ExtResource( 3 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.24287 )

@@ -64,6 +64,7 @@ When done with the Test Suite, delete all added fur nodes so it is ready for the
 }
 
 [node name="Part 1 - Apply and Tranfer" type="Spatial" parent="."]
+visible = false
 
 [node name="Case 1 - Apply Fur" type="Node" parent="Part 1 - Apply and Tranfer"]
 __meta__ = {
@@ -124,6 +125,7 @@ pattern_uv_scale = 5.0
 cast_shadow = false
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
+mat_ao_light_affect = 0.0
 mat_roughness = 1.0
 mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
 mat_albedo_uv_scale = Vector3( 1, 1, 0 )
@@ -197,6 +199,9 @@ __meta__ = {
 
 [node name="SkinnedMesh_2Mat_2Blend" parent="Part 2 - Parameters" instance=ExtResource( 10 )]
 
+[node name="Skeleton" parent="Part 2 - Parameters/SkinnedMesh_2Mat_2Blend/SkinnedMesh_2Mat_2Blend_Armature" index="0"]
+bones/1/bound_children = [ NodePath("BoneAttachment") ]
+
 [node name="ShellFur" type="Spatial" parent="Part 2 - Parameters/SkinnedMesh_2Mat_2Blend/SkinnedMesh_2Mat_2Blend_Armature/Skeleton/SkinnedMesh_2Mat_2Blend" index="0"]
 script = ExtResource( 13 )
 shader_type = 0
@@ -208,6 +213,7 @@ pattern_uv_scale = 5.0
 cast_shadow = false
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
+mat_ao_light_affect = 0.0
 mat_roughness = 1.0
 mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
 mat_albedo_uv_scale = Vector3( 1, 1, 0 )
@@ -244,7 +250,6 @@ mesh = SubResource( 3 )
 material/0 = null
 
 [node name="Part 3 - LOD" type="Spatial" parent="."]
-visible = false
 
 [node name="Case 9 - LOD" type="Node" parent="Part 3 - LOD"]
 __meta__ = {
@@ -267,6 +272,7 @@ pattern_uv_scale = 5.0
 cast_shadow = false
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
+mat_ao_light_affect = 0.0
 mat_roughness = 1.0
 mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
 mat_albedo_uv_scale = Vector3( 1, 1, 0 )
@@ -308,6 +314,7 @@ pattern_uv_scale = 5.0
 cast_shadow = false
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
+mat_ao_light_affect = 0.0
 mat_roughness = 1.0
 mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
 mat_albedo_uv_scale = Vector3( 1, 1, 0 )
@@ -350,6 +357,7 @@ pattern_uv_scale = 5.0
 cast_shadow = false
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
+mat_ao_light_affect = 0.0
 mat_roughness = 1.0
 mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
 mat_albedo_uv_scale = Vector3( 1, 1, 0 )
@@ -408,6 +416,7 @@ pattern_uv_scale = 5.0
 cast_shadow = false
 mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
+mat_ao_light_affect = 0.0
 mat_roughness = 1.0
 mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
 mat_albedo_uv_scale = Vector3( 1, 1, 0 )
@@ -418,7 +427,7 @@ mat_shape_density = 1.0
 mat_shape_thickness_base = 0.75
 mat_shape_thickness_tip = 0.3
 mat_shape_thickness_rand = 0.0
-mat_shape_growth = 1.33603
+mat_shape_growth = 1.0
 mat_shape_growth_rand = 0.0
 mat_shape_ldtg_uv_scale = Vector3( 1, 1, 0 )
 mat_shape_ldtg_texture = null

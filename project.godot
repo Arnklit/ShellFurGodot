@@ -54,16 +54,11 @@ gdscript/warnings/unsafe_method_access=true
 gdscript/warnings/unsafe_cast=true
 gdscript/warnings/unsafe_call_argument=true
 
-[display]
-
-window/vsync/use_vsync=false
-
 [editor_plugins]
 
 enabled=PoolStringArray( "res://addons/Todo_Manager/plugin.cfg", "res://addons/WAT/plugin.cfg", "res://addons/godot-plugin-refresher/plugin.cfg", "res://addons/shell_fur/plugin.cfg" )
 
 [rendering]
 
-quality/filters/msaa=2
 quality/filters/use_fxaa=true
 environment/default_environment="res://test_assets/default_env.tres"
