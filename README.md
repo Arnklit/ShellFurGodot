@@ -2,7 +2,7 @@
 
 [![Shell Fur Add-on for Godot v0.1.0 Released - Feature Overview](https://user-images.githubusercontent.com/4955051/97077434-8b0f7800-15db-11eb-98eb-7cecf1648304.png)](https://youtu.be/7EUjxwGTPAI "Shell Fur Add-on for Godot v0.1.0 Released - Feature Overview")
 
-Add-on that adds a fur node to Godot 3.2. Demo project available [here.](https://github.com/Arnklit/ShellFurGodotDemo)
+Add-on that adds a fur node to Godot 3.4. Demo project available [here.](https://github.com/Arnklit/ShellFurGodotDemo)
 
 [Discord Server](https://discord.gg/mjGvWwQwv2)
 
@@ -68,7 +68,7 @@ The parameters for the fur is split into five sections.
   - **Growth** - This control can be animated either with an animation player node or a script for fur growth effect.
   - **Growth Rand** - This adds a random offset to the growth of each strands.
   - **ldtg UV Scale** - UV Scale for the ldtg texture below.
-  - **ldtg Textire** - An RGBA texture that can be used to customize the Length(R), Density(G), Thichkness(B) and Growth(A) parameters.
+  - **ldtg Texture** - An RGBA texture that can be used to customize the Length(R), Density(G), Thickness(B) and Growth(A) parameters.
 
 **Physics**
 
@@ -77,7 +77,7 @@ The parameters for the fur is split into five sections.
 - **Spring** - Amount of springiness to the physics.
 - **Damping** - Amount of damping to the physics (to imitate air and friction resistance stopping the fur's movement over time).
 - **Wind Strength** - Amount of wind strength, the wind is applied as a noise distortion in the vertex shader due to current limitations so it does not interact with the spring physics. If the *Wind Strength* is set to 0 the calculations are skipped in the shader.
-- **Wind Speed** - How quickly the wind noise moves accross the fur.
+- **Wind Speed** - How quickly the wind noise moves across the fur.
 - **Wind Scale** - Scale of the wind noise.
 - **Wind Angle** - The angle the wind pushes in degrees around the Y-axis. 0 means the wind is blowing in X- direction.
 
@@ -120,7 +120,7 @@ If you want to use your own pattern for the fur, you need use a texture with noi
 Breakdown of *Very Fine* texture - Left to right: Combined pattern texture, R channel, G channel, B channel and A channel.
 ![image](https://user-images.githubusercontent.com/4955051/111150649-41bdc600-8586-11eb-9dad-9def3a252be1.png)
 
-The easiest way to do this is to use this [file](https://github.com/Arnklit/media/blob/main/ShellFurAdd-on/pattern_examples.ptex) which shows examples of how I generate fur textures. It is made in the free Texture generation program [Material Maker](https://github.com/RodZill4/material-maker).
+The easiest way to do this is to use this [file](https://github.com/Arnklit/media/blob/main/ShellFurAdd-on/pattern_examples.ptex) which shows examples of how I generate fur textures. It is made in the free texture generation program [Material Maker](https://github.com/RodZill4/material-maker).
 
 Be sure to enable *Filter*, *Mipmaps* and *Anisotropic* and set *Srgb* to *Disable* when importing your own pattern textures.
 
@@ -173,7 +173,7 @@ Current Limitations
 
 Acknowledgements
 ---------------
-- Thanks to my patrons *Little Mouse Games, Winston, Johannes Wuensch, spacechase0, Dmitriy Keane and Marcus Richter* for all their support.
+- Thanks to my patrons *RodZilla, David Maziarka, Andres Hernandez, Sneaky Amxx, Mike King, Decayingdev, Aleks Litynski, Elias Eskelinen, Joseph Catrambone, Oskar Jonsson, Winston, spacechase0 and Marcus Richter* for all their support.
 - Kiri (@ExpiredPopsicle) was a huge help in answering questions and pointing me in the right direction with this.
 
 Contributing
@@ -183,4 +183,4 @@ If you want to contribute to the project or just work on your own version, clone
 License
 -------
 - ShellFur is under MIT license, see LICENSE.md for details.
-- The 3D noise function used for wind is under MIT license by Stefan Gustavson https://github.com/ashima/webgl-noise
+- The 3D noise function used for wind is under [MIT license by Stefan Gustavson](https://github.com/ashima/webgl-noise)

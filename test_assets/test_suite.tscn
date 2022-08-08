@@ -64,7 +64,6 @@ When done with the Test Suite, delete all added fur nodes so it is ready for the
 }
 
 [node name="Part 1 - Apply and Tranfer" type="Spatial" parent="."]
-visible = false
 
 [node name="Case 1 - Apply Fur" type="Node" parent="Part 1 - Apply and Tranfer"]
 __meta__ = {
@@ -250,6 +249,7 @@ mesh = SubResource( 3 )
 material/0 = null
 
 [node name="Part 3 - LOD" type="Spatial" parent="."]
+visible = false
 
 [node name="Case 9 - LOD" type="Node" parent="Part 3 - LOD"]
 __meta__ = {
