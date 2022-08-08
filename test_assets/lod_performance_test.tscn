@@ -1,0 +1,158 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=1]
+[ext_resource path="res://addons/shell_fur/noise_patterns/very_fine.png" type="Texture" id=2]
+[ext_resource path="res://test_assets/scripts/fps_counter.gd" type="Script" id=3]
+[ext_resource path="res://test_assets/scripts/Lod-slider.gd" type="Script" id=4]
+
+[sub_resource type="SphereMesh" id=1]
+
+[node name="LOD Performance" type="Spatial"]
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+mesh = SubResource( 1 )
+material/0 = null
+
+[node name="ShellFur" type="Spatial" parent="MeshInstance"]
+script = ExtResource( 1 )
+shader_type = 0
+custom_shader = null
+layers = 40
+pattern_selector = 0
+pattern_texture = ExtResource( 2 )
+pattern_uv_scale = 5.0
+cast_shadow = false
+mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
+mat_ao = 1.0
+mat_ao_light_affect = 0.0
+mat_roughness = 1.0
+mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
+mat_albedo_uv_scale = Vector3( 1, 1, 0 )
+mat_albedo_texture = null
+mat_shape_length = 0.5
+mat_shape_length_rand = 0.3
+mat_shape_density = 1.0
+mat_shape_thickness_base = 0.75
+mat_shape_thickness_tip = 0.3
+mat_shape_thickness_rand = 0.0
+mat_shape_growth = 1.0
+mat_shape_growth_rand = 0.0
+mat_shape_ldtg_uv_scale = Vector3( 1, 1, 0 )
+mat_shape_ldtg_texture = null
+physics_custom_physics_pivot = NodePath("")
+physics_gravity = 0.1
+physics_spring = 4.0
+physics_damping = 0.1
+physics_wind_strength = 0.0
+physics_wind_speed = 1.0
+physics_wind_scale = 1.0
+physics_wind_angle = 0.0
+styling_blendshape = 0
+lod_LOD0_distance = 10.0
+lod_LOD1_distance = 100.0
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3 )
+
+[node name="Panel" type="PanelContainer" parent="."]
+margin_right = 414.0
+margin_bottom = 256.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 435.0
+margin_bottom = 265.0
+
+[node name="FPS Counter" type="Label" parent="Panel/VBoxContainer"]
+margin_right = 428.0
+margin_bottom = 14.0
+text = "FPS"
+script = ExtResource( 3 )
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer"]
+margin_top = 18.0
+margin_right = 428.0
+margin_bottom = 22.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+margin_top = 26.0
+margin_right = 428.0
+margin_bottom = 42.0
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/HBoxContainer"]
+margin_top = 1.0
+margin_right = 40.0
+margin_bottom = 15.0
+text = "LOD 0"
+
+[node name="Lod0-slider" type="HSlider" parent="Panel/VBoxContainer/HBoxContainer"]
+margin_left = 44.0
+margin_right = 344.0
+margin_bottom = 16.0
+rect_min_size = Vector2( 300, 0 )
+max_value = 10.0
+step = 0.0
+script = ExtResource( 4 )
+fur_path = NodePath("../../../../MeshInstance/ShellFur")
+lod = "LOD0"
+
+[node name="ValueLabel" type="Label" parent="Panel/VBoxContainer/HBoxContainer"]
+margin_left = 348.0
+margin_top = 1.0
+margin_right = 428.0
+margin_bottom = 15.0
+rect_min_size = Vector2( 80, 0 )
+text = "Value"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/VBoxContainer"]
+margin_top = 46.0
+margin_right = 428.0
+margin_bottom = 62.0
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/HBoxContainer2"]
+margin_top = 1.0
+margin_right = 40.0
+margin_bottom = 15.0
+text = "LOD 1"
+
+[node name="Lod1-slider" type="HSlider" parent="Panel/VBoxContainer/HBoxContainer2"]
+margin_left = 44.0
+margin_right = 344.0
+margin_bottom = 16.0
+rect_min_size = Vector2( 300, 0 )
+max_value = 10.0
+step = 0.0
+value = 10.0
+script = ExtResource( 4 )
+fur_path = NodePath("../../../../MeshInstance/ShellFur")
+lod = "LOD1"
+
+[node name="ValueLabel" type="Label" parent="Panel/VBoxContainer/HBoxContainer2"]
+margin_left = 348.0
+margin_top = 1.0
+margin_right = 428.0
+margin_bottom = 15.0
+rect_min_size = Vector2( 80, 0 )
+text = "Value"
+
+[node name="HSeparator2" type="HSeparator" parent="Panel/VBoxContainer"]
+margin_top = 66.0
+margin_right = 428.0
+margin_bottom = 70.0
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer"]
+margin_top = 74.0
+margin_right = 428.0
+margin_bottom = 258.0
+text = "Note: You have to disable v-sync to get any kind of useful
+performance data.
+
+Note: When setting the LOD levels through the API, you can
+set the LOD0 level to be higher than the LOD1 level, whereas
+that is blocked in the fur UI, this gives unexpected results that
+don't make a lot of sense. But I have not blocked this, as I 
+expect people who are setting the the LOD levels through the
+API to know what they are doing and it can be confusing if you
+try to set the function and it does something else than what 
+you ask it to do."

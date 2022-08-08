@@ -1,7 +1,7 @@
-// Copyright © 2021 Kasper Arnklit Frandsen - MIT License
+// Copyright © 2022 Kasper Arnklit Frandsen - MIT License
 // See `LICENSE.md` included in the source distribution for details.
 shader_type spatial;
-render_mode depth_draw_alpha_prepass, diffuse_burley, specular_schlick_ggx;
+render_mode shadows_disabled, diffuse_lambert, specular_disabled, depth_draw_opaque;
 
 // If you are making your own shader, you can customize or add your own
 // parameters below and they will automatically get parsed and displayed in
@@ -15,6 +15,7 @@ render_mode depth_draw_alpha_prepass, diffuse_burley, specular_schlick_ggx;
 // Main
 uniform vec4 transmission : hint_color = vec4(0.3, 0.3, 0.3, 1.0);
 uniform float ao : hint_range(0.0, 1.0) = 1.0;
+uniform float ao_light_affect : hint_range(0.0, 1.0) = 0.0;
 uniform float roughness : hint_range(0.0, 1.0) = 1.0;
 
 // Albedo
@@ -219,17 +220,9 @@ void fragment() {
 	if (shape_density * ldtg_texture_data.g * 1.02 <= pattern.b + 0.01) {
 		discard;
 	}
-
-	// Workaround for issue https://github.com/godotengine/godot/issues/36669
-	// Below two lines should work but they do not, so we use discard instead
-	//ALPHA_SCISSOR = scissor_thresh;
-	//ALPHA = pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand;
-	// We discard the parts of mesh that does not make up the strand, we multiply
-	// by ldtg texture R channel and the unique ids in pattern's G channel to allow
-	// for randomized and controlled length
-	if (scissor_thresh > pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand) {
-		discard;
-	}
+	
+	ALPHA_SCISSOR = scissor_thresh;
+	ALPHA = pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand;
 	
 	mat4 albedo_color_srgb = gradient_lin2srgb(albedo_color);
 	vec3 albedo_base_color = vec3(albedo_color_srgb[0].x, albedo_color_srgb[0].y, albedo_color_srgb[0].z);
@@ -238,4 +231,5 @@ void fragment() {
 	TRANSMISSION = transmission.rgb;
 	ROUGHNESS = roughness;
 	AO = 1.0 - (-lod_adjusted_layer_value + 1.0) * ao;
+	AO_LIGHT_AFFECT = ao_light_affect;
 }

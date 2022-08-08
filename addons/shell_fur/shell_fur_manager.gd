@@ -31,11 +31,11 @@ enum SHADER_TYPES {REGULAR, MOBILE, CUSTOM}
 const BUILTIN_SHADERS = [
 	{
 		name = "Regular",
-		shader_path = "res://addons/shell_fur/shaders/shell_fur.shader",
+		shader_path = "res://addons/shell_fur/shaders/shell_fur.gdshader",
 	},
 	{
 		name = "Mobile",
-		shader_path = "res://addons/shell_fur/shaders/shell_fur_mobile.shader",
+		shader_path = "res://addons/shell_fur/shaders/shell_fur_mobile.gdshader",
 	},
 ]
 
