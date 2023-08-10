@@ -16,6 +16,7 @@ script = ExtResource("1")
 [node name="Color1" type="ColorPickerButton" parent="."]
 custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
+size_flags_horizontal = 3
 flat = true
 color = Color(0.43, 0.35, 0.29, 1)
 edit_alpha = false
