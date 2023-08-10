@@ -1,8 +1,9 @@
 # Shell Fur Add-on for Godot Engine
 
-[![Shell Fur Add-on for Godot v0.1.0 Released - Feature Overview](https://user-images.githubusercontent.com/4955051/97077434-8b0f7800-15db-11eb-98eb-7cecf1648304.png)](https://youtu.be/7EUjxwGTPAI "Shell Fur Add-on for Godot v0.1.0 Released - Feature Overview")
+[![Shell Fur Add-on for Godot v0.3.0 Released - Feature Overview](https://user-images.githubusercontent.com/4955051/97077434-8b0f7800-15db-11eb-98eb-7cecf1648304.png)](https://youtu.be/7EUjxwGTPAI "Shell Fur Add-on for Godot v0.3.0 Released - Feature Overview")
 
-Add-on that adds a fur node to Godot 3.4. Demo project available [here.](https://github.com/Arnklit/ShellFurGodotDemo)
+Add-on that adds a fur node to Godot 4.1.
+Migrated from Arnklit's Godot 3.4 version found [here.](https://github.com/Arnklit/ShellFurGodot)
 
 [Discord Server](https://discord.gg/mjGvWwQwv2)
 
@@ -10,9 +11,7 @@ Add-on that adds a fur node to Godot 3.4. Demo project available [here.](https:/
 
 Installation
 -----------
-ShellFur is available on the Godot Asset Library, so the easiest way to install it into your project is directly inside Godot. Simply go to the AssetLib screen and search for "Fur" and the add-on should appear. Select it and press Download -> Install.
-
-Alternatively you can press the green **Code** button at the top of this page and select **Download ZIP**, unzip the file and place the "shell_fur" folder in your project like so "addons/shell_fur*.
+The Godot 4.1 version is not available on the Godot Asset Library, but you can press the green **Code** button at the top of this page and select **Download ZIP**, unzip the file and place the "shell_fur" folder in your project like so "addons/shell_fur*.
 
 Once the files are in your project, you need to activate the add-on from the *Project -> Project Settings... -> Plugins* menu.
 
