@@ -1,14 +1,14 @@
 extends HSlider
 
 
-export var fur_path : NodePath
-export var lod : String
+@export var fur_path : NodePath
+@export var lod : String
 
-onready var fur = get_node(fur_path)
-onready var label = get_parent().get_node("ValueLabel")
+@onready var fur = get_node(fur_path)
+@onready var label = get_parent().get_node("ValueLabel")
 
 func _ready() -> void:
-	var _result = connect("value_changed", self, "_set_lod")
+	var _result = connect("value_changed", Callable(self, "_set_lod"))
 	_set_lod(value)
 
 
