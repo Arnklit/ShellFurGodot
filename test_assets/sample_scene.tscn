@@ -1,123 +1,122 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=3 uid="uid://dtqburllwmawx"]
 
-[ext_resource path="res://test_assets/textures/voronoi_even.png" type="Texture" id=1]
-[ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=2]
-[ext_resource path="res://test_assets/sub_fur_scene.tscn" type="PackedScene" id=3]
+[ext_resource type="Texture2D" uid="uid://b4jk5t063m13h" path="res://test_assets/textures/voronoi_even.png" id="1"]
+[ext_resource type="Script" path="res://addons/shell_fur/shell_fur_manager.gd" id="2"]
+[ext_resource type="PackedScene" path="res://test_assets/sub_fur_scene.tscn" id="3"]
 
-[sub_resource type="ProceduralSky" id=1]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ppjur"]
 
-[sub_resource type="Environment" id=2]
+[sub_resource type="Sky" id="1"]
+sky_material = SubResource("ProceduralSkyMaterial_ppjur")
+
+[sub_resource type="Environment" id="2"]
 background_mode = 2
-background_sky = SubResource( 1 )
+background_energy_multiplier = 2.0
+sky = SubResource("1")
 tonemap_mode = 3
 ssao_radius = 0.25
-ssao_radius2 = 0.1
-ssao_quality = 2
 
-[sub_resource type="Animation" id=3]
+[sub_resource type="Animation" id="3"]
 length = 10.0
-loop = true
-tracks/0/type = "transform"
-tracks/0/path = NodePath("Camera Pivot")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
+loop_mode = 1
+tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/keys = PoolRealArray(  )
-tracks/1/type = "value"
-tracks/1/path = NodePath("Camera Pivot:rotation_degrees")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0, 10 ),
-"transitions": PoolRealArray( 1, 1 ),
+tracks/0/path = NodePath("Camera3D Pivot:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 10),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [ Vector3( 0, 0, 0 ), Vector3( 0, 360, 0 ) ]
+"values": [Vector3(0, 0, 0), Vector3(0, 360, 0)]
 }
 
-[sub_resource type="Animation" id=4]
+[sub_resource type="Animation" id="4"]
 resource_name = "panning in and out"
 length = 10.0
-loop = true
+loop_mode = 1
 tracks/0/type = "value"
-tracks/0/path = NodePath("Camera Pivot/Camera:translation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D Pivot/Camera3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 2, 7, 10 ),
-"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"times": PackedFloat32Array(0, 2, 7, 10),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [ Vector3( 0, 0.429, 6.95921 ), Vector3( 0, 0.429, 3.17728 ), Vector3( 0, 0.429, 12.194 ), Vector3( 0, 0.429, 6.95921 ) ]
+"values": [Vector3(0, 0.429, 6.95921), Vector3(0, 0.429, 3.17728), Vector3(0, 0.429, 12.194), Vector3(0, 0.429, 6.95921)]
 }
 
-[sub_resource type="SphereMesh" id=5]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_fcm1x"]
+_data = {
+"camera rotating": SubResource("3"),
+"panning in and out": SubResource("4")
+}
+
+[sub_resource type="SphereMesh" id="5"]
 radial_segments = 16
 rings = 12
 
-[sub_resource type="SpatialMaterial" id=6]
-albedo_color = Color( 0.490196, 0.384314, 0.258824, 1 )
+[sub_resource type="PlaneMesh" id="7"]
+size = Vector2(8, 8)
 
-[sub_resource type="PlaneMesh" id=7]
-size = Vector2( 8, 8 )
-
-[node name="Spatial" type="Spatial"]
+[node name="Node3D" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource( 2 )
+environment = SubResource("2")
 
-[node name="DirectionalLight" type="DirectionalLight" parent="."]
-transform = Transform( 1, 0, 0, 0, -0.707107, 0.707107, 0, -0.707107, -0.707107, 0, 20, 0 )
-light_color = Color( 1, 0.94902, 0.776471, 1 )
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.707107, 0.707107, 0, -0.707107, -0.707107, 0, 20, 0)
+light_color = Color(1, 0.94902, 0.776471, 1)
 shadow_enabled = true
 
-[node name="CameraRig" type="Spatial" parent="."]
+[node name="CameraRig" type="Node3D" parent="."]
 visible = false
 
-[node name="Camera Pivot" type="Spatial" parent="CameraRig"]
+[node name="Camera3D Pivot" type="Node3D" parent="CameraRig"]
 
-[node name="Camera" type="Camera" parent="CameraRig/Camera Pivot"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.429, 10.1882 )
+[node name="Camera3D" type="Camera3D" parent="CameraRig/Camera3D Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.429, 6.95921)
+fov = 45.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="CameraRig"]
 autoplay = "panning in and out"
-"anims/camera rotating" = SubResource( 3 )
-"anims/panning in and out" = SubResource( 4 )
-"next/panning in and out" = "panning in and out"
+libraries = {
+"": SubResource("AnimationLibrary_fcm1x")
+}
+"next/panning in and out" = &"panning in and out"
 
-[node name="MeshInstance" type="MeshInstance" parent="."]
-transform = Transform( 0.999997, -0.00131767, -0.00188137, 0.00132825, 0.999983, 0.00564026, 0.00187391, -0.00564274, 0.999982, -0.00839138, -0.0207424, -0.0652213 )
-mesh = SubResource( 5 )
-material/0 = SubResource( 6 )
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.999997, -0.00131767, -0.00188137, 0.00132825, 0.999983, 0.00564026, 0.00187391, -0.00564274, 0.999982, -0.00839138, -0.0207424, -0.0652213)
+mesh = SubResource("5")
 
-[node name="ShellFur" type="Spatial" parent="MeshInstance"]
-script = ExtResource( 2 )
+[node name="ShellFur" type="Node3D" parent="MeshInstance3D"]
+script = ExtResource("2")
 shader_type = 0
 custom_shader = null
 layers = 40
 pattern_selector = 5
-pattern_texture = ExtResource( 1 )
+pattern_texture = ExtResource("1")
 pattern_uv_scale = 10.0
 cast_shadow = true
-mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
+mat_transmission = Color(0.3, 0.3, 0.3, 1)
 mat_ao = 1.0
 mat_ao_light_affect = 0.0
 mat_roughness = 1.0
-mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
-mat_albedo_uv_scale = Vector3( 1, 1, 0 )
+mat_albedo_color = Transform3D(0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0)
+mat_albedo_uv_scale = Vector3(1, 1, 0)
 mat_albedo_texture = null
 mat_shape_length = 0.3
-mat_shape_length_rand = 0.0
+mat_shape_length_rand = 0.3
 mat_shape_density = 1.0
 mat_shape_thickness_base = 0.602
 mat_shape_thickness_tip = 0.039
 mat_shape_thickness_rand = 0.0
 mat_shape_growth = 1.0
 mat_shape_growth_rand = 0.0
-mat_shape_ldtg_uv_scale = Vector3( 1, 1, 0 )
+mat_shape_ldtg_uv_scale = Vector3(1, 1, 0)
 mat_shape_ldtg_texture = null
 physics_custom_physics_pivot = NodePath("")
 physics_gravity = 0.773
@@ -131,10 +130,9 @@ styling_blendshape = 0
 lod_LOD0_distance = 10.0
 lod_LOD1_distance = 100.0
 
-[node name="MeshInstance2" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.12759, 0 )
-mesh = SubResource( 7 )
-material/0 = null
+[node name="MeshInstance2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.12759, 0)
+mesh = SubResource("7")
 
-[node name="SubFurScene" parent="." instance=ExtResource( 3 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.24287 )
+[node name="SubFurScene" parent="." instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.24287)
