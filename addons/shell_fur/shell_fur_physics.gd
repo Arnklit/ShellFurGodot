@@ -1,4 +1,4 @@
-# Copyright © 2021 Kasper Arnklit Frandsen - MIT License
+# Copyright © 2023 Kasper Arnklit Frandsen and Contributers - MIT License
 # See `LICENSE.md` included in the source distribution for details.
 const ShellFurManager = preload("res://addons/shell_fur/shell_fur_manager.gd")
 

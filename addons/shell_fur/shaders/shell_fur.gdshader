@@ -10,8 +10,6 @@ render_mode diffuse_burley, specular_schlick_ggx, depth_draw_opaque;
 // Use prefixes: albedo_, shape_ and custom_ to automatically put your 
 // parameters into categories in the inspector.
 
-// mat4´s with "color" in their name will get parsed as gradients.
-
 // Main
 uniform vec4 transmission : source_color = vec4(0.3, 0.3, 0.3, 1.0);
 uniform float ao : hint_range(0.0, 1.0) = 1.0;
@@ -19,14 +17,10 @@ uniform float ao_light_affect : hint_range(0.0, 1.0) = 0.0;
 uniform float roughness : hint_range(0.0, 1.0) = 1.0;
 
 // Albedo
-uniform mat4 albedo_color = mat4(
-	vec4(0.43, 0.35, 0.29, 0.0),
-	vec4(0.78, 0.63, 0.52, 0.0),
-	vec4(0.0, 0.0, 0.0, 0.0),
-	vec4(0.0)
-);
+uniform vec4 albedo_base_color : source_color = vec4(0.43, 0.35, 0.29, 1.0);
+uniform vec4 albedo_tip_color : source_color = vec4(0.78, 0.63, 0.52, 1.0);
 uniform vec3 albedo_uv_scale = vec3(1.0, 1.0, 0.0);
-uniform sampler2D albedo_texture : source_color;
+uniform sampler2D albedo_texture : source_color, filter_linear_mipmap_anisotropic;
 
 // Shape
 uniform float shape_length : hint_range(0.0, 5.0) = 0.5;
@@ -38,11 +32,11 @@ uniform float shape_thickness_rand : hint_range(0.0, 1.0) = 0.0;
 uniform float shape_growth : hint_range(0.0, 2.0) = 1.0;
 uniform float shape_growth_rand : hint_range(0.0, 1.0) = 0.0;
 uniform vec3 shape_ldtg_uv_scale = vec3(1.0, 1.0, 0.0);
-uniform sampler2D shape_ldtg_texture : hint_default_white; // Length, Desity, Thickness, Growth
+uniform sampler2D shape_ldtg_texture : hint_default_white, filter_nearest_mipmap_anisotropic; // Length, Desity, Thickness, Growth
 
 // Internal uniforms - DO NOT CUSTOMIZE THESE IF YOU ARE CLONING THE SHADER
 uniform int i_layers = 40;
-uniform sampler2D i_pattern_texture : hint_default_black;
+uniform sampler2D i_pattern_texture : hint_default_black, filter_linear_mipmap_anisotropic;
 uniform float i_pattern_uv_scale : hint_range(0.0, 100.0) = 5.0;
 uniform float i_wind_strength = 0.0;
 uniform float i_wind_speed = 1.0;
@@ -61,16 +55,6 @@ varying float lod_adjusted_layer_value;
 
 float lin2srgb(float lin) {
 	return pow(lin, 2.2);
-}
-
-mat4 gradient_lin2srgb(mat4 lin_mat) {
-	mat4 srgb_mat = mat4(
-		vec4(lin2srgb(lin_mat[0].x), lin2srgb(lin_mat[0].y), lin2srgb(lin_mat[0].z), lin2srgb(lin_mat[0].w)),
-		vec4(lin2srgb(lin_mat[1].x), lin2srgb(lin_mat[1].y), lin2srgb(lin_mat[1].z), lin2srgb(lin_mat[1].w)),
-		vec4(0.0),
-		vec4(0.0)
-	);
-	return srgb_mat;
 }
 
 vec3 mod289(vec3 x)
@@ -229,10 +213,7 @@ void fragment() {
 	ALPHA_SCISSOR_THRESHOLD = scissor_thresh;
 	ALPHA = pattern.r * ldtg_texture_data.r - pattern.r * ldtg_texture_data.r * pattern.g * shape_length_rand;
 
-	mat4 albedo_color_srgb = gradient_lin2srgb(albedo_color);
-	vec3 albedo_base_color = vec3(albedo_color_srgb[0].x, albedo_color_srgb[0].y, albedo_color_srgb[0].z);
-	vec3 albedo_tip_color = vec3(albedo_color_srgb[1].x, albedo_color_srgb[1].y, albedo_color_srgb[1].z);
-	ALBEDO = (texture(albedo_texture, UV * albedo_uv_scale.xy).rgb * mix(albedo_base_color, albedo_tip_color, lod_adjusted_layer_value));
+	ALBEDO = texture(albedo_texture, UV * albedo_uv_scale.xy).rgb * mix(albedo_base_color, albedo_tip_color, lod_adjusted_layer_value).rgb;
 	BACKLIGHT = transmission.rgb;
 	ROUGHNESS = roughness;
 	AO = 1.0 - (-lod_adjusted_layer_value + 1.0) * ao;

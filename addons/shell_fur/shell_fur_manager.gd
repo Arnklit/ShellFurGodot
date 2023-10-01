@@ -1,4 +1,4 @@
-# Copyright © 2021 Kasper Arnklit Frandsen - MIT License
+# Copyright © 2023 Kasper Arnklit Frandsen and Contributers - MIT License
 # See `LICENSE.md` included in the source distribution for details.
 @tool
 extends Node3D
@@ -50,7 +50,8 @@ const DEFAULT_PARAMETERS = {
 	mat_ao = 1.0,
 	mat_ao_light_affect = 0.0,
 	mat_roughness = 1.0,
-	mat_albedo_color = Projection(Vector4(0.43, 0.35, 0.29, 1.0), Vector4(0.78, 0.63, 0.520, 1.0), Vector4(0,0,1,0), Vector4.ZERO),
+	mat_albedo_base_color = Color(0.43, 0.35, 0.29, 1.0),
+	mat_albedo_tip_color = Color(0.78, 0.63, 0.520, 1.0),
 	mat_albedo_uv_scale = Vector3(1.0, 1.0, 0.0),
 	mat_shape_length = 0.5,
 	mat_shape_length_rand = 0.3,
