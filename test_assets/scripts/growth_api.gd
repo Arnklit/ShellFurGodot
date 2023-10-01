@@ -1,8 +1,8 @@
-tool
-extends MeshInstance
+@tool
+extends MeshInstance3D
 
 
-export var enable_growth := false
+@export var enable_growth := false
 var _timer := 0.0
 
 
@@ -14,5 +14,5 @@ func _process(delta : float) -> void:
 	if _timer > 2.0:
 		_timer -= 2.0
 	
-	get_node("ShellFur").set_shader_param("shape_growth", _timer)
+	get_node("ShellFur").set_shader_parameter("shape_growth", _timer)
 

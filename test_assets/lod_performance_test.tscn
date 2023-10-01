@@ -1,33 +1,32 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=6 format=3 uid="uid://dv18mgbkfoye0"]
 
-[ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=1]
-[ext_resource path="res://addons/shell_fur/noise_patterns/very_fine.png" type="Texture" id=2]
-[ext_resource path="res://test_assets/scripts/fps_counter.gd" type="Script" id=3]
-[ext_resource path="res://test_assets/scripts/Lod-slider.gd" type="Script" id=4]
+[ext_resource type="Script" path="res://addons/shell_fur/shell_fur_manager.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://3if61t0a3s7s" path="res://addons/shell_fur/noise_patterns/very_fine.png" id="2"]
+[ext_resource type="Script" path="res://test_assets/scripts/fps_counter.gd" id="3"]
+[ext_resource type="Script" path="res://test_assets/scripts/Lod-slider.gd" id="4"]
 
-[sub_resource type="SphereMesh" id=1]
+[sub_resource type="SphereMesh" id="1"]
 
-[node name="LOD Performance" type="Spatial"]
+[node name="LOD Performance" type="Node3D"]
 
-[node name="MeshInstance" type="MeshInstance" parent="."]
-mesh = SubResource( 1 )
-material/0 = null
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("1")
 
-[node name="ShellFur" type="Spatial" parent="MeshInstance"]
-script = ExtResource( 1 )
+[node name="ShellFur" type="Node3D" parent="MeshInstance3D"]
+script = ExtResource("1")
 shader_type = 0
 custom_shader = null
 layers = 40
 pattern_selector = 0
-pattern_texture = ExtResource( 2 )
+pattern_texture = ExtResource("2")
 pattern_uv_scale = 5.0
 cast_shadow = false
-mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
+mat_transmission = Color(0.3, 0.3, 0.3, 1)
 mat_ao = 1.0
 mat_ao_light_affect = 0.0
 mat_roughness = 1.0
-mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
-mat_albedo_uv_scale = Vector3( 1, 1, 0 )
+mat_albedo_color = Projection(0.43, 0.35, 0.29, 1, 0.78, 0.63, 0.52, 1, 0, 0, 1, 0, 0, 0, 0, 0)
+mat_albedo_uv_scale = Vector3(1, 1, 0)
 mat_albedo_texture = null
 mat_shape_length = 0.5
 mat_shape_length_rand = 0.3
@@ -37,7 +36,7 @@ mat_shape_thickness_tip = 0.3
 mat_shape_thickness_rand = 0.0
 mat_shape_growth = 1.0
 mat_shape_growth_rand = 0.0
-mat_shape_ldtg_uv_scale = Vector3( 1, 1, 0 )
+mat_shape_ldtg_uv_scale = Vector3(1, 1, 0)
 mat_shape_ldtg_texture = null
 physics_custom_physics_pivot = NodePath("")
 physics_gravity = 0.1
@@ -51,100 +50,73 @@ styling_blendshape = 0
 lod_LOD0_distance = 10.0
 lod_LOD1_distance = 100.0
 
-[node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3 )
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+fov = 45.0
 
 [node name="Panel" type="PanelContainer" parent="."]
-margin_right = 414.0
-margin_bottom = 256.0
+offset_right = 414.0
+offset_bottom = 256.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
-margin_left = 7.0
-margin_top = 7.0
-margin_right = 435.0
-margin_bottom = 265.0
+layout_mode = 2
 
 [node name="FPS Counter" type="Label" parent="Panel/VBoxContainer"]
-margin_right = 428.0
-margin_bottom = 14.0
+layout_mode = 2
 text = "FPS"
-script = ExtResource( 3 )
+script = ExtResource("3")
 
 [node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer"]
-margin_top = 18.0
-margin_right = 428.0
-margin_bottom = 22.0
+layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
-margin_top = 26.0
-margin_right = 428.0
-margin_bottom = 42.0
+layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/HBoxContainer"]
-margin_top = 1.0
-margin_right = 40.0
-margin_bottom = 15.0
+layout_mode = 2
 text = "LOD 0"
 
 [node name="Lod0-slider" type="HSlider" parent="Panel/VBoxContainer/HBoxContainer"]
-margin_left = 44.0
-margin_right = 344.0
-margin_bottom = 16.0
-rect_min_size = Vector2( 300, 0 )
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
 max_value = 10.0
 step = 0.0
-script = ExtResource( 4 )
-fur_path = NodePath("../../../../MeshInstance/ShellFur")
+script = ExtResource("4")
+fur_path = NodePath("../../../../MeshInstance3D/ShellFur")
 lod = "LOD0"
 
 [node name="ValueLabel" type="Label" parent="Panel/VBoxContainer/HBoxContainer"]
-margin_left = 348.0
-margin_top = 1.0
-margin_right = 428.0
-margin_bottom = 15.0
-rect_min_size = Vector2( 80, 0 )
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
 text = "Value"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Panel/VBoxContainer"]
-margin_top = 46.0
-margin_right = 428.0
-margin_bottom = 62.0
+layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/HBoxContainer2"]
-margin_top = 1.0
-margin_right = 40.0
-margin_bottom = 15.0
+layout_mode = 2
 text = "LOD 1"
 
 [node name="Lod1-slider" type="HSlider" parent="Panel/VBoxContainer/HBoxContainer2"]
-margin_left = 44.0
-margin_right = 344.0
-margin_bottom = 16.0
-rect_min_size = Vector2( 300, 0 )
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
 max_value = 10.0
 step = 0.0
 value = 10.0
-script = ExtResource( 4 )
-fur_path = NodePath("../../../../MeshInstance/ShellFur")
+script = ExtResource("4")
+fur_path = NodePath("../../../../MeshInstance3D/ShellFur")
 lod = "LOD1"
 
 [node name="ValueLabel" type="Label" parent="Panel/VBoxContainer/HBoxContainer2"]
-margin_left = 348.0
-margin_top = 1.0
-margin_right = 428.0
-margin_bottom = 15.0
-rect_min_size = Vector2( 80, 0 )
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
 text = "Value"
 
 [node name="HSeparator2" type="HSeparator" parent="Panel/VBoxContainer"]
-margin_top = 66.0
-margin_right = 428.0
-margin_bottom = 70.0
+layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer"]
-margin_top = 74.0
-margin_right = 428.0
-margin_bottom = 258.0
+layout_mode = 2
 text = "Note: You have to disable v-sync to get any kind of useful
 performance data.
 

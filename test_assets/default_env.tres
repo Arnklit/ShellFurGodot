@@ -1,8 +1,15 @@
-[gd_resource type="Environment" load_steps=2 format=2]
+[gd_resource type="Environment" load_steps=3 format=3 uid="uid://cuf331sy85x70"]
 
-[sub_resource type="ProceduralSky" id=1]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_nvwea"]
+sky_curve = 0.09
+
+[sub_resource type="Sky" id="1"]
+sky_material = SubResource("ProceduralSkyMaterial_nvwea")
 
 [resource]
 background_mode = 2
-background_sky = SubResource( 1 )
-background_sky_orientation = Basis( -0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, -0.707107 )
+background_energy_multiplier = 2.0
+sky = SubResource("1")
+sky_rotation = Vector3(0, 2.35619, 0)
+ambient_light_source = 3
+ambient_light_color = Color(0.760784, 0.760784, 0.760784, 1)

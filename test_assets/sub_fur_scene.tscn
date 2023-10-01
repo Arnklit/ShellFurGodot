@@ -1,17 +1,17 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://addons/shell_fur/shell_fur_manager.gd" type="Script" id=1]
-[ext_resource path="res://addons/shell_fur/noise_patterns/very_fine.png" type="Texture" id=2]
+[ext_resource path="res://addons/shell_fur/noise_patterns/very_fine.png" type="Texture2D" id=2]
 
 [sub_resource type="SphereMesh" id=1]
 
-[node name="SubFurScene" type="Spatial"]
+[node name="SubFurScene" type="Node3D"]
 
-[node name="MeshInstance" type="MeshInstance" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource( 1 )
 material/0 = null
 
-[node name="ShellFur" type="Spatial" parent="MeshInstance"]
+[node name="ShellFur" type="Node3D" parent="MeshInstance3D"]
 script = ExtResource( 1 )
 shader_type = 0
 custom_shader = null
@@ -24,7 +24,7 @@ mat_transmission = Color( 0.3, 0.3, 0.3, 1 )
 mat_ao = 1.0
 mat_ao_light_affect = 0.0
 mat_roughness = 1.0
-mat_albedo_color = Transform( 0.43, 0.78, 0, 0.35, 0.63, 0, 0.29, 0.52, 0, 0, 0, 0 )
+mat_albedo_color = Projection(0.43, 0.35, 0.29, 1, 0.78, 0.63, 0.52, 1, 0, 0, 1, 0, 0, 0, 0, 0)
 mat_albedo_uv_scale = Vector3( 1, 1, 0 )
 mat_albedo_texture = null
 mat_shape_length = 0.5
